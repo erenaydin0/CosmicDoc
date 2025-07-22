@@ -1,0 +1,96 @@
+:root {
+  --white-color: #f9f6ee;
+  --black-color: #0D0D0D;
+  
+  /* RGB renk değerleri */
+  --white-color-rgb: 249, 246, 238;
+  --black-color-rgb: 13, 13, 13;
+  --primary-color-rgb: 242, 48, 5;
+  --secondary-color-rgb: 39, 62, 71;
+  --accent-color-rgb: 89, 30, 17;
+  --success-color-rgb: 76, 175, 80;
+  --warning-color-rgb: 255, 152, 0;
+  --error-color-rgb: 244, 67, 54;
+
+  /* Ana renkler */
+  --background-color: var(--white-color);
+  --primary-color: #F23005;
+  --secondary-color: #273E47;
+  --accent-color: #591E11;
+  --text-color: var(--black-color);
+  
+  /* Hata, Uyarı ve Başarı renkleri */
+  --success-color: #4CAF50;
+  --success-bg-color: rgba(76, 175, 80, 0.05);
+  --warning-color: #FF9800;
+  --warning-bg-color: rgba(255, 152, 0, 0.05);
+  --error-color: #F44336;
+  --error-bg-color: rgba(244, 67, 54, 0.05);
+  
+  /* Kart ve UI elementleri için ek renkler */
+  --card-shadow-color: rgba(0, 0, 0, 0.1);
+  --hover-shadow-color: rgba(0, 0, 0, 0.15);
+  --subtle-bg-color: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='dark'] {
+  /* RGB renk değerleri - Koyu tema */
+  --primary-color-rgb: 242, 48, 5;
+  --secondary-color-rgb: 39, 62, 71;
+  --accent-color-rgb: 112, 41, 28;
+  --success-color-rgb: 102, 187, 106;
+  --warning-color-rgb: 255, 167, 38;
+  --error-color-rgb: 239, 83, 80;
+  
+  /* Ana renkler - Koyu tema */
+  --background-color: var(--black-color);
+  --primary-color: #F23005;
+  --secondary-color: #273E47;
+  --accent-color: #702A1C;
+  --text-color: var(--white-color);
+  
+  /* Hata, Uyarı ve Başarı renkleri - Koyu tema */
+  --success-color: #66BB6A;
+  --success-bg-color: rgba(102, 187, 106, 0.1);
+  --warning-color: #FFA726;
+  --warning-bg-color: rgba(255, 167, 38, 0.1);
+  --error-color: #EF5350;
+  --error-bg-color: rgba(239, 83, 80, 0.1);
+  
+  /* Kart ve UI elementleri için ek renkler - Koyu tema */
+  --card-shadow-color: rgba(0, 0, 0, 0.25);
+  --hover-shadow-color: rgba(0, 0, 0, 0.35);
+  --subtle-bg-color: rgba(255, 255, 255, 0.03);
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Montserrat', sans-serif;
+  transition: background-color 0.5s ease, color 0.5s ease;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.container {
+  padding: 1rem 2rem 3rem;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tema geçişleri sırasında yumuşak animasyonlar için */
+* {
+  transition: background-color 0.5s ease, 
+              color 0.5s ease, 
+              border-color 0.5s ease, 
+              box-shadow 0.5s ease;
+}
+
+/* Mobil düzenlemeler */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+}

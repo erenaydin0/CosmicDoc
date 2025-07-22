@@ -1,0 +1,327 @@
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  padding: 1rem 0.5rem;
+  perspective: 1000px;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.page-description {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 2.5rem 2rem;
+  border-radius: 18px;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  min-height: 220px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tıklanabilirlik için mikro animasyonlar */
+.card:active {
+  transform: scale(0.97) translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Ripple efekti için */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+  z-index: 1;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.03));
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Tıklama ripple efekti */
+.card .ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 0.8s linear;
+  background-color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Özel ripple efektleri */
+.card[to="/excel-compare"] .ripple {
+  background-color: rgba(33, 115, 70, 0.25);
+}
+
+.card[to="/pdf-compare"] .ripple {
+  background-color: rgba(226, 35, 26, 0.25);
+}
+
+.card[to="/text-compare"] .ripple {
+  background-color: rgba(41, 105, 176, 0.25);
+}
+
+.card[to="/file-convert"] .ripple {
+  background-color: rgba(255, 153, 0, 0.25);
+}
+
+.card .icon-container {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* Özel ikon stilleri */
+.excel-icon {
+  background-color: rgba(33, 115, 70, 0.1);
+}
+
+.excel-icon svg {
+  color: #217346; /* Excel yeşili */
+}
+
+.pdf-icon {
+  background-color: rgba(226, 35, 26, 0.1);
+}
+
+.pdf-icon svg {
+  color: #E2231A; /* PDF kırmızısı */
+}
+
+.text-icon {
+  background-color: rgba(41, 105, 176, 0.1);
+}
+
+.text-icon svg {
+  color: #2969B0; /* Metin mavisi */
+}
+
+.convert-icon {
+  background-color: rgba(255, 153, 0, 0.1);
+}
+
+.convert-icon svg {
+  color: #FF9900; /* Dönüştürme turuncusu */
+}
+
+.card svg {
+  margin-bottom: 0;
+  transition: all 0.4s ease;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.card h2 {
+  color: var(--text-color);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  transition: color 0.3s ease;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.card p {
+  color: var(--text-color);
+  opacity: 0.8;
+  margin-bottom: 0;
+  font-size: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.card:hover {
+  transform: translateY(-10px) rotateX(5deg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(145deg, var(--background-color), rgba(var(--primary-color-rgb), 0.05));
+}
+
+/* Tıklanma sonrası geri tepme animasyonu */
+.card:active:hover {
+  transform: translateY(-7px) rotateX(3deg) scale(0.97);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover::before {
+  transform: scaleX(1);
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+/* Kart focus durumu (klavye navigasyonu için) */
+.card:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-color), 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card:focus:not(:focus-visible) {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover .icon-container {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* İkon basma efekti */
+.card:active .icon-container {
+  transform: scale(0.95);
+  box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Hover durumunda özel ikon stilleri */
+.card:hover .excel-icon {
+  box-shadow: 0 0 20px rgba(33, 115, 70, 0.3);
+  background: linear-gradient(135deg, rgba(33, 115, 70, 0.2), rgba(33, 115, 70, 0.3));
+}
+
+.card:hover .pdf-icon {
+  box-shadow: 0 0 20px rgba(226, 35, 26, 0.3);
+  background: linear-gradient(135deg, rgba(226, 35, 26, 0.2), rgba(226, 35, 26, 0.3));
+}
+
+.card:hover .text-icon {
+  box-shadow: 0 0 20px rgba(41, 105, 176, 0.3);
+  background: linear-gradient(135deg, rgba(41, 105, 176, 0.2), rgba(41, 105, 176, 0.3));
+}
+
+.card:hover .convert-icon {
+  box-shadow: 0 0 20px rgba(255, 153, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 153, 0, 0.2), rgba(255, 153, 0, 0.3));
+}
+
+.card:hover svg {
+  transform: scale(1.2);
+}
+
+/* Tıklama durumundaki ikon efekti */
+.card:active svg {
+  transform: scale(0.95);
+  transition: transform 0.2s;
+}
+
+.card:hover .excel-icon svg {
+  color: #217346;
+}
+
+.card:hover .pdf-icon svg {
+  color: #E2231A;
+}
+
+.card:hover .text-icon svg {
+  color: #2969B0;
+}
+
+.card:hover .convert-icon svg {
+  color: #FF9900;
+}
+
+.card:hover h2 {
+  color: var(--primary-color);
+}
+
+.card:hover p {
+  opacity: 1;
+}
+
+/* Mobil düzenlemeler */
+@media (max-width: 768px) {
+  .card-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 2rem;
+    min-height: 180px;
+  }
+  
+  .page-title {
+    font-size: 1.8rem;
+  }
+  
+  .page-description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Mobil cihazlarda farklı basma efekti */
+  .card:active {
+    transform: scale(0.98);
+  }
+  
+  .card:active:hover {
+    transform: scale(0.98);
+  }
+}

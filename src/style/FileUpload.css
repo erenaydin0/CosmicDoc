@@ -1,0 +1,316 @@
+.file-upload-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 2rem;
+}
+
+.drop-zone {
+  border: 2px dashed var(--primary-color);
+  background-color: var(--background-color);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 250px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.drop-zone:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(var(--primary-color-rgb), 0.03) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.drop-zone:hover:before {
+  opacity: 1;
+}
+
+.drop-zone:hover:not(.file-uploaded) {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.drop-zone.drag-over {
+  background-color: rgba(var(--primary-color-rgb), 0.05);
+  border-color: var(--accent-color);
+  border-style: dashed;
+  border-width: 3px;
+  transform: scale(1.01);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+.drop-zone.drag-over:before {
+  background: radial-gradient(circle at center, rgba(var(--primary-color-rgb), 0.08) 0%, transparent 75%);
+  opacity: 1;
+}
+
+.drop-zone.file-uploaded {
+  border-color: var(--success-color);
+  border-style: solid;
+  border-width: 2px;
+  background-color: var(--success-bg-color);
+}
+
+.drop-zone.file-error {
+  border-color: var(--error-color);
+  border-style: solid;
+  border-width: 2px;
+  background-color: var(--error-bg-color);
+}
+
+.drop-zone p {
+  margin: 0;
+  color: var(--text-color);
+}
+
+.clear-file-button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 5px;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.clear-file-button:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: rotate(90deg);
+}
+
+.drop-zone-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  width: 100%;
+  padding: 0.5rem;
+  overflow: hidden;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.file-name {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.success-icon {
+  color: var(--success-color);
+  margin-bottom: 1rem;
+  animation: zoomIn 0.5s ease-in-out;
+}
+
+@keyframes zoomIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.drop-zone.file-error .error-icon {
+  color: var(--error-color);
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-types-hint {
+  font-size: 0.75rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  margin-top: 0.5rem;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drop-zone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.upload-icon {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.drop-zone:hover .upload-icon {
+  transform: translateY(-3px);
+}
+
+.drop-zone.drag-over .upload-icon {
+  color: var(--accent-color);
+  animation: bounce 0.6s ease infinite alternate;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+.compare-button {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 60px;
+}
+
+.compare-button:disabled {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.3);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.compare-button:hover:not(:disabled) {
+  background-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.button-icon {
+  font-size: 1.2rem;
+}
+
+/* Dosya sürüklendiğinde özel animasyon */
+.drop-zone.drag-over:after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 15px;
+  border: 2px dashed var(--accent-color);
+  opacity: 0.3;
+  animation: pulse 1.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.03); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 0.3; }
+}
+
+/* Mobil cihazlar için düzenleme */
+@media (max-width: 768px) {
+  .file-upload-container {
+    flex-direction: column;
+  }
+  
+  .drop-zone {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Tema uyumlu buton renkleri */
+[data-theme='dark'] .compare-button:disabled {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.drop-hint {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--accent-color);
+  margin: 0;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.upload-icon.drop-ready {
+  color: var(--accent-color);
+  animation: bounceIn 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  40% { transform: scale(1.1); opacity: 1; }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
