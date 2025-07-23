@@ -55,8 +55,8 @@ const PdfCompare: React.FC = () => {
     <div className="page-content">
       <h1>PDF Karşılaştırma</h1>
       <p className="page-description">
-        İki PDF dosyasını yükleyerek içeriklerini karşılaştırabilirsiniz. 
-        Sistem, metinlerdeki farklılıkları tespit edecektir.
+        PDF Karşılaştırma Aracı ile iki PDF dosyasının içeriğini kolayca karşılaştırın. 
+        Yüklediğiniz belgelerdeki metin farklılıkları anında tespit edilir.
       </p>
       
       <FileUpload 

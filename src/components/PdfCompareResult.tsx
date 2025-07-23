@@ -345,7 +345,19 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
           {calculateTotalDiffCount() > 0 && (
             <div className="all-pages-details">
               {result.pageResults.map((page, pageIndex) => {
-                const pageDiffCount = page.differences.filter(diff => diff.added || diff.removed).length;
+                const pageDifferences = page.differences.filter(diff => diff.added || diff.removed);
+                let pageDiffCount = 0;
+                let i = 0;
+                while (i < pageDifferences.length) {
+                  const currentDiff = pageDifferences[i];
+                  if (currentDiff.removed && pageDifferences[i + 1] && pageDifferences[i + 1].added) {
+                    pageDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
+                    i += 2; // Bir sonraki çifti kontrol et
+                  } else {
+                    pageDiffCount += 1; // Tekli ekleme veya silme olarak say
+                    i += 1; // Bir sonraki farkı kontrol et
+                  }
+                }
                 
                 if (pageDiffCount === 0) return null; // Fark yoksa sayfayı gösterme
 
