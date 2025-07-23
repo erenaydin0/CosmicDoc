@@ -53,7 +53,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="page-content">
-      <h1 className="page-title">CrossDoc ile Dokümanlarınızı Yönetin</h1>
+      <h1 className="page-title">SynchDoc ile Dokümanlarınızı Yönetin</h1>
       <p className="page-description">Dosyalarınızı karşılaştırın ve dönüştürün</p>
       
       <div className="card-container">

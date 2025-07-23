@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import '../style/Header.css';
 
-const THEME_STORAGE_KEY = 'crossdoc-theme-preference';
+const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -84,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme }) => {
     <header className="app-header">
       <div className="logo-container">
         <Link to="/" className="logo-link">
-          <div className="logo">CROSSDOC</div>
+          <div className="logo">SYNCHDOC</div>
         </Link>
         <div className="breadcrumbs">
           {pathnames.map((value, index) => {

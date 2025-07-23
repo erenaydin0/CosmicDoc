@@ -10,7 +10,7 @@ import PageTransition from './components/PageTransition';
 import "./App.css";
 import "./style/PageStyles.css";
 
-const THEME_STORAGE_KEY = 'crossdoc-theme-preference';
+const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
 
 // Sayfaların dış wrapper bileşeni
 const AppRoutes = () => {
