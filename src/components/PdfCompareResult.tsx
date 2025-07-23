@@ -18,6 +18,7 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
   
   const pdf1ContainerRef = useRef<HTMLDivElement>(null);
   const pdf2ContainerRef = useRef<HTMLDivElement>(null);
+  const comparisonResultsRef = useRef<HTMLDivElement>(null);
 
   // Sayfa referanslarını tutmak için useRef kullanıyoruz
   const pdf1PageRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -129,6 +130,13 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
     renderPdfPages();
   }, [result]);
   
+  // PDF'ler yüklendiğinde otomatik kaydırma
+  useEffect(() => {
+    if (!isLoading && comparisonResultsRef.current) {
+      comparisonResultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isLoading]);
+
   // PDF görüntüleme alanlarını senkronize et
   useEffect(() => {
     const syncScroll = (e: Event) => {
@@ -290,7 +298,9 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
           </div>
         </div>
         
-        <div className="comparison-results">
+        <div className="comparison-results"
+          ref={comparisonResultsRef}
+        >
           <div className="result-header">
             <h2>PDF Karşılaştırma Sonucu</h2>
             <div className="summary-info">
