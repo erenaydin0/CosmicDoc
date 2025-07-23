@@ -4,6 +4,7 @@ import PdfCompareResult from '../components/PdfCompareResult';
 import { PdfCompareService } from '../services/PdfCompareService';
 import { PdfCompareResult as PdfCompareResultType } from '../types/PdfTypes';
 import '../style/PageStyles.css';
+import '../style/PdfCompareResult.css';
 
 const PdfCompare: React.FC = () => {
   const allowedPdfTypes = ['.pdf'];
