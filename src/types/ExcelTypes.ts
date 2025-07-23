@@ -24,4 +24,8 @@ export interface ExcelCompareResult {
   overallDiffPercentage: number;
   missingSheets1: string[];
   missingSheets2: string[];
+  file1MaxRows: number;
+  file2MaxRows: number;
+  file1MaxCols: number;
+  file2MaxCols: number;
 } 

@@ -29,6 +29,12 @@ export class ExcelCompareService {
       const sheetResults: SheetDiff[] = [];
       const processedSheets = new Set<string>();
       
+      // Dosyaların satır ve sütun sayılarını sakla
+      let file1MaxRows = 0;
+      let file2MaxRows = 0;
+      let file1MaxCols = 0;
+      let file2MaxCols = 0;
+      
       // Birinci dosyanın tüm sayfalarını işle
       for (const sheetName of sheets1) {
         if (sheets2.includes(sheetName)) {
@@ -39,6 +45,18 @@ export class ExcelCompareService {
           // Sayfaları JSON'a dönüştür
           const json1 = XLSX.utils.sheet_to_json(sheet1, { header: 1, defval: null }) as any[][];
           const json2 = XLSX.utils.sheet_to_json(sheet2, { header: 1, defval: null }) as any[][];
+          
+          // Her dosyanın satır ve sütun sayılarını güncelle
+          file1MaxRows = Math.max(file1MaxRows, json1.length);
+          file2MaxRows = Math.max(file2MaxRows, json2.length);
+          
+          // Her satırdaki maksimum sütun sayısını hesapla
+          for (const row of json1) {
+            file1MaxCols = Math.max(file1MaxCols, row.length);
+          }
+          for (const row of json2) {
+            file2MaxCols = Math.max(file2MaxCols, row.length);
+          }
           
           // Sayfaları karşılaştır
           const differences = this.compareSheets(json1, json2, sheetName);
@@ -71,7 +89,11 @@ export class ExcelCompareService {
         sheetResults,
         overallDiffPercentage,
         missingSheets1,
-        missingSheets2
+        missingSheets2,
+        file1MaxRows,
+        file2MaxRows,
+        file1MaxCols,
+        file2MaxCols
       };
     } catch (error: unknown) {
       console.error('Excel karşılaştırma hatası:', error);

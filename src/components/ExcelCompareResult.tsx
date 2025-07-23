@@ -333,41 +333,6 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     );
   };
 
-  // Eksik sayfaları göster
-  const renderMissingSheets = () => {
-    if (result.missingSheets1.length === 0 && result.missingSheets2.length === 0) {
-      return null;
-    }
-    
-    return (
-      <div className="missing-sheets">
-        <h3>Eksik Sayfalar</h3>
-        
-        {result.missingSheets1.length > 0 && (
-          <div className="missing-sheet-group">
-            <h4>Dosya 1'de Eksik Sayfalar:</h4>
-            <ul>
-              {result.missingSheets1.map((sheet, index) => (
-                <li key={index}>{sheet}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        
-        {result.missingSheets2.length > 0 && (
-          <div className="missing-sheet-group">
-            <h4>Dosya 2'de Eksik Sayfalar:</h4>
-            <ul>
-              {result.missingSheets2.map((sheet, index) => (
-                <li key={index}>{sheet}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="excel-compare-result">
       <div className="excel-result-container">
@@ -394,20 +359,34 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                 </div>
                 <div className="excel-summary-item">
                   <span>Dosya 1 Satır:</span>
-                  <span>{Math.max(...result.sheetResults.map(s => Math.max(...s.differences.map(d => d.row), 0)), 0)}</span>
-                </div>
-                <div className="excel-summary-item">
+                  <span>{result.file1MaxRows}</span>
                   <span>Dosya 2 Satır:</span>
-                  <span>{Math.max(...result.sheetResults.map(s => Math.max(...s.differences.map(d => d.row), 0)), 0)}</span>
+                  <span>{result.file2MaxRows}</span>
                 </div>
                 <div className="excel-summary-item">
                   <span>Dosya 1 Sütun:</span>
-                  <span>{Math.max(...result.sheetResults.map(s => Math.max(...s.differences.map(d => d.col), 0)), 0)}</span>
+                  <span>{result.file1MaxCols}</span>
+                  <span>Dosya 2 Sütun:</span>
+                  <span>{result.file2MaxCols}</span>
                 </div>
                 <div className="excel-summary-item">
-                  <span>Dosya 2 Sütun:</span>
-                  <span>{Math.max(...result.sheetResults.map(s => Math.max(...s.differences.map(d => d.col), 0)), 0)}</span>
+                  <span>Dosya 1 Sayfa:</span>
+                  <span>{result.sheetCount1}</span>
+                  <span>Dosya 2 Sayfa:</span>
+                  <span>{result.sheetCount2}</span>
                 </div>
+                {result.missingSheets1.length > 0 && (
+                  <div className="excel-summary-item excel-diff-high">
+                    <span>Dosya 1'de Eksik Sayfalar:</span>
+                    <span>{result.missingSheets1.join(', ')}</span>
+                  </div>
+                )}
+                {result.missingSheets2.length > 0 && (
+                  <div className="excel-summary-item excel-diff-high">
+                    <span>Dosya 2'de Eksik Sayfalar:</span>
+                    <span>{result.missingSheets2.join(', ')}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -420,7 +399,6 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
               </button>
             )}
 
-            {renderMissingSheets()}
           </div>
         </div>
       </div>
