@@ -25,9 +25,22 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
   
   // Toplam fark sayısını hesapla
   const calculateTotalDiffCount = () => {
-    return result.pageResults.reduce((total, page) => {
-      return total + page.differences.filter(diff => diff.added || diff.removed).length;
-    }, 0);
+    let totalDiffCount = 0;
+    result.pageResults.forEach(page => {
+      const differences = page.differences.filter(diff => diff.added || diff.removed);
+      let i = 0;
+      while (i < differences.length) {
+        const currentDiff = differences[i];
+        if (currentDiff.removed && differences[i + 1] && differences[i + 1].added) {
+          totalDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
+          i += 2; // Bir sonraki çifti kontrol et
+        } else {
+          totalDiffCount += 1; // Tekli ekleme veya silme olarak say
+          i += 1; // Bir sonraki farkı kontrol et
+        }
+      }
+    });
+    return totalDiffCount;
   };
 
   // Dosya boyutunu okunabilir formata dönüştür
@@ -177,15 +190,38 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
 
   // Excel'e aktarma işlevi
   const handleExportToExcel = () => {
-    const data = result.pageResults.flatMap(page => {
-      return page.differences.filter(diff => diff.added || diff.removed).map(diff => ({
-        Sayfa: page.pageNumber,
-        Tip: diff.added ? 'Eklendi' : 'Silindi',
-        Değer: diff.value,
-      }));
+    const allRows: any[] = [];
+
+    result.pageResults.forEach(page => {
+      const pageNumber = page.pageNumber;
+      const differences = page.differences.filter(diff => diff.added || diff.removed); // Sadece gerçek farkları dikkate al
+
+      let i = 0;
+      while (i < differences.length) {
+        const currentDiff = differences[i];
+
+        if (currentDiff.removed && differences[i + 1] && differences[i + 1].added) {
+          // Bir çift bulundu: silineni eklenen takip ediyor (bir değişiklik)
+          const nextDiff = differences[i + 1];
+          allRows.push({
+            Sayfa: pageNumber,
+            'Dosya 1': currentDiff.value,
+            'Dosya 2': nextDiff.value,
+          });
+          i += 2; // Hem mevcut hem de bir sonraki farkı atla
+        } else {
+          // Tek bir eklenen veya silinen fark
+          allRows.push({
+            Sayfa: pageNumber,
+            'Dosya 1': currentDiff.removed ? currentDiff.value : '',
+            'Dosya 2': currentDiff.added ? currentDiff.value : '',
+          });
+          i += 1; // Bir sonraki farka geç
+        }
+      }
     });
 
-    const ws = XLSX.utils.json_to_sheet(data);
+    const ws = XLSX.utils.json_to_sheet(allRows); // allRows kullan
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'PDF Farkları');
     XLSX.writeFile(wb, 'pdf_fark_raporu.xlsx');
