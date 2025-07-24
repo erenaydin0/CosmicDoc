@@ -350,3 +350,61 @@
 .filter-options input[type="checkbox"] {
   margin-right: 8px;
 }
+
+/* Yapı karşılaştırma tablosu stilleri */
+.structure-diff-table {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px var(--card-shadow-color);
+  max-width: 600px;
+  width: 100%;
+}
+
+.structure-diff-header {
+  display: flex;
+  background-color: var(--subtle-bg-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.structure-diff-row {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.structure-diff-row:last-child {
+  border-bottom: none;
+}
+
+.structure-diff-cell {
+  flex: 1;
+  padding: 12px 15px;
+  text-align: center;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-cell {
+  font-weight: 600;
+  background-color: var(--subtle-bg-color);
+}
+
+.structure-diff-header .header-cell:first-child {
+  border-top-left-radius: 8px;
+}
+
+.structure-diff-header .header-cell:last-child {
+  border-top-right-radius: 8px;
+}
+
+.diff-zero {
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+.diff-nonzero {
+  color: var(--error-color);
+  font-weight: 600;
+}
