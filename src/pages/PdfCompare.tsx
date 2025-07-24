@@ -3,6 +3,7 @@ import FileUpload from '../components/FileUpload';
 import PdfCompareResult from '../components/PdfCompareResult';
 import { PdfCompareService } from '../services/PdfCompareService';
 import { PdfCompareResult as PdfCompareResultType } from '../types/PdfTypes';
+import { savePdfFile, getPdfFile } from '../services/IndexedDBService';
 import '../style/PageStyles.css';
 import '../style/PdfCompareResult.css';
 
@@ -18,15 +19,24 @@ const PdfCompare: React.FC = () => {
     setCompareError(null);
     
     try {
-      // PDF dosyalarını localStorage'a kaydet
-      const saveFileToLocalStorage = async (file: File, key: string) => {
+      // PDF dosyalarını IndexedDB'ye kaydet
+      const saveFileToIndexedDB = async (file: File, key: string) => {
         return new Promise<void>((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = (e) => {
+          reader.onload = async (e) => {
             try {
-              const dataUrl = e.target?.result as string;
-              localStorage.setItem(key, dataUrl);
-              resolve();
+              const dataUrl = e.target?.result;
+              if (dataUrl) {
+                // Dosyayı IndexedDB'ye kaydet
+                await savePdfFile(key, dataUrl, {
+                  fileName: file.name,
+                  fileType: file.type,
+                  lastModified: file.lastModified
+                });
+                resolve();
+              } else {
+                reject(new Error('Dosya okunamadı'));
+              }
             } catch (err) {
               reject(err);
             }
@@ -38,8 +48,8 @@ const PdfCompare: React.FC = () => {
 
       // PDF dosyalarını paralel olarak kaydet
       await Promise.all([
-        saveFileToLocalStorage(file1, 'pdf1DataUrl'),
-        saveFileToLocalStorage(file2, 'pdf2DataUrl')
+        saveFileToIndexedDB(file1, 'pdf1DataUrl'),
+        saveFileToIndexedDB(file2, 'pdf2DataUrl')
       ]);
       
       const result = await PdfCompareService.comparePdfFiles(file1, file2);

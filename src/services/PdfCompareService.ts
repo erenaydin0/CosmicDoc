@@ -1,6 +1,7 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import { DiffResult, PdfPageCompareResult, PdfCompareResult } from '../types/PdfTypes';
 import { diffWords } from 'diff';
+import { getPdfFile } from './IndexedDBService';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
@@ -65,6 +66,72 @@ export class PdfCompareService {
   }
   
   /**
+   * ID ile IndexedDB'den PDF dosyası yükler ve karşılaştırır
+   */
+  public static async comparePdfFilesFromDB(id1: string, id2: string): Promise<PdfCompareResult | null> {
+    try {
+      // IndexedDB'den dosyaları al
+      const fileData1 = await getPdfFile<any>(id1);
+      const fileData2 = await getPdfFile<any>(id2);
+      
+      if (!fileData1 || !fileData2) {
+        throw new Error('Dosyalar veritabanından yüklenemedi');
+      }
+      
+      // PDF'leri çözümle
+      const pdf1Data = fileData1.data;
+      const pdf2Data = fileData2.data;
+      
+      // PDF içeriğinden metin çıkar
+      const pdf1Text = await this.extractTextFromDataURL(pdf1Data);
+      const pdf2Text = await this.extractTextFromDataURL(pdf2Data);
+      
+      // Sayfa sayılarını karşılaştır
+      const pageCountDiff = pdf1Text.length !== pdf2Text.length;
+      
+      // Her sayfayı karşılaştır
+      const pageResults: PdfPageCompareResult[] = [];
+      const maxPages = Math.max(pdf1Text.length, pdf2Text.length);
+      
+      for (let i = 0; i < maxPages; i++) {
+        const page1Text = i < pdf1Text.length ? pdf1Text[i] : '';
+        const page2Text = i < pdf2Text.length ? pdf2Text[i] : '';
+        
+        // Sayfa içeriğini kelime bazında karşılaştır
+        const differences = this.compareTexts(page1Text, page2Text);
+        
+        // Farklılık yüzdesini hesapla
+        const diffPercentage = this.calculateDiffPercentage(differences);
+        
+        pageResults.push({
+          pageNumber: i + 1,
+          hasDifferences: differences.some(d => d.added || d.removed),
+          diffPercentage,
+          differences
+        });
+      }
+      
+      // Genel farklılık yüzdesini hesapla
+      const overallDiffPercentage = this.calculateOverallDiffPercentage(pageResults);
+      
+      return {
+        file1Name: fileData1.metadata?.fileName || 'Dosya 1',
+        file2Name: fileData2.metadata?.fileName || 'Dosya 2',
+        file1Size: typeof pdf1Data === 'string' ? pdf1Data.length : 0,
+        file2Size: typeof pdf2Data === 'string' ? pdf2Data.length : 0,
+        pageCount1: pdf1Text.length,
+        pageCount2: pdf2Text.length,
+        pageCountDiffers: pageCountDiff,
+        pageResults,
+        overallDiffPercentage
+      };
+    } catch (error) {
+      console.error('PDF veritabanından karşılaştırma hatası:', error);
+      return null;
+    }
+  }
+  
+  /**
    * PDF dosyasından metin çıkarır
    */
   private static async extractTextFromPdf(file: File): Promise<string[]> {
@@ -85,6 +152,44 @@ export class PdfCompareService {
     }
     
     return pagesText;
+  }
+  
+  /**
+   * Data URL'den PDF metni çıkarır
+   */
+  private static async extractTextFromDataURL(dataUrl: string): Promise<string[]> {
+    try {
+      // Data URL'deki base64 içeriğini çıkar
+      const base64Content = dataUrl.split(',')[1];
+      const binaryString = window.atob(base64Content);
+      const bytes = new Uint8Array(binaryString.length);
+      
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      // PDF'yi yükle
+      const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+      const numPages = pdf.numPages;
+      const pagesText: string[] = [];
+      
+      // Her sayfadan metni çıkar
+      for (let i = 1; i <= numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map(item => 'str' in item ? item.str : '')
+          .join(' ')
+          .trim();
+        
+        pagesText.push(pageText);
+      }
+      
+      return pagesText;
+    } catch (error) {
+      console.error('Data URL çözümlenirken hata:', error);
+      return [];
+    }
   }
   
   /**
