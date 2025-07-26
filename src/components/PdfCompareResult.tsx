@@ -78,14 +78,11 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
           return;
         }
         
-        const file1DataUrl = file1Data.data;
-        const file2DataUrl = file2Data.data;
-        
         console.log('PDF worker yolu:', pdfjsLib.GlobalWorkerOptions.workerSrc);
         
         // PDF dokümanlarını yükle
-        const loadDocument1 = pdfjsLib.getDocument(file1DataUrl).promise;
-        const loadDocument2 = pdfjsLib.getDocument(file2DataUrl).promise;
+        const loadDocument1 = pdfjsLib.getDocument(file1Data.data).promise;
+        const loadDocument2 = pdfjsLib.getDocument(file2Data.data).promise;
         
         // PDF dokümanlarını paralel olarak yükle
         const [pdf1, pdf2] = await Promise.all([loadDocument1, loadDocument2]);

@@ -388,23 +388,6 @@
   margin-top: 15px;
 }
 
-.back-button {
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  margin-bottom: 20px;
-  cursor: pointer;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  transition: background-color 0.2s;
-}
-
-.back-button:hover {
-  background-color: #e0e0e0;
-}
-
 .loader {
   width: 40px;
   height: 40px;

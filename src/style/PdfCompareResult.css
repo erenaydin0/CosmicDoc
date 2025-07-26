@@ -155,7 +155,7 @@
   padding: 10px;
   border-radius: 6px;
   margin-bottom: 10px;
-  cursor: pointer; /* Tıklanabilir olduğunu belirtir */
+  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
@@ -193,7 +193,6 @@
   text-align: left;
 }
 
-/* Fark renkleri daha belirgin olsun */
 .added-line {
   background-color: rgba(var(--success-color-rgb), 0.15);
   padding: 1px 0;

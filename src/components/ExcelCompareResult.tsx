@@ -267,7 +267,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                         onClick={() => toggleFilterDropdown(col.key)}
                       />
                       {showFilterDropdown === col.key && (
-                        <div className="filter-dropdown" ref={filterDropdownRef}> {/* Ref eklendi */}
+                        <div className="filter-dropdown" ref={filterDropdownRef}>
                           <div className="filter-dropdown-header">
                             <button onClick={() => {
                               const allValues = Array.from(new Set(activeSheet.differences.map((diff: any) => diff[col.key])));
@@ -374,6 +374,14 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
             {Math.abs(rowDiff)}
           </div>
         </div>
+        <div className="structure-diff-row">
+          <div className="structure-diff-cell header-cell">Boyut</div>
+          <div className="structure-diff-cell">{formatFileSize(result.file1Size)}</div>
+          <div className="structure-diff-cell">{formatFileSize(result.file2Size)}</div>
+          <div className={`structure-diff-cell ${Math.abs(result.file1Size - result.file2Size) === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
+            {formatFileSize(Math.abs(result.file1Size - result.file2Size))}
+          </div>
+        </div>
       </div>
     );
   };
@@ -394,12 +402,6 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                   <span>Toplam Fark Sayısı:</span>
                   <span className={calculateTotalDiffCount() > 0 ? 'excel-diff-high' : 'excel-diff-none'}>
                     {calculateTotalDiffCount()}
-                  </span>
-                </div>
-                <div className="excel-summary-item">
-                  <span>Boyut Farkı:</span>
-                  <span>
-                    {formatFileSize(Math.abs(result.file1Size - result.file2Size))}
                   </span>
                 </div>
                 <span>Yapısal Farklar</span>

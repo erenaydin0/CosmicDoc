@@ -46,9 +46,6 @@
   color: var(--text-color);
 }
 
-.excel-summary-item span:nth-child(2) {
-  color: var(--error-color);
-}
 .excel-summary-item span:last-child {
   color: var(--error-color);
 }
@@ -210,13 +207,6 @@
 .empty-value {
   color: var(--text-color);
   font-style: italic;
-}
-
-.no-diff-message {
-  padding: 20px;
-  text-align: center;
-  color: var(--success-color);
-  font-weight: 500;
 }
 
 /* Responsive tasarım */
