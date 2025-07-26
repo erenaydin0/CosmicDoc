@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FileUpload from '../components/FileUpload';
 import PdfCompareResult from '../components/PdfCompareResult';
 import { PdfCompareService } from '../services/PdfCompareService';
 import { PdfCompareResult as PdfCompareResultType } from '../types/PdfTypes';
-import { savePdfFile, getPdfFile } from '../services/IndexedDBService';
+import { savePdfFile, getPdfFile, clearPdfStore } from '../services/IndexedDBService';
 import '../style/PageStyles.css';
 import '../style/PdfCompareResult.css';
 
@@ -12,6 +12,17 @@ const PdfCompare: React.FC = () => {
   const [isComparing, setIsComparing] = useState(false);
   const [compareResult, setCompareResult] = useState<PdfCompareResultType | null>(null);
   const [compareError, setCompareError] = useState<string | null>(null);
+  const [fileTimestamp, setFileTimestamp] = useState<number>(Date.now());
+  
+  // Component ilk yüklendiğinde verileri temizle
+  useEffect(() => {
+    // Tüm eski PDF verilerini temizle
+    clearPdfStore().catch(err => console.error('PDF deposu temizlenirken hata:', err));
+    
+    return () => {
+      // Component kaldırıldığında da temizleme işlemi yapabilirsiniz
+    };
+  }, []);
   
   const handleCompare = async (file1: File, file2: File) => {
     setIsComparing(true);
@@ -19,6 +30,17 @@ const PdfCompare: React.FC = () => {
     setCompareError(null);
     
     try {
+      // Yeni bir timestamp oluştur
+      const timestamp = Date.now();
+      setFileTimestamp(timestamp);
+      
+      // Önceki verileri temizle
+      await clearPdfStore();
+      
+      // Her yeni PDF karşılaştırması için benzersiz anahtarlar oluştur
+      const pdf1Key = `pdf1_${timestamp}`;
+      const pdf2Key = `pdf2_${timestamp}`;
+      
       // PDF dosyalarını IndexedDB'ye kaydet
       const saveFileToIndexedDB = async (file: File, key: string) => {
         return new Promise<void>((resolve, reject) => {
@@ -31,7 +53,8 @@ const PdfCompare: React.FC = () => {
                 await savePdfFile(key, dataUrl, {
                   fileName: file.name,
                   fileType: file.type,
-                  lastModified: file.lastModified
+                  lastModified: file.lastModified,
+                  timestamp: timestamp
                 });
                 resolve();
               } else {
@@ -48,12 +71,19 @@ const PdfCompare: React.FC = () => {
 
       // PDF dosyalarını paralel olarak kaydet
       await Promise.all([
-        saveFileToIndexedDB(file1, 'pdf1DataUrl'),
-        saveFileToIndexedDB(file2, 'pdf2DataUrl')
+        saveFileToIndexedDB(file1, pdf1Key),
+        saveFileToIndexedDB(file2, pdf2Key)
       ]);
       
       const result = await PdfCompareService.comparePdfFiles(file1, file2);
-      setCompareResult(result);
+      // Karşılaştırma sonucuna timestamp ekle
+      const resultWithTimestamp = {
+        ...result,
+        timestamp: timestamp,
+        pdf1Key,
+        pdf2Key
+      };
+      setCompareResult(resultWithTimestamp);
     } catch (error) {
       console.error('PDF karşılaştırma hatası:', error);
       setCompareError(error instanceof Error ? error.message : 'PDF karşılaştırılırken bir hata oluştu');

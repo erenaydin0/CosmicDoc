@@ -355,7 +355,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell">{result.sheetCount1}</div>
           <div className="structure-diff-cell">{result.sheetCount2}</div>
           <div className={`structure-diff-cell ${sheetDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
-            {sheetDiff}
+            {Math.abs(sheetDiff)}
           </div>
         </div>
         <div className="structure-diff-row">
@@ -363,7 +363,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell">{result.file1MaxCols}</div>
           <div className="structure-diff-cell">{result.file2MaxCols}</div>
           <div className={`structure-diff-cell ${colDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
-            {colDiff}
+            {Math.abs(colDiff)}
           </div>
         </div>
         <div className="structure-diff-row">
@@ -371,7 +371,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell">{result.file1MaxRows}</div>
           <div className="structure-diff-cell">{result.file2MaxRows}</div>
           <div className={`structure-diff-cell ${rowDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
-            {rowDiff}
+            {Math.abs(rowDiff)}
           </div>
         </div>
       </div>

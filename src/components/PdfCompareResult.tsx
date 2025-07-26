@@ -3,12 +3,17 @@ import { PdfCompareResult as PdfCompareResultType } from '../types/PdfTypes';
 import * as pdfjsLib from 'pdfjs-dist';
 import * as XLSX from 'xlsx';
 import '../style/PdfCompareResult.css';
+import { getPdfFile } from '../services/IndexedDBService';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
 
 interface PdfCompareResultProps {
-  result: PdfCompareResultType;
+  result: PdfCompareResultType & {
+    timestamp?: number;
+    pdf1Key?: string;
+    pdf2Key?: string;
+  };
 }
 
 const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
@@ -58,15 +63,23 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
       try {
         setIsLoading(true);
         
-        // PDF veri URL'lerini oluştur (normalde FileReader kullanırdık ama burada veri simüle ediyoruz)
-        const file1DataUrl = localStorage.getItem('pdf1DataUrl');
-        const file2DataUrl = localStorage.getItem('pdf2DataUrl');
+        // IndexedDB'den PDF verilerini al
+        const pdf1Key = result.pdf1Key || `pdf1_${result.timestamp}`;
+        const pdf2Key = result.pdf2Key || `pdf2_${result.timestamp}`;
         
-        if (!file1DataUrl || !file2DataUrl) {
-          console.error('PDF veri URL\'leri bulunamadı');
+        console.log('PDF anahtarları:', pdf1Key, pdf2Key);
+        
+        const file1Data = await getPdfFile<any>(pdf1Key);
+        const file2Data = await getPdfFile<any>(pdf2Key);
+        
+        if (!file1Data || !file2Data) {
+          console.error('PDF verileri IndexedDB\'den alınamadı');
           setIsLoading(false);
           return;
         }
+        
+        const file1DataUrl = file1Data.data;
+        const file2DataUrl = file2Data.data;
         
         console.log('PDF worker yolu:', pdfjsLib.GlobalWorkerOptions.workerSrc);
         
@@ -128,6 +141,13 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
     
     // PDF sayfalarını render et
     renderPdfPages();
+    
+    // Component kaldırıldığında temizle
+    return () => {
+      // Canvas elementlerini temizle
+      setPdf1Pages([]);
+      setPdf2Pages([]);
+    };
   }, [result]);
   
   // PDF'ler yüklendiğinde otomatik kaydırma
@@ -394,4 +414,4 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
   );
 };
 
-export default PdfCompareResult; 
+export default PdfCompareResult;
