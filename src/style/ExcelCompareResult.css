@@ -307,15 +307,22 @@
   background-color: var(--subtle-bg-color);
 }
 
+.filter-search-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
 .filter-search-input {
   flex: 1;
   padding: 6px 10px;
+  padding-right: 30px; /* Temizleme iconu için alan bırak */
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background-color: var(--background-color);
   color: var(--text-color);
   font-size: 0.9rem;
-  margin-right: 10px;
 }
 
 .filter-search-input:focus {
@@ -326,6 +333,23 @@
 
 .filter-search-input::placeholder {
   color: rgba(var(--text-color-rgb), 0.5);
+}
+
+.clear-search-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(var(--text-color-rgb), 0.5);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.clear-search-icon:hover {
+  color: var(--error-color);
+  background-color: rgba(var(--error-color-rgb), 0.1);
 }
 
 .filter-actions {
@@ -389,15 +413,7 @@
   text-decoration: underline;
 }
 
-.close-filter-icon {
-  cursor: pointer;
-  color: var(--text-color);
-  margin-left: 10px;
-}
 
-.close-filter-icon:hover {
-  color: var(--text-color);
-}
 
 .filter-options label {
   display: block;

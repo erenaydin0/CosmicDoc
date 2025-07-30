@@ -231,6 +231,14 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     }
   };
 
+  // Arama kutusunu temizle
+  const clearFilterSearch = (columnKey: string) => {
+    setFilterSearchTerms(prev => ({
+      ...prev,
+      [columnKey]: ''
+    }));
+  };
+
   // Filtre için gerekli değerleri cache'den al
   const getFilterValues = (columnKey: string) => {
     return cachedFilterValues[columnKey] || [];
@@ -453,15 +461,24 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                       {showFilterDropdown === col.key && (
                         <div className="filter-dropdown" ref={filterDropdownRef}>
                           <div className="filter-dropdown-header">
-                            <input
-                              type="text"
-                              placeholder="Ara..."
-                              value={filterSearchTerms[col.key] || ''}
-                              onChange={(e) => updateFilterSearchTerm(col.key, e.target.value)}
-                              className="filter-search-input"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <FontAwesomeIcon icon={faTimes} className="close-filter-icon" onClick={() => setShowFilterDropdown(null)} />
+                            <div className="filter-search-container">
+                              <input
+                                type="text"
+                                placeholder="Ara..."
+                                value={filterSearchTerms[col.key] || ''}
+                                onChange={(e) => updateFilterSearchTerm(col.key, e.target.value)}
+                                className="filter-search-input"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              {filterSearchTerms[col.key] && (
+                                <FontAwesomeIcon 
+                                  icon={faTimes} 
+                                  className="clear-search-icon" 
+                                  onClick={() => clearFilterSearch(col.key)}
+                                  title="Aramayı temizle"
+                                />
+                              )}
+                            </div>
                           </div>
                           <div className="filter-actions">
                             <button onClick={() => {
