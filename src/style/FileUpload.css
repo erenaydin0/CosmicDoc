@@ -7,17 +7,17 @@
 }
 
 .drop-zone {
-  border: 2px dashed var(--primary-color);
+  border: none;
   background-color: var(--background-color);
   backdrop-filter: blur(10px);
-  border-radius: 10px;
+  border-radius: 20px;
   padding: 1.5rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 100%;
   max-width: 350px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--neu-raised-shadow);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -39,6 +39,7 @@
   background: radial-gradient(circle at center, rgba(var(--primary-color-rgb), 0.03) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
+  border-radius: 20px;
 }
 
 .drop-zone:hover:before {
@@ -46,17 +47,15 @@
 }
 
 .drop-zone:hover:not(.file-uploaded) {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--neu-pressed-shadow);
   transform: translateY(-2px);
 }
 
 .drop-zone.drag-over {
   background-color: rgba(var(--primary-color-rgb), 0.05);
-  border-color: var(--accent-color);
-  border-style: dashed;
-  border-width: 3px;
+  border: 3px dashed var(--accent-color);
   transform: scale(1.01);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--neu-pressed-shadow);
 }
 
 .drop-zone.drag-over:before {
@@ -65,17 +64,15 @@
 }
 
 .drop-zone.file-uploaded {
-  border-color: var(--success-color);
-  border-style: solid;
-  border-width: 2px;
+  border: 2px solid var(--success-color);
   background-color: var(--success-bg-color);
+  box-shadow: var(--neu-pressed-shadow);
 }
 
 .drop-zone.file-error {
-  border-color: var(--error-color);
-  border-style: solid;
-  border-width: 2px;
+  border: 2px solid var(--error-color);
   background-color: var(--error-bg-color);
+  box-shadow: var(--neu-pressed-shadow);
 }
 
 .drop-zone p {
@@ -87,21 +84,27 @@
   position: absolute;
   right: 10px;
   top: 10px;
-  background: none;
+  background: var(--background-color);
   border: none;
   color: var(--text-color);
   opacity: 0.6;
   cursor: pointer;
-  padding: 5px;
-  transition: all 0.2s ease;
+  padding: 8px;
+  transition: all 0.3s ease;
   border-radius: 50%;
   z-index: 5;
+  box-shadow: var(--neu-raised-shadow);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .clear-file-button:hover {
   opacity: 1;
-  background-color: rgba(0, 0, 0, 0.05);
-  transform: rotate(90deg);
+  box-shadow: var(--neu-pressed-shadow);
+  transform: rotate(90deg) scale(0.95);
 }
 
 .drop-zone-body {
@@ -220,15 +223,16 @@
 }
 
 .compare-button {
-  background-color: var(--primary-color);
-  color: var(--white-color);
+  background-color: var(--background-color);
+  color: var(--primary-color);
   border: none;
   padding: 1rem 2rem;
-  border-radius: 10px;
+  border-radius: 15px;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: 600;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--neu-raised-shadow);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -236,16 +240,23 @@
 }
 
 .compare-button:disabled {
-  background-color: rgba(0, 0, 0, 0.1);
-  color: rgba(0, 0, 0, 0.3);
+  background-color: var(--subtle-bg-color);
+  color: var(--text-color);
+  opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
+  box-shadow: var(--neu-inset-shadow-light);
 }
 
 .compare-button:hover:not(:disabled) {
-  background-color: var(--accent-color);
+  background: linear-gradient(135deg, var(--background-color), var(--subtle-bg-color));
+  color: var(--accent-color);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--neu-pressed-shadow);
+}
+
+.compare-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: var(--neu-inset-shadow-light);
 }
 
 .button-icon {
@@ -260,7 +271,7 @@
   left: -5px;
   right: -5px;
   bottom: -5px;
-  border-radius: 15px;
+  border-radius: 25px;
   border: 2px dashed var(--accent-color);
   opacity: 0.3;
   animation: pulse 1.5s infinite;
@@ -282,13 +293,19 @@
   .drop-zone {
     width: 100%;
     margin-bottom: 1rem;
+    border-radius: 18px;
+  }
+  
+  .compare-button {
+    border-radius: 12px;
   }
 }
 
 /* Tema uyumlu buton renkleri */
 [data-theme='dark'] .compare-button:disabled {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.3);
+  background-color: var(--subtle-bg-color);
+  color: var(--text-color);
+  opacity: 0.5;
 }
 
 .drop-hint {

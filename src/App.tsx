@@ -7,6 +7,7 @@ import PdfCompare from './pages/PdfCompare';
 import TextCompare from './pages/TextCompare';
 import FileConvert from './pages/FileConvert';
 import PageTransition from './components/PageTransition';
+import ThemeTransition from './components/ThemeTransition';
 import "./App.css";
 import "./style/PageStyles.css";
 
@@ -51,11 +52,26 @@ function App() {
     }
   );
 
+  const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
+
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
+    // Tema geçiş animasyonunu başlat
+    setIsThemeTransitioning(true);
+    document.body.classList.add('theme-transitioning');
+    
+    // Hafif bir gecikme ile tema değişikliğini yap
+    setTimeout(() => {
+      const newTheme = theme === 'light' ? 'dark' : 'light';
+      setTheme(newTheme);
+      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+      document.documentElement.setAttribute('data-theme', newTheme);
+      
+      // Tema geçiş animasyonunu bitir
+      setTimeout(() => {
+        setIsThemeTransitioning(false);
+        document.body.classList.remove('theme-transitioning');
+      }, 800); // CSS'deki --theme-transition-duration ile eşleşiyor
+    }, 100);
   };
 
   useEffect(() => {
@@ -63,9 +79,15 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  // Tema geçişi durumunu window objesine ekle (diğer bileşenler için)
+  useEffect(() => {
+    (window as any).isThemeTransitioning = isThemeTransitioning;
+  }, [isThemeTransitioning]);
+
   return (
     <Router>
-      <Header toggleTheme={toggleTheme} />
+      <ThemeTransition isTransitioning={isThemeTransitioning} currentTheme={theme} />
+      <Header toggleTheme={toggleTheme} isThemeTransitioning={isThemeTransitioning} />
       <div className="container">
         <AppRoutes />
       </div>

@@ -648,7 +648,6 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                     {calculateTotalDiffCount()}
                   </span>
                 </div>
-                <span>Yapısal Farklar</span>
                 {renderStructureDiffTable()}
                 {result.missingSheets1.length > 0 && (
                   <div className="excel-summary-item excel-diff-high">

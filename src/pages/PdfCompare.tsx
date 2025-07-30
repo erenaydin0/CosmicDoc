@@ -3,7 +3,7 @@ import FileUpload from '../components/FileUpload';
 import PdfCompareResult from '../components/PdfCompareResult';
 import { PdfCompareService } from '../services/PdfCompareService';
 import { PdfCompareResult as PdfCompareResultType } from '../types/PdfTypes';
-import { savePdfFile, getPdfFile, clearPdfStore } from '../services/IndexedDBService';
+import { savePdfFile, clearPdfStore } from '../services/IndexedDBService';
 import '../style/PageStyles.css';
 import '../style/PdfCompareResult.css';
 
@@ -12,7 +12,6 @@ const PdfCompare: React.FC = () => {
   const [isComparing, setIsComparing] = useState(false);
   const [compareResult, setCompareResult] = useState<PdfCompareResultType | null>(null);
   const [compareError, setCompareError] = useState<string | null>(null);
-  const [fileTimestamp, setFileTimestamp] = useState<number>(Date.now());
   
   // Component ilk yüklendiğinde verileri temizle
   useEffect(() => {
@@ -32,7 +31,6 @@ const PdfCompare: React.FC = () => {
     try {
       // Yeni bir timestamp oluştur
       const timestamp = Date.now();
-      setFileTimestamp(timestamp);
       
       // Önceki verileri temizle
       await clearPdfStore();
@@ -96,7 +94,7 @@ const PdfCompare: React.FC = () => {
     <div className="page-content">
       <h1>PDF Karşılaştırma</h1>
       <p className="page-description">
-        PDF Karşılaştırma Aracı ile iki PDF dosyasının içeriğini kolayca karşılaştırın. 
+        PDF Karşılaştırma aracı ile iki PDF dosyasının içeriğini kolayca karşılaştırın. 
         Yüklediğiniz belgelerdeki metin farklılıkları anında tespit edilir.
       </p>
       

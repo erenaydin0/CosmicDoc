@@ -30,6 +30,12 @@ const TextCompare: React.FC = () => {
 
   return (
     <div className="page-content">
+      <h1>Metin Karşılaştırma</h1>
+      <p className="page-description">
+        Metin Karşılaştırma aracı ile iki metin dosyasının içeriğini kolayca karşılaştırın. 
+        Yüklediğiniz belgelerdeki metin farklılıkları anında tespit edilir.
+      </p>
+
       <FileUpload 
         onCompare={handleCompare} 
         pageType="text" 

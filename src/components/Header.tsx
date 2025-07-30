@@ -8,9 +8,10 @@ const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
 
 interface HeaderProps {
   toggleTheme: () => void;
+  isThemeTransitioning?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = false }) => {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter((x) => x);
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(
@@ -42,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme }) => {
       }
     };
 
-    // Storage event'ini dinle (farklı sekmelerde senkronizasyon için)
+    // Storage event'ini dinle (farklı sekmelarda senkronizasyon için)
     window.addEventListener('storage', handleStorageChange);
     
     // Cleanup
@@ -52,17 +53,24 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme }) => {
   }, [currentTheme]);
 
   const handleThemeToggle = () => {
+    // Tema geçişi devam ediyorsa tıklamayı engelle
+    if (isThemeTransitioning) return;
+    
     setIsRotating(true);
+    
+    // Rotasyon animasyonunu başlat ve tema değişikliğini çağır
     setTimeout(() => {
       toggleTheme();
       setCurrentTheme(prevTheme => {
         const newTheme = prevTheme === 'light' ? 'dark' : 'light';
         return newTheme;
       });
+      
+      // Rotasyon animasyonunu bitir
       setTimeout(() => {
         setIsRotating(false);
-      }, 300); // Animasyon bittikten sonra rotating durumunu sıfırla
-    }, 300); // Dönme animasyonu tamamlandığında tema değişimi yap
+      }, 400);
+    }, 200);
   };
 
   const getPageName = (path: string) => {
@@ -100,7 +108,8 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme }) => {
       </div>
       <button 
         onClick={handleThemeToggle} 
-        className={`theme-toggle-button ${isRotating ? 'rotating' : ''}`}
+        className={`theme-toggle-button ${isRotating ? 'rotating' : ''} ${isThemeTransitioning ? 'transitioning' : ''}`}
+        disabled={isThemeTransitioning}
         aria-label={currentTheme === 'light' ? 'Karanlık temaya geç' : 'Aydınlık temaya geç'}
       >
         <FontAwesomeIcon 

@@ -12,7 +12,7 @@
   font-weight: 700;
   color: var(--text-color);
   margin-bottom: 0.5rem;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  background: var(--primary-color);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -30,10 +30,10 @@
   background-color: var(--background-color);
   color: var(--text-color);
   padding: 2.5rem 2rem;
-  border-radius: 18px;
+  border-radius: 20px;
   text-decoration: none;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--neu-raised-shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,11 +51,11 @@
 /* Tıklanabilirlik için mikro animasyonlar */
 .card:active {
   transform: scale(0.97) translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--neu-pressed-shadow);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* Ripple efekti için */
+/* Neumorphism için gradient overlay */
 .card::before {
   content: '';
   position: absolute;
@@ -68,6 +68,7 @@
   transform-origin: left;
   transition: transform 0.4s ease;
   z-index: 1;
+  border-radius: 20px 20px 0 0;
 }
 
 .card::after {
@@ -77,10 +78,11 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.03));
+  background: linear-gradient(to bottom, transparent, var(--subtle-bg-color));
   z-index: 0;
   opacity: 0;
   transition: opacity 0.4s ease;
+  border-radius: 20px;
 }
 
 /* Tıklama ripple efekti */
@@ -119,14 +121,15 @@
 }
 
 .card .icon-container {
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.5rem;
-  background-color: rgba(var(--primary-color-rgb), 0.1);
+  background-color: var(--background-color);
+  box-shadow: var(--neu-raised-shadow);
   position: relative;
   transition: all 0.3s ease;
   overflow: hidden;
@@ -135,7 +138,7 @@
 
 /* Özel ikon stilleri */
 .excel-icon {
-  background-color: rgba(33, 115, 70, 0.1);
+  background-color: var(--background-color);
 }
 
 .excel-icon svg {
@@ -143,7 +146,7 @@
 }
 
 .pdf-icon {
-  background-color: rgba(226, 35, 26, 0.1);
+  background-color: var(--background-color);
 }
 
 .pdf-icon svg {
@@ -151,7 +154,7 @@
 }
 
 .text-icon {
-  background-color: rgba(41, 105, 176, 0.1);
+  background-color: var(--background-color);
 }
 
 .text-icon svg {
@@ -159,7 +162,7 @@
 }
 
 .convert-icon {
-  background-color: rgba(255, 153, 0, 0.1);
+  background-color: var(--background-color);
 }
 
 .convert-icon svg {
@@ -168,7 +171,7 @@
 
 .card svg {
   margin-bottom: 0;
-  transition: all 0.4s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
@@ -179,7 +182,7 @@
   margin-bottom: 0.75rem;
   font-weight: 700;
   font-size: 1.4rem;
-  transition: color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   position: relative;
   z-index: 2;
@@ -191,20 +194,21 @@
   margin-bottom: 0;
   font-size: 1rem;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 2;
 }
 
 .card:hover {
-  transform: translateY(-10px) rotateX(5deg);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  background: linear-gradient(145deg, var(--background-color), rgba(var(--primary-color-rgb), 0.05));
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 12px 12px 24px var(--neu-shadow-dark), -12px -12px 24px var(--neu-shadow-light);
+  background: linear-gradient(135deg, var(--background-color), var(--subtle-bg-color));
 }
 
 /* Tıklanma sonrası geri tepme animasyonu */
 .card:active:hover {
-  transform: translateY(-7px) rotateX(3deg) scale(0.97);
+  transform: translateY(-4px) scale(0.98);
+  box-shadow: var(--neu-pressed-shadow);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -219,48 +223,57 @@
 /* Kart focus durumu (klavye navigasyonu için) */
 .card:focus {
   outline: none;
-  box-shadow: 0 0 0 3px var(--primary-color), 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 0 3px var(--primary-color), var(--neu-raised-shadow);
 }
 
 .card:focus:not(:focus-visible) {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--neu-raised-shadow);
 }
 
 .card:hover .icon-container {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.3);
+  transform: scale(1.05);
+  box-shadow: var(--neu-inset-shadow-light);
 }
 
 /* İkon basma efekti */
 .card:active .icon-container {
   transform: scale(0.95);
-  box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.2);
+  box-shadow: var(--neu-pressed-shadow);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* Hover durumunda özel ikon stilleri */
+/* Hover durumunda özel ikon stilleri - neumorphism uyumlu */
 .card:hover .excel-icon {
-  box-shadow: 0 0 20px rgba(33, 115, 70, 0.3);
-  background: linear-gradient(135deg, rgba(33, 115, 70, 0.2), rgba(33, 115, 70, 0.3));
+  box-shadow: var(--neu-inset-shadow-light);
+  background: linear-gradient(135deg, 
+              var(--background-color), 
+              rgba(33, 115, 70, 0.05));
 }
 
 .card:hover .pdf-icon {
-  box-shadow: 0 0 20px rgba(226, 35, 26, 0.3);
-  background: linear-gradient(135deg, rgba(226, 35, 26, 0.2), rgba(226, 35, 26, 0.3));
+  box-shadow: var(--neu-inset-shadow-light);
+  background: linear-gradient(135deg, 
+              var(--background-color), 
+              rgba(226, 35, 26, 0.05));
 }
 
 .card:hover .text-icon {
-  box-shadow: 0 0 20px rgba(41, 105, 176, 0.3);
-  background: linear-gradient(135deg, rgba(41, 105, 176, 0.2), rgba(41, 105, 176, 0.3));
+  box-shadow: var(--neu-inset-shadow-light);
+  background: linear-gradient(135deg, 
+              var(--background-color), 
+              rgba(41, 105, 176, 0.05));
 }
 
 .card:hover .convert-icon {
-  box-shadow: 0 0 20px rgba(255, 153, 0, 0.3);
-  background: linear-gradient(135deg, rgba(255, 153, 0, 0.2), rgba(255, 153, 0, 0.3));
+  box-shadow: var(--neu-inset-shadow-light);
+  background: linear-gradient(135deg, 
+              var(--background-color), 
+              rgba(255, 153, 0, 0.05));
 }
 
 .card:hover svg {
-  transform: scale(1.2);
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 8px rgba(var(--primary-color-rgb), 0.3));
 }
 
 /* Tıklama durumundaki ikon efekti */
@@ -271,26 +284,32 @@
 
 .card:hover .excel-icon svg {
   color: #217346;
+  filter: drop-shadow(0 2px 8px rgba(33, 115, 70, 0.4));
 }
 
 .card:hover .pdf-icon svg {
   color: #E2231A;
+  filter: drop-shadow(0 2px 8px rgba(226, 35, 26, 0.4));
 }
 
 .card:hover .text-icon svg {
   color: #2969B0;
+  filter: drop-shadow(0 2px 8px rgba(41, 105, 176, 0.4));
 }
 
 .card:hover .convert-icon svg {
   color: #FF9900;
+  filter: drop-shadow(0 2px 8px rgba(255, 153, 0, 0.4));
 }
 
 .card:hover h2 {
   color: var(--primary-color);
+  text-shadow: 0 1px 3px rgba(var(--primary-color-rgb), 0.3);
 }
 
 .card:hover p {
   opacity: 1;
+  transform: translateY(-2px);
 }
 
 /* Mobil düzenlemeler */
@@ -305,6 +324,7 @@
   .card {
     padding: 2rem;
     min-height: 180px;
+    border-radius: 18px;
   }
   
   .page-title {
@@ -316,13 +336,36 @@
     margin-bottom: 1.5rem;
   }
   
-  /* Mobil cihazlarda farklı basma efekti */
+  /* Mobil cihazlarda neumorphism uyumlu basma efekti */
   .card:active {
-    transform: scale(0.98);
+    transform: scale(0.98) translateY(-2px);
+    box-shadow: var(--neu-pressed-shadow);
   }
   
   .card:active:hover {
-    transform: scale(0.98);
+    transform: scale(0.98) translateY(-2px);
+    box-shadow: var(--neu-pressed-shadow);
+  }
+  
+  /* Mobil için hover efektleri (dokunmatik cihazlarda) */
+  @media (hover: hover) {
+    .card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+    }
+    
+    .card:hover .icon-container {
+      transform: scale(1.03);
+    }
+    
+    .card:hover svg {
+      transform: scale(1.08);
+    }
+  }
+  
+  .card .icon-container {
+    width: 70px;
+    height: 70px;
   }
 }
 
@@ -332,21 +375,23 @@
   align-items: center;
   margin: 20px 0;
   padding: 20px;
-  background-color: var(--subtle-bg-color);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  border-radius: 16px;
+  box-shadow: var(--neu-raised-shadow);
+  border: none;
 }
 
 .error-message {
   margin: 20px 0;
   padding: 15px;
-  background-color: rgba(231, 76, 60, 0.1);
-  border-left: 4px solid #e74c3c;
-  border-radius: 4px;
-  color: #c0392b;
+  background-color: var(--background-color);
+  border-radius: 12px;
+  box-shadow: var(--neu-raised-shadow);
+  color: var(--error-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-left: 4px solid var(--error-color);
 }
 
 .error-message p {
@@ -354,18 +399,19 @@
 }
 
 .error-message button {
-  background-color: transparent;
-  border: 1px solid #e74c3c;
-  border-radius: 4px;
-  color: #e74c3c;
-  padding: 4px 10px;
+  background-color: var(--background-color);
+  border: none;
+  border-radius: 8px;
+  color: var(--error-color);
+  padding: 8px 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: var(--neu-raised-shadow);
 }
 
 .error-message button:hover {
-  background-color: #e74c3c;
-  color: white;
+  box-shadow: var(--neu-pressed-shadow);
+  transform: scale(0.98);
 }
 
 .comparing-indicator {
@@ -376,10 +422,14 @@
   padding: 30px;
   margin: 20px 0;
   text-align: center;
+  background-color: var(--background-color);
+  border-radius: 16px;
+  box-shadow: var(--neu-raised-shadow);
+  border: none;
 }
 
 .spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
+  border: 4px solid var(--subtle-bg-color);
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -391,8 +441,8 @@
 .loader {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border: 4px solid var(--subtle-bg-color);
+  border-top: 4px solid var(--primary-color);
   border-radius: 50%;
   animation: spin 2s linear infinite;
   margin-top: 10px;
@@ -414,19 +464,21 @@
 
 .progress-bar {
   flex: 1;
-  height: 8px;
-  background-color: var(--border-color);
-  border-radius: 4px;
+  height: 12px;
+  background-color: var(--background-color);
+  border-radius: 12px;
   overflow: hidden;
   position: relative;
+  box-shadow: var(--neu-inset-shadow-light);
 }
 
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-  border-radius: 4px;
+  border-radius: 12px;
   transition: width 0.3s ease;
   position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .progress-fill::after {
@@ -458,16 +510,6 @@
 }
 
 /* Enhanced comparing indicator */
-.comparing-indicator {
-  background-color: var(--subtle-bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  margin: 20px 0;
-  box-shadow: 0 2px 8px var(--card-shadow-color);
-}
-
 .comparing-indicator p {
   margin: 0 0 10px 0;
   color: var(--text-color);

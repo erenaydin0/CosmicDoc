@@ -86,7 +86,7 @@ const ExcelCompare: React.FC = () => {
     <div className="page-content">
       <h1>Excel Karşılaştırma</h1>
       <p className="page-description">
-        Excel Karşılaştırma Aracı ile iki Excel dosyasının içeriğini kolayca karşılaştırın.
+        Excel Karşılaştırma aracı ile iki Excel dosyasının içeriğini kolayca karşılaştırın.
         Yüklediğiniz tablolardaki veri farklılıkları anında tespit edilir.
       </p>
       

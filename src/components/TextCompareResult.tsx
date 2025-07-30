@@ -109,7 +109,6 @@ const TextCompareResult: React.FC<TextCompareResultProps> = ({ result }) => {
   let file1DisplayLineCounter = 1;
   let file2DisplayLineCounter = 1;
 
-  // Metin karşılaştırma yapısal farklar tablosu
   const renderTextStructureDiffTable = () => {
     const rowDiff = file2LineCount - file1LineCount;
     const sizeDiff = result.file2Size - result.file1Size;
@@ -220,7 +219,6 @@ const TextCompareResult: React.FC<TextCompareResultProps> = ({ result }) => {
                     {calculateTotalDiffCount()}
                   </span>
                 </div>
-                <span>Yapısal Farklar</span>
                 {renderTextStructureDiffTable()}
               </div>
             </div>
