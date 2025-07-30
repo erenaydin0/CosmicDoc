@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './ThemeTransition.css';
+import '../style/ThemeTransition.css';
 
 interface ThemeTransitionProps {
   isTransitioning: boolean;

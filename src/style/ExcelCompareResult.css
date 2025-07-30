@@ -12,93 +12,6 @@
   margin-top: 20px;
 }
 
-.excel-result-header {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: none;
-  background-color: var(--background-color);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--neu-inset-shadow-light);
-}
-
-.excel-result-header h2 {
-  margin: 0;
-  margin-bottom: 10px;
-  color: var(--text-color);
-  font-size: 24px;
-}
-
-.excel-summary-info {
-  background-color: var(--background-color);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: var(--neu-raised-shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.excel-summary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  padding: 10px 15px;
-  background-color: var(--background-color);
-  border-radius: 8px;
-  box-shadow: var(--neu-inset-shadow-light);
-  font-weight: 600;
-  color: var(--text-color);
-  margin-bottom: 4px;
-}
-
-.excel-summary-item:last-child {
-  margin-bottom: 0;
-}
-
-.excel-summary-item span:last-child {
-  color: var(--error-color);
-}
-
-.excel-diff-none {
-    color: var(--success-color);
-}
-  
-.excel-diff-low {
-    color: var(--warning-color);
-}
-  
-.excel-diff-high {
-    color: var(--error-color);
-    font-weight: 600;
-}
-
-.excel-export-button {
-  background-color: var(--background-color);
-  color: var(--primary-color);
-  border: none;
-  border-radius: 12px;
-  padding: 12px 20px;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  margin-bottom: 20px;
-  box-shadow: var(--neu-raised-shadow);
-}
-
-.excel-export-button:hover {
-  box-shadow: var(--neu-pressed-shadow);
-  transform: scale(0.98);
-  color: var(--accent-color);
-}
-
-.excel-export-button:active {
-  box-shadow: var(--neu-inset-shadow-light);
-}
-
 /* Sayfa sekmeleri */
 .sheet-tabs {
   display: flex;
@@ -228,14 +141,6 @@
   white-space: nowrap;
 }
 
-.diff-removed {
-  background-color: var(--error-bg-color);
-}
-
-.diff-added {
-  background-color: var(--success-bg-color);
-}
-
 .empty-value {
   color: var(--text-color);
   font-style: italic;
@@ -243,10 +148,6 @@
 
 /* Responsive tasarım */
 @media (max-width: 768px) {
-  .excel-summary-info {
-    flex-direction: column;
-    gap: 10px;
-  }
   
   .sheet-tab {
     font-size: 14px;
@@ -508,16 +409,6 @@
 
 .structure-diff-header .header-cell:last-child {
   border-top-right-radius: 8px;
-}
-
-.diff-zero {
-  color: var(--success-color);
-  font-weight: 600;
-}
-
-.diff-nonzero {
-  color: var(--error-color);
-  font-weight: 600;
 }
 
 /* Responsive Tasarım */

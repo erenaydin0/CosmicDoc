@@ -14,6 +14,7 @@
   display: flex;
   min-width: 400px;
   width: 80%;
+  gap: 0.5rem;
 }
 
 .pdf-preview-container {
@@ -32,7 +33,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--neu-raised-shadow);
   border-radius: 16px 16px 0 0;
 }
 
@@ -63,10 +64,7 @@
   font-size: 1rem;
   margin-bottom: 8px;
   color: var(--text-color);
-  background-color: var(--background-color);
   padding: 8px;
-  border-radius: 8px;
-  box-shadow: var(--neu-inset-shadow-light);
 }
 
 .pdf-preview-page {
@@ -93,64 +91,7 @@
   position: relative;
 }
 
-.result-header {
-  margin-bottom: 20px;
-}
-
-.result-header h2 {
-  margin-bottom: 12px;
-  color: var(--text-color);
-  font-size: 1.3rem;
-  text-align: left;
-}
-
-.summary-info {
-  background-color: var(--background-color);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: var(--neu-raised-shadow);
-  margin-bottom: 20px;
-}
-
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  padding: 5px 0;
-  border-bottom: 1px dashed rgba(var(--text-color-rgb), 0.1);
-}
-
-.summary-item:last-child {
-  border-bottom: none;
-}
-
-.summary-item span:first-child {
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.summary-item span:last-child {
-  font-weight: bold;
-}
-
-.diff-none {
-  color: var(--success-color);
-  font-weight: bold;
-}
-
-.diff-low {
-  color: var(--warning-color);
-  font-weight: bold;
-}
-
-.diff-high {
-  color: var(--error-color);
-  font-weight: bold;
-}
-
 .all-pages-details {
-  margin-top: 15px;
   max-height: 550px;
   overflow-y: auto;
   padding-right: 10px;
@@ -168,9 +109,7 @@
 }
 
 .page-details:hover {
-  background-color: rgba(var(--warning-color-rgb), 0.1);
-  transform: translate(-5px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--neu-inset-shadow-light);
 }
 
 .page-details h3 {
@@ -276,24 +215,6 @@
   }
 }
 
-.export-button {
-  display: block;
-  width: 100%;
-  padding: 12px 20px;
-  margin-top: 20px;
-  background-color: var(--primary-color);
-  color: var(--white-color);
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  position: sticky;
-  bottom: 0px;
-  z-index: 10;
-}
-
 /* Karşılaştırma modu butonları */
 .compare-mode-buttons {
   display: flex;
@@ -307,6 +228,7 @@
   border: 2px solid var(--primary-color);
   border-radius: 6px;
   background-color: transparent;
+  box-shadow: var(--neu-raised-shadow);
   color: var(--primary-color);
   font-size: 0.9rem;
   font-weight: 500;
@@ -317,6 +239,7 @@
 
 .mode-button:hover {
   background-color: rgba(var(--primary-color-rgb), 0.1);
+  box-shadow: var(--neu-inset-shadow-light);
 }
 
 .mode-button.active {
@@ -360,8 +283,7 @@
 
 .visual-page-result:hover {
   background-color: rgba(var(--warning-color-rgb), 0.1);
-  transform: translate(-5px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--neu-inset-shadow-light);
 }
 
 .visual-page-result h4 {
@@ -382,16 +304,4 @@
   color: var(--success-color);
   font-style: italic;
   margin: 10px 0;
-}
-
-.visual-export-button {
-  margin-bottom: 15px !important;
-  margin-top: 0 !important;
-  background-color: var(--warning-color);
-  position: relative;
-}
-
-.visual-export-button:hover {
-  background-color: rgba(var(--warning-color-rgb), 0.8);
-  transform: translateY(-1px);
 }

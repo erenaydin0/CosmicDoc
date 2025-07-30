@@ -549,8 +549,8 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                   {columnHeaders.map(col => (
                     <td key={`${startIndex + index}-${col.key}`}
                       className={
-                        col.key === 'value1' ? 'diff-value diff-removed' :
-                        col.key === 'value2' ? 'diff-value diff-added' :
+                        col.key === 'value1' ? 'diff-value diff-high' :
+                        col.key === 'value2' ? 'diff-value diff-none' :
                         ''
                       }
                     >
@@ -591,7 +591,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell header-cell">Sayfa</div>
           <div className="structure-diff-cell">{result.sheetCount1}</div>
           <div className="structure-diff-cell">{result.sheetCount2}</div>
-          <div className={`structure-diff-cell ${sheetDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
+          <div className={`structure-diff-cell ${sheetDiff === 0 ? 'diff-none' : 'diff-high'}`}>
             {Math.abs(sheetDiff)}
           </div>
         </div>
@@ -599,7 +599,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell header-cell">Sütun</div>
           <div className="structure-diff-cell">{result.file1MaxCols}</div>
           <div className="structure-diff-cell">{result.file2MaxCols}</div>
-          <div className={`structure-diff-cell ${colDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
+          <div className={`structure-diff-cell ${colDiff === 0 ? 'diff-none' : 'diff-high'}`}>
             {Math.abs(colDiff)}
           </div>
         </div>
@@ -607,7 +607,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell header-cell">Satır</div>
           <div className="structure-diff-cell">{result.file1MaxRows}</div>
           <div className="structure-diff-cell">{result.file2MaxRows}</div>
-          <div className={`structure-diff-cell ${rowDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
+          <div className={`structure-diff-cell ${rowDiff === 0 ? 'diff-none' : 'diff-high'}`}>
             {Math.abs(rowDiff)}
           </div>
         </div>
@@ -615,7 +615,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell header-cell">Boyut</div>
           <div className="structure-diff-cell">{formatFileSize(result.file1Size)}</div>
           <div className="structure-diff-cell">{formatFileSize(result.file2Size)}</div>
-          <div className={`structure-diff-cell ${Math.abs(result.file1Size - result.file2Size) === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
+          <div className={`structure-diff-cell ${Math.abs(result.file1Size - result.file2Size) === 0 ? 'diff-none' : 'diff-high'}`}>
             {formatFileSize(Math.abs(result.file1Size - result.file2Size))}
           </div>
         </div>
@@ -641,22 +641,22 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
           <div className="excel-summary-section">
             <div className="excel-result-header">
               <h2>Excel Karşılaştırma Sonucu</h2>
-              <div className="excel-summary-info">
-                <div className="excel-summary-item">
+              <div className="summary-info">
+                <div className="summary-item">
                   <span>Toplam Fark Sayısı:</span>
-                  <span className={calculateTotalDiffCount() > 0 ? 'excel-diff-high' : 'excel-diff-none'}>
+                  <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
                     {calculateTotalDiffCount()}
                   </span>
                 </div>
                 {renderStructureDiffTable()}
                 {result.missingSheets1.length > 0 && (
-                  <div className="excel-summary-item excel-diff-high">
+                  <div className="summary-item diff-high">
                     <span>Dosya 1'de Eksik Sayfalar:</span>
                     <span>{result.missingSheets1.join(', ')}</span>
                   </div>
                 )}
                 {result.missingSheets2.length > 0 && (
-                  <div className="excel-summary-item excel-diff-high">
+                  <div className="summary-item diff-high">
                     <span>Dosya 2'de Eksik Sayfalar:</span>
                     <span>{result.missingSheets2.join(', ')}</span>
                   </div>
@@ -666,7 +666,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
 
             {calculateTotalDiffCount() > 0 && (
               <button 
-                className="excel-export-button"
+                className="export-button"
                 onClick={handleExportToExcel}
               >
                 Rapor İndir

@@ -125,7 +125,7 @@ const TextCompareResult: React.FC<TextCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell header-cell">Satır</div>
           <div className="structure-diff-cell">{file1LineCount}</div>
           <div className="structure-diff-cell">{file2LineCount}</div>
-          <div className={`structure-diff-cell ${rowDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
+          <div className={`structure-diff-cell ${rowDiff === 0 ? 'diff-none' : 'diff-high'}`}>
             {Math.abs(rowDiff)}
           </div>
         </div>
@@ -133,7 +133,7 @@ const TextCompareResult: React.FC<TextCompareResultProps> = ({ result }) => {
           <div className="structure-diff-cell header-cell">Boyut</div>
           <div className="structure-diff-cell">{formatFileSize(result.file1Size)}</div>
           <div className="structure-diff-cell">{formatFileSize(result.file2Size)}</div>
-          <div className={`structure-diff-cell ${sizeDiff === 0 ? 'diff-zero' : 'diff-nonzero'}`}>
+          <div className={`structure-diff-cell ${sizeDiff === 0 ? 'diff-none' : 'diff-high'}`}>
             {formatFileSize(Math.abs(sizeDiff))}
           </div>
         </div>

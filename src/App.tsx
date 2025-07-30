@@ -10,6 +10,7 @@ import PageTransition from './components/PageTransition';
 import ThemeTransition from './components/ThemeTransition';
 import "./App.css";
 import "./style/PageStyles.css";
+import "./style/Components.css";
 
 const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
 

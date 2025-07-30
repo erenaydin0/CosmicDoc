@@ -596,7 +596,7 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
           )}
           {compareMode === CompareMode.VISUAL && visualResults.filter(vr => vr.hasVisualDifferences).length > 0 && (
                 <button 
-                  className="export-button visual-export-button"
+                  className="export-button"
                   onClick={handleExportVisualToPdf}
                 >
                   Rapor İndir
