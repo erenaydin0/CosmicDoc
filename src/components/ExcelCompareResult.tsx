@@ -639,7 +639,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
             {renderActiveDifferences()}
           </div>
           <div className="excel-summary-section">
-            <div className="excel-result-header">
+            <div className="result-header">
               <h2>Excel Karşılaştırma Sonucu</h2>
               <div className="summary-info">
                 <div className="summary-item">

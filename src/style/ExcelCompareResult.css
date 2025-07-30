@@ -75,7 +75,7 @@
 
 .differences-table-header th {
   background-color: var(--background-color);
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--neu-raised-shadow);
   font-weight: 600;
   padding: 15px 20px;
   text-align: left;
@@ -87,6 +87,8 @@
 
 .differences-table-body-scroll {
   height: 1000px;
+  box-shadow: var(--neu-inset-shadow-light);
+  overflow-y: auto;
 }
 
 .differences-table {
@@ -105,6 +107,7 @@
 .differences-table-header th:nth-child(1),
 .differences-table td:nth-child(1) {
   width: 10%; /* Satır */
+  border-radius: 16px 0 0 0;
 }
 
 .differences-table-header th:nth-child(2),
@@ -120,6 +123,7 @@
 .differences-table-header th:nth-child(4),
 .differences-table td:nth-child(4) {
   width: 40%; /* Dosya 2 Değeri */
+  border-radius: 0 16px 0 0;
 }
 
 .differences-table th {
