@@ -151,16 +151,20 @@
 }
 
 .page-details {
-  background-color: var(--subtle-bg-color);
   padding: 10px;
-  border-radius: 6px;
   margin-bottom: 10px;
+  background-color: var(--subtle-bg-color);
+  border-radius: 6px;
+  border-left: 4px solid var(--warning-color);
+  text-align: left;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .page-details:hover {
-  background-color: rgba(var(--white-color-rgb), 0.05);
+  background-color: rgba(var(--warning-color-rgb), 0.1);
+  transform: translate(-5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .page-details h3 {
@@ -282,4 +286,106 @@
   position: sticky;
   bottom: 0px;
   z-index: 10;
+}
+
+/* Karşılaştırma modu butonları */
+.compare-mode-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.mode-button {
+  padding: 8px 16px;
+  border: 2px solid var(--primary-color);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.mode-button:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+}
+
+.mode-button.active {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+}
+
+.mode-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Tek PDF önizleme */
+.single-preview {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.single-preview .pdf-preview-pages {
+  max-height: 1000px;
+}
+
+/* Görsel karşılaştırma sonuçları */
+.visual-results {
+  max-height: 600px;
+  overflow-y: auto;
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
+.visual-page-result {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: var(--subtle-bg-color);
+  border-radius: 6px;
+  border-left: 4px solid var(--warning-color);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.visual-page-result:hover {
+  background-color: rgba(var(--warning-color-rgb), 0.1);
+  transform: translate(-5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.visual-page-result h4 {
+  margin: 0 0 5px;
+  color: var(--text-color);
+  font-size: 0.95rem;
+}
+
+.visual-page-result p {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.no-visual-diff {
+  text-align: center;
+  color: var(--success-color);
+  font-style: italic;
+  margin: 10px 0;
+}
+
+.visual-export-button {
+  margin-bottom: 15px !important;
+  margin-top: 0 !important;
+  background-color: var(--warning-color);
+  position: relative;
+}
+
+.visual-export-button:hover {
+  background-color: rgba(var(--warning-color-rgb), 0.8);
+  transform: translateY(-1px);
 }

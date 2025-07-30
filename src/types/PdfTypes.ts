@@ -1,3 +1,9 @@
+// Karşılaştırma modu
+export enum CompareMode {
+  TEXT = 'text',
+  VISUAL = 'visual'
+}
+
 // Diff sonucu
 export interface DiffResult {
   value: string;
@@ -14,6 +20,14 @@ export interface PdfPageCompareResult {
   differences: DiffResult[];
 }
 
+// Görsel karşılaştırma sonucu
+export interface VisualCompareResult {
+  pageNumber: number;
+  differencePercentage: number;
+  hasVisualDifferences: boolean;
+  overlayCanvas?: HTMLCanvasElement;
+}
+
 // PDF karşılaştırma sonucu
 export interface PdfCompareResult {
   file1Name: string;
@@ -25,6 +39,7 @@ export interface PdfCompareResult {
   pageCountDiffers: boolean;
   pageResults: PdfPageCompareResult[];
   overallDiffPercentage: number;
+  visualResults?: VisualCompareResult[];
   // Önizleme için gereken ek alanlar
   timestamp?: number;
   pdf1Key?: string;

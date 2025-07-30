@@ -1,5 +1,5 @@
 import * as pdfjsLib from 'pdfjs-dist';
-import { DiffResult, PdfPageCompareResult, PdfCompareResult } from '../types/PdfTypes';
+import { DiffResult, PdfPageCompareResult, PdfCompareResult, VisualCompareResult } from '../types/PdfTypes';
 import { diffWords } from 'diff';
 import { getPdfFile } from './IndexedDBService';
 
@@ -223,5 +223,172 @@ export class PdfCompareService {
     
     const sum = pageResults.reduce((acc, result) => acc + result.diffPercentage, 0);
     return sum / pageResults.length;
+  }
+
+  /**
+   * İki PDF'i görsel olarak karşılaştırır
+   */
+  public static async compareVisually(file1Key: string, file2Key: string): Promise<VisualCompareResult[]> {
+    try {
+      // IndexedDB'den PDF verilerini al
+      const file1Data = await getPdfFile<any>(file1Key);
+      const file2Data = await getPdfFile<any>(file2Key);
+      
+      if (!file1Data || !file2Data) {
+        throw new Error('PDF verileri bulunamadı');
+      }
+      
+      // PDF dokümanlarını yükle
+      const pdf1 = await pdfjsLib.getDocument(file1Data.data).promise;
+      const pdf2 = await pdfjsLib.getDocument(file2Data.data).promise;
+      
+      const numPages1 = pdf1.numPages;
+      const numPages2 = pdf2.numPages;
+      const maxPages = Math.max(numPages1, numPages2);
+      
+      const visualResults: VisualCompareResult[] = [];
+      
+      for (let i = 1; i <= maxPages; i++) {
+        let canvas1: HTMLCanvasElement | null = null;
+        let canvas2: HTMLCanvasElement | null = null;
+        
+        // İlk PDF'den sayfa render et
+        if (i <= numPages1) {
+          const page1 = await pdf1.getPage(i);
+          canvas1 = await this.renderPageToCanvas(page1);
+        }
+        
+        // İkinci PDF'den sayfa render et
+        if (i <= numPages2) {
+          const page2 = await pdf2.getPage(i);
+          canvas2 = await this.renderPageToCanvas(page2);
+        }
+        
+        // Sayfaları karşılaştır
+        const compareResult = this.compareCanvases(canvas1, canvas2, i);
+        visualResults.push(compareResult);
+      }
+      
+      return visualResults;
+    } catch (error) {
+      console.error('Görsel karşılaştırma hatası:', error);
+      throw new Error('Görsel karşılaştırma yapılırken hata oluştu');
+    }
+  }
+  
+  /**
+   * PDF sayfasını canvas'e render eder
+   */
+  private static async renderPageToCanvas(page: any): Promise<HTMLCanvasElement> {
+    const scale = 1.5;
+    const viewport = page.getViewport({ scale });
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    
+    const context = canvas.getContext('2d')!;
+    await page.render({ canvasContext: context, viewport }).promise;
+    
+    return canvas;
+  }
+  
+  /**
+   * İki canvas'ı piksel bazında karşılaştırır ve overlay oluşturur
+   */
+  private static compareCanvases(
+    canvas1: HTMLCanvasElement | null, 
+    canvas2: HTMLCanvasElement | null, 
+    pageNumber: number
+  ): VisualCompareResult {
+    if (!canvas1 && !canvas2) {
+      return {
+        pageNumber,
+        differencePercentage: 0,
+        hasVisualDifferences: false
+      };
+    }
+    
+    if (!canvas1 || !canvas2) {
+      return {
+        pageNumber,
+        differencePercentage: 100,
+        hasVisualDifferences: true,
+        overlayCanvas: canvas1 || canvas2 || undefined
+      };
+    }
+    
+    // Canvas boyutlarını eşitle
+    const maxWidth = Math.max(canvas1.width, canvas2.width);
+    const maxHeight = Math.max(canvas1.height, canvas2.height);
+    
+    // Overlay canvas oluştur
+    const overlayCanvas = document.createElement('canvas');
+    overlayCanvas.width = maxWidth;
+    overlayCanvas.height = maxHeight;
+    const overlayCtx = overlayCanvas.getContext('2d')!;
+    
+    // Beyaz arka plan ekle
+    overlayCtx.fillStyle = '#ffffff';
+    overlayCtx.fillRect(0, 0, maxWidth, maxHeight);
+    
+    // İlk canvas'ı tam opak çiz
+    overlayCtx.globalAlpha = 1.0;
+    overlayCtx.globalCompositeOperation = 'source-over';
+    overlayCtx.drawImage(canvas1, 0, 0);
+    
+    // Farkları hesapla ve turuncu ile işaretle
+    const imageData1 = canvas1.getContext('2d')!.getImageData(0, 0, Math.min(canvas1.width, maxWidth), Math.min(canvas1.height, maxHeight));
+    const imageData2 = canvas2.getContext('2d')!.getImageData(0, 0, Math.min(canvas2.width, maxWidth), Math.min(canvas2.height, maxHeight));
+    
+    const overlayImageData = overlayCtx.getImageData(0, 0, maxWidth, maxHeight);
+    
+    let differentPixels = 0;
+    const threshold = 30; // Piksel farklılık eşiği
+    
+    const minWidth = Math.min(canvas1.width, canvas2.width, maxWidth);
+    const minHeight = Math.min(canvas1.height, canvas2.height, maxHeight);
+    
+    for (let y = 0; y < minHeight; y++) {
+      for (let x = 0; x < minWidth; x++) {
+        const index1 = (y * canvas1.width + x) * 4;
+        const index2 = (y * canvas2.width + x) * 4;
+        const overlayIndex = (y * maxWidth + x) * 4;
+        
+        if (index1 < imageData1.data.length && index2 < imageData2.data.length) {
+          const r1 = imageData1.data[index1];
+          const g1 = imageData1.data[index1 + 1];
+          const b1 = imageData1.data[index1 + 2];
+          
+          const r2 = imageData2.data[index2];
+          const g2 = imageData2.data[index2 + 1];
+          const b2 = imageData2.data[index2 + 2];
+          
+          const diff = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
+          
+          if (diff > threshold) {
+            differentPixels++;
+            // Farkı canlı turuncu/kırmızı renkte işaretle
+            overlayImageData.data[overlayIndex] = 255; // R
+            overlayImageData.data[overlayIndex + 1] = 69;  // G
+            overlayImageData.data[overlayIndex + 2] = 0;   // B
+            overlayImageData.data[overlayIndex + 3] = 255; // A (tam opaklık)
+          }
+        }
+      }
+    }
+    
+    // Güncellenmiş image data'yı canvas'a uygula
+    overlayCtx.putImageData(overlayImageData, 0, 0);
+    
+    const totalPixels = minWidth * minHeight;
+    const differencePercentage = totalPixels > 0 ? (differentPixels / totalPixels) * 100 : 0;
+    
+    return {
+      pageNumber,
+      differencePercentage,
+      hasVisualDifferences: differencePercentage > 0.1, // %0.1'den fazla fark varsa
+      overlayCanvas: overlayCanvas
+    };
   }
 } 
