@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ExcelCompareResult as ExcelCompareResultType, CellDiff } from '../types/ExcelTypes';
+import { ExcelCompareResult as ExcelCompareResultType } from '../types/ExcelTypes';
 import * as XLSX from 'xlsx';
 import '../style/ExcelCompareResult.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faFilter, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 interface ExcelCompareResultProps {
   result: ExcelCompareResultType;
@@ -14,6 +14,12 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
   const [filters, setFilters] = useState<{ [key: string]: Set<any> }>({}); // Kolon index'ine göre seçili değerler
   const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'ascending' | 'descending' | null }>({ key: null, direction: null });
   const [showFilterDropdown, setShowFilterDropdown] = useState<string | null>(null); // Hangi kolonun filtresi açık
+  const [filterSearchTerms, setFilterSearchTerms] = useState<{ [key: string]: string }>({}); // Her filtre için arama terimi
+  const [cachedFilterValues, setCachedFilterValues] = useState<{ [key: string]: any[] }>({}); // Önbelleğe alınmış filtre değerleri
+  
+  // Pagination state'leri
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(100); // Sayfa başına gösterilecek satır sayısı
 
   const filterDropdownRef = useRef<HTMLDivElement>(null); // Filtre dropdown'ı için referans
 
@@ -44,6 +50,36 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showFilterDropdown, activeSheetIndex, result.sheetResults]); // result.sheetResults bağımlılık olarak eklendi
+
+  // Aktif sayfa değiştiğinde filtre değerlerini önbelleğe al
+  useEffect(() => {
+    if (result.sheetResults.length > 0) {
+      const activeSheet = result.sheetResults[activeSheetIndex];
+      const newCachedValues: { [key: string]: any[] } = {};
+      
+      const columnKeys = ['row', 'col', 'value1', 'value2'];
+      
+      columnKeys.forEach(columnKey => {
+        const uniqueValues = Array.from(new Set(activeSheet.differences.map((diff: any) => diff[columnKey])));
+        newCachedValues[columnKey] = uniqueValues.sort((a, b) => {
+          // Null değerleri sona koy
+          if (a === null && b !== null) return 1;
+          if (a !== null && b === null) return -1;
+          if (a === null && b === null) return 0;
+          
+          // Sayısal değerleri sayısal olarak sırala
+          if (typeof a === 'number' && typeof b === 'number') {
+            return a - b;
+          }
+          
+          // String olarak sırala
+          return String(a).localeCompare(String(b));
+        });
+      });
+      
+      setCachedFilterValues(newCachedValues);
+    }
+  }, [result.sheetResults, activeSheetIndex]);
 
   // Toplam fark sayısını hesapla
   const calculateTotalDiffCount = () => {
@@ -130,6 +166,9 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
               setFilters({}); // Sayfa değişince filtreleri sıfırla
               setSortConfig({ key: null, direction: null }); // Sayfa değişince sıralamayı sıfırla
               setShowFilterDropdown(null);
+              setCurrentPage(1); // Sayfa değişince pagination'ı sıfırla
+              setFilterSearchTerms({}); // Sayfa değişince arama terimlerini sıfırla
+              setCachedFilterValues({}); // Cache'i temizle, yeni sayfa için yeniden hesaplanacak
             }}
           >
             {sheet.sheetName} 
@@ -176,35 +215,86 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     setShowFilterDropdown(prev => (prev === columnKey ? null : columnKey));
   };
 
-  // Gösterilecek farkları filtrele ve sırala
+  // Filtre arama terimini güncelle
+  const updateFilterSearchTerm = (columnKey: string, searchTerm: string) => {
+    setFilterSearchTerms(prev => ({
+      ...prev,
+      [columnKey]: searchTerm
+    }));
+    
+    // Arama terimi varsa, filters'a da ekle (boş bir Set ile)
+    if (searchTerm.trim()) {
+      setFilters(prev => ({
+        ...prev,
+        [columnKey]: prev[columnKey] || new Set()
+      }));
+    }
+  };
+
+  // Filtre için gerekli değerleri cache'den al
+  const getFilterValues = (columnKey: string) => {
+    return cachedFilterValues[columnKey] || [];
+  };
+
+  // Filtrelenmiş değerleri hesapla (arama terimi ile)
+  const getFilteredValues = (columnKey: string) => {
+    const allValues = getFilterValues(columnKey);
+    const searchTerm = filterSearchTerms[columnKey]?.toLowerCase() || '';
+    
+    if (!searchTerm) return allValues;
+    
+    return allValues.filter(value => {
+      const displayValue = columnKey === 'col' 
+        ? convertColumnIndexToLetter(value) 
+        : String(value === null ? '(boş)' : value);
+      return displayValue.toLowerCase().includes(searchTerm);
+    });
+  };
+
+  // Gösterilecek farkları filtrele ve sırala (Pagination ile)
   const filteredAndSortedDifferences = useMemo(() => {
     if (result.sheetResults.length === 0) return [];
 
     let currentDifferences = [...result.sheetResults[activeSheetIndex].differences];
 
-    // Filtreleme
+    // Filtreleme (hem seçili değerler hem de arama terimleri)
     Object.keys(filters).forEach(columnKey => {
       const selectedValues = filters[columnKey];
-      if (selectedValues.size > 0) {
+      const searchTerm = filterSearchTerms[columnKey]?.toLowerCase() || '';
+      
+      if (selectedValues.size > 0 || searchTerm) {
         currentDifferences = currentDifferences.filter(diff => {
           let valueToCompare: any;
+          let displayValue: string;
+          
           switch (columnKey) {
             case 'row':
               valueToCompare = diff.row;
+              displayValue = String(valueToCompare);
               break;
             case 'col':
               valueToCompare = diff.col;
+              displayValue = convertColumnIndexToLetter(valueToCompare);
               break;
             case 'value1':
               valueToCompare = diff.value1;
+              displayValue = String(valueToCompare === null ? '(boş)' : valueToCompare);
               break;
             case 'value2':
               valueToCompare = diff.value2;
+              displayValue = String(valueToCompare === null ? '(boş)' : valueToCompare);
               break;
             default:
               return true; // Bilinmeyen kolon anahtarı, filtreleme yok
           }
-          return selectedValues.has(valueToCompare);
+          
+          // Arama terimi kontrolü
+          const matchesSearch = !searchTerm || displayValue.toLowerCase().includes(searchTerm);
+          
+          // Seçili değerler kontrolü (eğer hiç seçili değer yoksa veya arama terimi varsa, tüm değerleri kabul et)
+          const matchesSelection = selectedValues.size === 0 || selectedValues.has(valueToCompare);
+          
+          return matchesSearch && matchesSelection;
         });
       }
     });
@@ -226,7 +316,101 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     }
 
     return currentDifferences;
-  }, [result.sheetResults, activeSheetIndex, filters, sortConfig]);
+  }, [result.sheetResults, activeSheetIndex, filters, sortConfig, filterSearchTerms]);
+
+  // Pagination hesaplamaları
+  const totalItems = filteredAndSortedDifferences.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const currentPageData = filteredAndSortedDifferences.slice(startIndex, endIndex);
+
+  // Sayfa numarası değiştiğinde
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  // Sayfa boyutu değiştiğinde
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // İlk sayfaya dön
+  };
+
+  // Pagination kontrollerini render et
+  const renderPaginationControls = () => {
+    if (totalItems === 0) return null;
+
+    const maxVisiblePages = 5;
+    const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    return (
+      <div className="pagination-controls">
+        <div className="pagination-info">
+          <span>
+            {startIndex + 1}-{endIndex} / {totalItems} sonuç gösteriliyor
+          </span>
+          <select 
+            value={pageSize} 
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            className="page-size-selector"
+          >
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+            <option value={250}>250</option>
+            <option value={500}>500</option>
+          </select>
+          <span>satır/sayfa</span>
+        </div>
+        
+        <div className="pagination-buttons">
+          <button 
+            onClick={() => handlePageChange(1)} 
+            disabled={currentPage === 1}
+            className="pagination-button"
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <button 
+            onClick={() => handlePageChange(currentPage - 1)} 
+            disabled={currentPage === 1}
+            className="pagination-button"
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          
+          {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(pageNum => (
+            <button
+              key={pageNum}
+              onClick={() => handlePageChange(pageNum)}
+              className={`pagination-button ${currentPage === pageNum ? 'active' : ''}`}
+            >
+              {pageNum}
+            </button>
+          ))}
+          
+          <button 
+            onClick={() => handlePageChange(currentPage + 1)} 
+            disabled={currentPage === totalPages}
+            className="pagination-button"
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+          <button 
+            onClick={() => handlePageChange(totalPages)} 
+            disabled={currentPage === totalPages}
+            className="pagination-button"
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   // Aktif sayfanın farklarını göster
   const renderActiveDifferences = () => {
@@ -269,32 +453,67 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                       {showFilterDropdown === col.key && (
                         <div className="filter-dropdown" ref={filterDropdownRef}>
                           <div className="filter-dropdown-header">
-                            <button onClick={() => {
-                              const allValues = Array.from(new Set(activeSheet.differences.map((diff: any) => diff[col.key])));
-                              const currentSelected = filters[col.key] || new Set();
-                              if (currentSelected.size === allValues.length) {
-                                // Hepsi seçiliyse, tümünü temizle
-                                setFilters(prev => ({ ...prev, [col.key]: new Set() }));
-                              } else {
-                                // Tamamı veya bir kısmı seçili değilse, tümünü seç
-                                setFilters(prev => ({ ...prev, [col.key]: new Set(allValues) }));
-                              }
-                            }}>
-                              {filters[col.key]?.size === Array.from(new Set(activeSheet.differences.map((diff: any) => diff[col.key]))).length ? 'Tümünü Kaldır' : 'Tümünü Seç'}
-                            </button>
+                            <input
+                              type="text"
+                              placeholder="Ara..."
+                              value={filterSearchTerms[col.key] || ''}
+                              onChange={(e) => updateFilterSearchTerm(col.key, e.target.value)}
+                              className="filter-search-input"
+                              onClick={(e) => e.stopPropagation()}
+                            />
                             <FontAwesomeIcon icon={faTimes} className="close-filter-icon" onClick={() => setShowFilterDropdown(null)} />
                           </div>
+                          <div className="filter-actions">
+                            <button onClick={() => {
+                              const allValues = getFilterValues(col.key);
+                              const searchTerm = filterSearchTerms[col.key]?.toLowerCase() || '';
+                              const filteredValues = searchTerm 
+                                ? allValues.filter(value => {
+                                    const displayValue = col.key === 'col' ? convertColumnIndexToLetter(value) : String(value === null ? '(boş)' : value);
+                                    return displayValue.toLowerCase().includes(searchTerm);
+                                  })
+                                : allValues;
+                              const currentSelected = filters[col.key] || new Set();
+                              const selectedFilteredCount = filteredValues.filter(value => currentSelected.has(value)).length;
+                              
+                              if (selectedFilteredCount === filteredValues.length) {
+                                // Filtrelenmiş seçeneklerin hepsi seçiliyse, tümünü temizle
+                                const newFilters = new Set(currentSelected);
+                                filteredValues.forEach(value => newFilters.delete(value));
+                                setFilters(prev => ({ ...prev, [col.key]: newFilters }));
+                              } else {
+                                // Filtrelenmiş seçeneklerin tamamı veya bir kısmı seçili değilse, tümünü seç
+                                const newFilters = new Set(currentSelected);
+                                filteredValues.forEach(value => newFilters.add(value));
+                                setFilters(prev => ({ ...prev, [col.key]: newFilters }));
+                              }
+                            }}>
+                              {(() => {
+                                const filteredValues = getFilteredValues(col.key);
+                                const currentSelected = filters[col.key] || new Set();
+                                const selectedFilteredCount = filteredValues.filter(value => currentSelected.has(value)).length;
+                                return selectedFilteredCount === filteredValues.length ? 'Tümünü Kaldır' : 'Tümünü Seç';
+                              })()}
+                            </button>
+                          </div>
                           <div className="filter-options">
-                            {Array.from(new Set(activeSheet.differences.map((diff: any) => diff[col.key]))).map((value, idx) => (
-                              <label key={idx}>
-                                <input 
-                                  type="checkbox" 
-                                  checked={filters[col.key]?.has(value) || false}
-                                  onChange={(e) => handleFilterChange(col.key, value, e.target.checked)}
-                                />
-                                {col.key === 'col' ? convertColumnIndexToLetter(value) : String(value === null ? '(boş)' : value)}
-                              </label>
-                            ))}
+                            {cachedFilterValues[col.key] ? (
+                              getFilteredValues(col.key).map((value, idx) => (
+                                <label key={idx}>
+                                  <input 
+                                    type="checkbox" 
+                                    checked={filters[col.key]?.has(value) || false}
+                                    onChange={(e) => handleFilterChange(col.key, value, e.target.checked)}
+                                  />
+                                  {col.key === 'col' ? convertColumnIndexToLetter(value) : String(value === null ? '(boş)' : value)}
+                                </label>
+                              ))
+                            ) : (
+                              <div className="filter-loading">
+                                <div className="filter-spinner"></div>
+                                <span>Yükleniyor...</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -308,10 +527,10 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
         <div className="differences-table-body-scroll">
           <table className="differences-table">
             <tbody>
-              {filteredAndSortedDifferences.map((diff, index) => (
-                <tr key={index}>
+              {currentPageData.map((diff, index) => (
+                <tr key={startIndex + index}>
                   {columnHeaders.map(col => (
-                    <td key={`${index}-${col.key}`}
+                    <td key={`${startIndex + index}-${col.key}`}
                       className={
                         col.key === 'value1' ? 'diff-value diff-removed' :
                         col.key === 'value2' ? 'diff-value diff-added' :
@@ -329,6 +548,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
             </tbody>
           </table>
         </div>
+        {renderPaginationControls()}
       </div>
     );
   };
@@ -386,11 +606,18 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     );
   };
 
+  // Performans uyarısını render et
+  const renderPerformanceWarning = () => {
+    // Uyarı kaldırıldı
+    return null;
+  };
+
   return (
     <div className="excel-compare-result">
       <div className="excel-result-container">
         <div className="excel-compare-layout">
           <div className="excel-preview-section">
+            {renderPerformanceWarning()}
             {renderSheetTabs()}
             {renderActiveDifferences()}
           </div>

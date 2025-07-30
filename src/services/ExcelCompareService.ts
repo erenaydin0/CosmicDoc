@@ -60,7 +60,7 @@ export class ExcelCompareService {
           }
           
           // Sayfaları karşılaştır
-          const differences = this.compareSheets(json1, json2, sheetName);
+          const differences = await this.compareSheets(json1, json2, sheetName);
           
           // Farklılık yüzdesini hesapla
           const totalCells = this.countCells(json1) + this.countCells(json2);
@@ -173,7 +173,7 @@ export class ExcelCompareService {
           }
           
           // Sayfaları karşılaştır
-          const differences = this.compareSheets(json1, json2, sheetName);
+          const differences = await this.compareSheets(json1, json2, sheetName);
           
           // Farklılık yüzdesini hesapla
           const totalCells = this.countCells(json1) + this.countCells(json2);
@@ -271,32 +271,44 @@ export class ExcelCompareService {
   }
   
   /**
-   * İki Excel sayfasını karşılaştırır
+   * İki Excel sayfasını karşılaştırır (Optimized Version)
    */
-  private static compareSheets(sheet1: any[][], sheet2: any[][], sheetName: string): CellDiff[] {
+  private static async compareSheets(sheet1: any[][], sheet2: any[][], sheetName: string): Promise<CellDiff[]> {
     const differences: CellDiff[] = [];
     const maxRows = Math.max(sheet1.length, sheet2.length);
+    const CHUNK_SIZE = 1000; // Her chunk'ta 1000 satır işle
     
-    for (let r = 0; r < maxRows; r++) {
-      const row1 = r < sheet1.length ? sheet1[r] : [];
-      const row2 = r < sheet2.length ? sheet2[r] : [];
+    // Büyük veri setleri için chunk-based processing
+    for (let startRow = 0; startRow < maxRows; startRow += CHUNK_SIZE) {
+      const endRow = Math.min(startRow + CHUNK_SIZE, maxRows);
       
-      const maxCols = Math.max(row1.length, row2.length);
-      
-      for (let c = 0; c < maxCols; c++) {
-        const value1 = r < sheet1.length && c < row1.length ? row1[c] : null;
-        const value2 = r < sheet2.length && c < row2.length ? row2[c] : null;
+      // Her chunk'ı işle
+      for (let r = startRow; r < endRow; r++) {
+        const row1 = r < sheet1.length ? sheet1[r] : [];
+        const row2 = r < sheet2.length ? sheet2[r] : [];
         
-        // Hücre değerleri farklı mı?
-        if (this.cellValuesAreDifferent(value1, value2)) {
-          differences.push({
-            value1,
-            value2,
-            row: r + 1, // 1'den başlayan satır numaraları
-            col: c + 1, // 1'den başlayan sütun numaraları
-            sheet: sheetName
-          });
+        const maxCols = Math.max(row1.length, row2.length);
+        
+        for (let c = 0; c < maxCols; c++) {
+          const value1 = r < sheet1.length && c < row1.length ? row1[c] : null;
+          const value2 = r < sheet2.length && c < row2.length ? row2[c] : null;
+          
+          // Hücre değerleri farklı mı?
+          if (this.cellValuesAreDifferent(value1, value2)) {
+            differences.push({
+              value1,
+              value2,
+              row: r + 1, // 1'den başlayan satır numaraları
+              col: c + 1, // 1'den başlayan sütun numaraları
+              sheet: sheetName
+            });
+          }
         }
+      }
+      
+      // Her chunk'tan sonra main thread'e nefes ver
+      if (startRow + CHUNK_SIZE < maxRows) {
+        await new Promise(resolve => setTimeout(resolve, 0));
       }
     }
     
