@@ -417,11 +417,7 @@ const PdfCompare: React.FC = () => {
       (compareMode === CompareMode.VISUAL && 
        visualResults.length > 0 && 
        visualResults.filter(vr => vr.hasVisualDifferences).length === 0);
-    
-    const noDifferenceMessage = compareMode === CompareMode.VISUAL ? 
-      "Dosyalar arasında görsel fark bulunamadı." : 
-      "Dosyalar arasında fark bulunamadı.";
-    
+
     const previewContent = (
       <div className="pdf-previews">
         {compareMode === CompareMode.TEXT ? (
@@ -605,9 +601,6 @@ const PdfCompare: React.FC = () => {
                 </div>
               )
             ))}
-            {visualResults.filter(vr => vr.hasVisualDifferences).length === 0 && (
-              <p className="no-visual-diff">Görsel farklılık tespit edilmedi.</p>
-            )}
           </div>
         )}
       </>
@@ -616,9 +609,7 @@ const PdfCompare: React.FC = () => {
     return (
       <ComparisonLayout
         noDifference={noDifference && !isLoading && !isComparingVisually}
-        noDifferenceMessage={noDifferenceMessage}
         isLoading={isLoading || isComparingVisually}
-        loadingMessage="Dosyalar karşılaştırılıyor"
         previewContent={previewContent}
         summaryContent={summaryContent}
       />

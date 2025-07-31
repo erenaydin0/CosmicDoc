@@ -599,7 +599,6 @@ const ExcelCompare: React.FC = () => {
     return (
       <ComparisonLayout
         isLoading={isLoading}
-        loadingMessage="Dosyalar karşılaştırılıyor"
         noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <>

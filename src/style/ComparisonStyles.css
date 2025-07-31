@@ -748,13 +748,6 @@
   opacity: 0.8;
 }
 
-.no-visual-diff {
-  text-align: center;
-  color: var(--success-color);
-  font-style: italic;
-  margin: 10px 0;
-}
-
 /* Responsive tasarım - PDF */
 @media (max-width: 768px) {
   .pdf-previews {

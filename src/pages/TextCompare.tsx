@@ -85,7 +85,6 @@ const TextCompare: React.FC = () => {
     return (
       <ComparisonLayout
         isLoading={componentIsLoading}
-        loadingMessage="Dosyalar karşılaştırılıyor"
         noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <div className="text-files-previews">
