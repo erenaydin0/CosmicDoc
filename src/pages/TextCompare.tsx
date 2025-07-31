@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import FileUpload from '../components/FileUpload';
 import { compareTextFiles, TextCompareResult as TextCompareResultType } from '../services/TextCompareService';
 import '../style/PageStyles.css';
-import '../style/TextCompareResult.css';
 import { formatFileSize } from '../utils/formatters';
 import { exportTextCompareResults } from '../utils/exportUtils';
 import { calculateTextDiffCount } from '../utils/diffUtils';
@@ -195,19 +194,6 @@ const TextCompare: React.FC = () => {
         pageType="text" 
         allowedFileTypes={allowedTextTypes}
       />
-      
-      {isLoading && (
-        <div className="loading-container">
-          <p>Dosyalar karşılaştırılıyor...</p>
-        </div>
-      )}
-      
-      {error && (
-        <div className="error-container">
-          <p>{error}</p>
-        </div>
-      )}
-      
       {compareResult && !isLoading && !error && (
         <TextCompareResult result={compareResult} />
       )}

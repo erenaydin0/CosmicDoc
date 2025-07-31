@@ -4,7 +4,6 @@ import { PdfCompareService } from '../services/PdfCompareService';
 import { PdfCompareResult as PdfCompareResultType, CompareMode, VisualCompareResult } from '../types/PdfTypes';
 import { savePdfFile, clearPdfStore, getPdfFile } from '../services/IndexedDBService';
 import '../style/PageStyles.css';
-import '../style/PdfCompareResult.css';
 import * as pdfjsLib from 'pdfjs-dist';
 import jsPDF from 'jspdf';
 import { formatFileSize } from '../utils/formatters';

@@ -11,6 +11,7 @@ import "./App.css";
 import "./style/PageStyles.css";
 import "./style/Components.css";
 import "./style/TransitionEffects.css";
+import "./style/ComparisonStyles.css";
 
 const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
 

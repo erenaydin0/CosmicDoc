@@ -4,7 +4,6 @@ import { ExcelCompareService } from '../services/ExcelCompareService';
 import { ExcelCompareResult as ExcelCompareResultType } from '../types/ExcelTypes';
 import { saveExcelFile } from '../services/IndexedDBService';
 import '../style/PageStyles.css';
-import '../style/ExcelCompareResult.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faFilter, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { formatFileSize } from '../utils/formatters';
