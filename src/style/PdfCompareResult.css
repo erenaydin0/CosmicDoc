@@ -1,20 +1,7 @@
-.pdf-compare-result {
-  padding: 20px;
-  background-color: var(--background-color);
-  border-radius: 16px;
-  box-shadow: var(--neu-raised-shadow);
-}
-
-.result-container {
-  display: flex;
-  gap: 20px;
-}
-
 .pdf-previews {
   display: flex;
-  min-width: 400px;
-  width: 80%;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .pdf-preview-container {
@@ -85,12 +72,6 @@
   opacity: 0.7;
 }
 
-.comparison-results {
-  flex: 1;
-  width: 20%;
-  position: relative;
-}
-
 .all-pages-details {
   max-height: 550px;
   overflow-y: auto;
@@ -140,73 +121,6 @@
   line-height: 1.2;
   font-size: 14px;
   text-align: left;
-}
-
-.added-line {
-  background-color: rgba(var(--success-color-rgb), 0.15);
-  padding: 1px 0;
-  display: flex;
-  border-bottom: 1px solid rgba(var(--success-color-rgb), 0.3);
-}
-
-.added-line .diff-content {
-  color: var(--success-color);
-}
-
-.removed-line {
-  background-color: rgba(var(--error-color-rgb), 0.15);
-  padding: 1px 0;
-  display: flex;
-  border-bottom: 1px solid rgba(var(--error-color-rgb), 0.3);
-}
-
-.removed-line .diff-content {
-  color: var(--error-color);
-}
-
-.diff-prefix {
-  width: 15px;
-  text-align: center;
-  font-weight: bold;
-  user-select: none;
-}
-
-.diff-prefix:first-child {
-  color: var(--error-color);
-}
-
-.added-line .diff-prefix {
-  color: var(--success-color);
-}
-
-.removed-line .diff-prefix {
-  color: var(--error-color);
-}
-
-.diff-content {
-  flex: 1;
-  font-size: 12px;
-  overflow-wrap: break-word;
-  max-width: 100%;
-}
-
-.no-diff-message {
-  color: var(--text-color);
-  opacity: 0.7;
-  font-style: italic;
-  padding: 10px;
-}
-
-/* Mobil görünüm için düzenleme */
-@media (max-width: 1024px) {
-  .result-container {
-    flex-direction: column;
-  }
-  
-  .pdf-previews {
-    width: 100%;
-    margin-bottom: 20px;
-  }
 }
 
 @media (max-width: 768px) {

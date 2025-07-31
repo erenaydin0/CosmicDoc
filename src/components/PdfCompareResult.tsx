@@ -2,10 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { PdfCompareResult as PdfCompareResultType, CompareMode, VisualCompareResult } from '../types/PdfTypes';
 import { PdfCompareService } from '../services/PdfCompareService';
 import * as pdfjsLib from 'pdfjs-dist';
-import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import '../style/PdfCompareResult.css';
 import { getPdfFile } from '../services/IndexedDBService';
+import { formatFileSize } from '../utils/formatters';
+import { exportPdfCompareResults } from '../utils/exportUtils';
+import NoDiffMessage from './NoDiffMessage';
+import StructureDiffTable from './StructureDiffTable';
+import ExportButton from './ExportButton';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
@@ -56,14 +60,6 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
     return totalDiffCount;
   };
 
-  // Dosya boyutunu okunabilir formata dönüştür
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return bytes + ' B';
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
-    else return (bytes / 1073741824).toFixed(2) + ' GB';
-  };
-  
   // PDF sayfalarını oluştur
   useEffect(() => {
     const renderPdfPages = async () => {
@@ -160,6 +156,33 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
       comparisonResultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [isLoading]);
+
+  // PDF yapı karşılaştırma tablosunu oluştur
+  const renderPdfStructureDiffTable = () => {
+    // Sayfa farkını hesapla
+    const pageDiff = result.pageCount2 - result.pageCount1;
+    // Boyut farkını hesapla
+    const sizeDiff = result.file2Size - result.file1Size;
+
+    const rows = [
+      {
+        label: 'Sayfa',
+        value1: result.pageCount1,
+        value2: result.pageCount2,
+        diff: Math.abs(pageDiff),
+        isDiffZero: pageDiff === 0
+      },
+      {
+        label: 'Boyut',
+        value1: formatFileSize(result.file1Size),
+        value2: formatFileSize(result.file2Size),
+        diff: formatFileSize(Math.abs(sizeDiff)),
+        isDiffZero: sizeDiff === 0
+      }
+    ];
+
+    return <StructureDiffTable rows={rows} />;
+  };
 
   // PDF görüntüleme alanlarını senkronize et (sadece metin modunda)
   useEffect(() => {
@@ -305,41 +328,7 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
 
   // Excel'e aktarma işlevi
   const handleExportToExcel = () => {
-    const allRows: any[] = [];
-
-    result.pageResults.forEach(page => {
-      const pageNumber = page.pageNumber;
-      const differences = page.differences.filter(diff => diff.added || diff.removed); // Sadece gerçek farkları dikkate al
-
-      let i = 0;
-      while (i < differences.length) {
-        const currentDiff = differences[i];
-
-        if (currentDiff.removed && differences[i + 1] && differences[i + 1].added) {
-          // Bir çift bulundu: silineni eklenen takip ediyor (bir değişiklik)
-          const nextDiff = differences[i + 1];
-          allRows.push({
-            Sayfa: pageNumber,
-            'Dosya 1': currentDiff.value,
-            'Dosya 2': nextDiff.value,
-          });
-          i += 2; // Hem mevcut hem de bir sonraki farkı atla
-        } else {
-          // Tek bir eklenen veya silinen fark
-          allRows.push({
-            Sayfa: pageNumber,
-            'Dosya 1': currentDiff.removed ? currentDiff.value : '',
-            'Dosya 2': currentDiff.added ? currentDiff.value : '',
-          });
-          i += 1; // Bir sonraki farka geç
-        }
-      }
-    });
-
-    const ws = XLSX.utils.json_to_sheet(allRows); // allRows kullan
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'PDF Farkları');
-    XLSX.writeFile(wb, 'pdf_fark_raporu.xlsx');
+    exportPdfCompareResults(result.pageResults);
   };
 
   // Görsel karşılaştırma sonuçlarını PDF'e aktarma işlevi
@@ -349,54 +338,6 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Başlık
-      pdf.setFontSize(16);
-      pdf.text('PDF Görsel Karşılaştırma Raporu', pageWidth / 2, 20, { align: 'center' });
-      
-      // Dosya bilgileri
-      pdf.setFontSize(12);
-      pdf.text(`Dosya 1: ${result.file1Name}`, 20, 35);
-      pdf.text(`Dosya 2: ${result.file2Name}`, 20, 45);
-      pdf.text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`, 20, 55);
-      
-      let yPosition = 70;
-      
-      // Özet bilgileri
-      pdf.setFontSize(14);
-      pdf.text('Karşılaştırma Özeti:', 20, yPosition);
-      yPosition += 10;
-      
-      pdf.setFontSize(10);
-      const totalVisualDiffs = visualResults.filter(vr => vr.hasVisualDifferences).length;
-      pdf.text(`Toplam Sayfa: ${Math.max(result.pageCount1, result.pageCount2)}`, 20, yPosition);
-      yPosition += 7;
-      pdf.text(`Görsel Farklılık Bulunan Sayfa: ${totalVisualDiffs}`, 20, yPosition);
-      yPosition += 15;
-      
-      // Sayfa bazında sonuçlar
-      if (visualResults.length > 0) {
-        pdf.setFontSize(14);
-        pdf.text('Sayfa Bazında Sonuçlar:', 20, yPosition);
-        yPosition += 10;
-        
-        pdf.setFontSize(10);
-        visualResults.forEach((vResult) => {
-          if (yPosition > pageHeight - 30) {
-            pdf.addPage();
-            yPosition = 20;
-          }
-          
-          const status = vResult.hasVisualDifferences ? 
-            `Farklılık: %${vResult.differencePercentage.toFixed(2)}` : 
-            'Farklılık yok';
-          
-          pdf.text(`Sayfa ${vResult.pageNumber}: ${status}`, 20, yPosition);
-          yPosition += 7;
-        });
-        
-        yPosition += 10;
-      }
-      
       // Canvas görüntülerini ekle
       if (overlayPages.length > 0) {
         for (let i = 0; i < overlayPages.length; i++) {
@@ -404,28 +345,26 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
           const visualResult = visualResults[i];
           
           if (visualResult && visualResult.hasVisualDifferences) {
-            pdf.addPage();
-            
-            // Sayfa başlığı
-            pdf.setFontSize(14);
-            pdf.text(`Sayfa ${visualResult.pageNumber} - Görsel Karşılaştırma`, pageWidth / 2, 20, { align: 'center' });
+            if (i > 0) {
+              pdf.addPage();
+            }
             
             // Canvas'ı PDF'e ekle
             const imgData = canvas.toDataURL('image/jpeg', 0.8);
-            const imgWidth = pageWidth - 40;
+            const imgWidth = pageWidth - 20;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             
             // Sayfaya sığacak şekilde boyutlandır
-            const maxHeight = pageHeight - 60;
+            const maxHeight = pageHeight - 30;
             const finalHeight = Math.min(imgHeight, maxHeight);
             const finalWidth = (canvas.width * finalHeight) / canvas.height;
             
             const x = (pageWidth - finalWidth) / 2;
-            pdf.addImage(imgData, 'JPEG', x, 30, finalWidth, finalHeight);
+            pdf.addImage(imgData, 'JPEG', x, 15, finalWidth, finalHeight);
             
             // Sayfa bilgisi
             pdf.setFontSize(10);
-            pdf.text(`Görsel Farklılık: %${visualResult.differencePercentage.toFixed(2)}`, 20, pageHeight - 20);
+            pdf.text(`Sayfa ${visualResult.pageNumber} - Farklılık: %${visualResult.differencePercentage.toFixed(2)}`, 10, pageHeight - 10);
           }
         }
       }
@@ -438,239 +377,221 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
     }
   };
 
+
   return (
-    <div className="pdf-compare-result">
-      <div className="result-container">
-        <div className="pdf-previews">
-          {compareMode === CompareMode.TEXT ? (
-            <>
-              <div className="pdf-preview-container">
-                <div className="pdf-preview-header">
-                  <h3>{result.file1Name}</h3>
-                  <span>{result.pageCount1} sayfa</span>
-                </div>
-                <div 
-                  className="pdf-preview-pages"
-                  ref={pdf1ContainerRef}
-                >
-                  {isLoading ? (
-                    <div className="pdf-preview-loading">Yükleniyor...</div>
-                  ) : (
-                    pdf1Pages.map((canvas, index) => (
-                      <div key={`pdf1-page-${index}`} ref={el => pdf1PageRefs.current[index] = el}>
-                        <div className="pdf-page-number">Sayfa {index + 1}</div>
-                        <div 
-                          className="pdf-canvas-container"
-                          ref={el => {
-                            if (el && !el.firstChild) {
-                              el.appendChild(canvas);
-                            }
-                          }}
-                        />
+        <div className="compare-layout">
+          <div className="preview-section">
+            {calculateTotalDiffCount() === 0 && !isLoading && compareMode === CompareMode.TEXT ? (
+                <NoDiffMessage />
+            ) : compareMode === CompareMode.VISUAL && visualResults.length > 0 && 
+                visualResults.filter(vr => vr.hasVisualDifferences).length === 0 && !isLoading && !isComparingVisually ? (
+                <NoDiffMessage message="Dosyalar arasında görsel fark bulunamadı." />
+            ) : (
+              <div className="pdf-previews">
+                {compareMode === CompareMode.TEXT ? (
+                  <>
+                    <div className="pdf-preview-container">
+                      <div className="pdf-preview-header">
+                        <h3>{result.file1Name}</h3>
+                        <span>{result.pageCount1} sayfa</span>
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-              
-              <div className="pdf-preview-container">
-                <div className="pdf-preview-header">
-                  <h3>{result.file2Name}</h3>
-                  <span>{result.pageCount2} sayfa</span>
-                </div>
-                <div 
-                  className="pdf-preview-pages"
-                  ref={pdf2ContainerRef}
-                >
-                  {isLoading ? (
-                    <div className="pdf-preview-loading">Yükleniyor...</div>
-                  ) : (
-                    pdf2Pages.map((canvas, index) => (
-                      <div key={`pdf2-page-${index}`} ref={el => pdf2PageRefs.current[index] = el}>
-                        <div className="pdf-page-number">Sayfa {index + 1}</div>
-                        <div 
-                          className="pdf-canvas-container"
-                          ref={el => {
-                            if (el && !el.firstChild) {
-                              el.appendChild(canvas);
-                            }
-                          }}
-                        />
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="pdf-preview-container single-preview">
-              <div className="pdf-preview-header">
-                <h3>Görsel Karşılaştırma</h3>
-                <span>Üst üste bindirme</span>
-              </div>
-              <div 
-                className="pdf-preview-pages"
-                ref={overlayContainerRef}
-              >
-                {isLoading || isComparingVisually ? (
-                  <div className="pdf-preview-loading">
-                    {isComparingVisually ? 'Görsel karşılaştırma yapılıyor...' : 'Yükleniyor...'}
-                  </div>
-                ) : (
-                  overlayPages.map((canvas, index) => (
-                    <div key={`overlay-page-${index}`}>
-                      <div className="pdf-page-number">Sayfa {index + 1}</div>
                       <div 
-                        className="pdf-canvas-container"
-                        ref={el => {
-                          if (el && !el.firstChild) {
-                            el.appendChild(canvas);
-                          }
-                        }}
-                      />
+                        className="pdf-preview-pages"
+                        ref={pdf1ContainerRef}
+                      >
+                        {isLoading ? (
+                          <div className="pdf-preview-loading">Yükleniyor...</div>
+                        ) : (
+                          pdf1Pages.map((canvas, index) => (
+                            <div key={`pdf1-page-${index}`} ref={el => pdf1PageRefs.current[index] = el}>
+                              <div className="pdf-page-number">Sayfa {index + 1}</div>
+                              <div 
+                                className="pdf-canvas-container"
+                                ref={el => {
+                                  if (el && !el.firstChild) {
+                                    el.appendChild(canvas);
+                                  }
+                                }}
+                              />
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  ))
+                    
+                    <div className="pdf-preview-container">
+                      <div className="pdf-preview-header">
+                        <h3>{result.file2Name}</h3>
+                        <span>{result.pageCount2} sayfa</span>
+                      </div>
+                      <div 
+                        className="pdf-preview-pages"
+                        ref={pdf2ContainerRef}
+                      >
+                        {isLoading ? (
+                          <div className="pdf-preview-loading">Yükleniyor...</div>
+                        ) : (
+                          pdf2Pages.map((canvas, index) => (
+                            <div key={`pdf2-page-${index}`} ref={el => pdf2PageRefs.current[index] = el}>
+                              <div className="pdf-page-number">Sayfa {index + 1}</div>
+                              <div 
+                                className="pdf-canvas-container"
+                                ref={el => {
+                                  if (el && !el.firstChild) {
+                                    el.appendChild(canvas);
+                                  }
+                                }}
+                              />
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="pdf-preview-container single-preview">
+                    <div className="pdf-preview-header">
+                      <h3>Görsel Karşılaştırma</h3>
+                      <span>Üst üste bindirme</span>
+                    </div>
+                    <div 
+                      className="pdf-preview-pages"
+                      ref={overlayContainerRef}
+                    >
+                      {isLoading || isComparingVisually ? (
+                        <div className="pdf-preview-loading">
+                          {isComparingVisually ? 'Görsel karşılaştırma yapılıyor...' : 'Yükleniyor...'}
+                        </div>
+                      ) : (
+                        overlayPages.map((canvas, index) => (
+                          <div key={`overlay-page-${index}`}>
+                            <div className="pdf-page-number">Sayfa {index + 1}</div>
+                            <div 
+                              className="pdf-canvas-container"
+                              ref={el => {
+                                if (el && !el.firstChild) {
+                                  el.appendChild(canvas);
+                                }
+                              }}
+                            />
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
-          )}
-        </div>
-        
-        <div className="comparison-results"
-          ref={comparisonResultsRef}
-        >
-          <div className="result-header">
-            <h2>PDF Karşılaştırma Sonucu</h2>
-            <div className="compare-mode-buttons">
-              <button 
-                className={`mode-button ${compareMode === CompareMode.TEXT ? 'active' : ''}`}
-                onClick={() => handleModeChange(CompareMode.TEXT)}
-              >
-                Metin Karşılaştırma
-              </button>
-              <button 
-                className={`mode-button ${compareMode === CompareMode.VISUAL ? 'active' : ''}`}
-                onClick={() => handleModeChange(CompareMode.VISUAL)}
-                disabled={isComparingVisually}
-              >
-                Görsel Karşılaştırma
-              </button>
-            </div>
-            <div className="summary-info">
-              <div className="summary-item">
-                <span>Toplam Fark Sayısı:</span>
-                <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
-                  {calculateTotalDiffCount()}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span>Boyut Farkı:</span>
-                <span>
-                  {formatFileSize(Math.abs(result.file1Size - result.file2Size))}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span>Dosya 1 Sayfa:</span>
-                <span>{result.pageCount1}</span>
-              </div>
-              <div className="summary-item">
-                <span>Dosya 2 Sayfa:</span>
-                <span>{result.pageCount2}</span>
-              </div>
-              <div className="summary-item">
-                <span>Sayfa Sayısı Farklı:</span>
-                <span className={result.pageCountDiffers ? 'diff-high' : 'diff-none'}>
-                  {result.pageCountDiffers ? 'Evet' : 'Hayır'}
-                </span>
-              </div>
-            </div>
+            )}
           </div>
-
-          {compareMode === CompareMode.TEXT && calculateTotalDiffCount() > 0 && (
-            <button 
-              className="export-button"
-              onClick={handleExportToExcel}
-            >
-              Rapor İndir
-            </button>
-          )}
-          {compareMode === CompareMode.VISUAL && visualResults.filter(vr => vr.hasVisualDifferences).length > 0 && (
+          
+          <div className="summary-section" ref={comparisonResultsRef}>
+            <div className="result-header">
+              <h2>PDF Karşılaştırma Sonucu</h2>
+              <div className="compare-mode-buttons">
                 <button 
-                  className="export-button"
-                  onClick={handleExportVisualToPdf}
+                  className={`mode-button ${compareMode === CompareMode.TEXT ? 'active' : ''}`}
+                  onClick={() => handleModeChange(CompareMode.TEXT)}
                 >
-                  Rapor İndir
+                  Metin Karşılaştırma
                 </button>
-              )}
-          {compareMode === CompareMode.TEXT && calculateTotalDiffCount() > 0 && (
-            <div className="all-pages-details">
-              {result.pageResults.map((page, pageIndex) => {
-                const pageDifferences = page.differences.filter(diff => diff.added || diff.removed);
-                let pageDiffCount = 0;
-                let i = 0;
-                while (i < pageDifferences.length) {
-                  const currentDiff = pageDifferences[i];
-                  if (currentDiff.removed && pageDifferences[i + 1] && pageDifferences[i + 1].added) {
-                    pageDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
-                    i += 2; // Bir sonraki çifti kontrol et
-                  } else {
-                    pageDiffCount += 1; // Tekli ekleme veya silme olarak say
-                    i += 1; // Bir sonraki farkı kontrol et
-                  }
-                }
-                
-                if (pageDiffCount === 0) return null; // Fark yoksa sayfayı gösterme
+                <button 
+                  className={`mode-button ${compareMode === CompareMode.VISUAL ? 'active' : ''}`}
+                  onClick={() => handleModeChange(CompareMode.VISUAL)}
+                  disabled={isComparingVisually}
+                >
+                  Görsel Karşılaştırma
+                </button>
+              </div>
+              <div className="summary-info">
+                <div className="summary-item">
+                  <span>Toplam Fark Sayısı:</span>
+                  <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
+                    {calculateTotalDiffCount()}
+                  </span>
+                </div>
+                {renderPdfStructureDiffTable()}
+              </div>
+            </div>
 
-                return (
-                  <div 
-                    key={pageIndex}
-                    className="page-details"
-                    onClick={() => handlePageDetailsClick(page.pageNumber)}
-                  >
-                    <h3>Sayfa {page.pageNumber} <span className="diff-count">({pageDiffCount} fark)</span></h3>
-                    <div className="text-comparison">
-                      <div className="text-diff">
-                        {page.differences
-                          .filter(diff => diff.added || diff.removed)
-                          .map((diff, i) => (
-                            <div 
-                              key={i} 
-                              className={diff.added ? 'added-line' : 'removed-line'}
-                            >
-                              <span className="diff-prefix">{diff.added ? '+' : '-'}</span>
-                              <span className="diff-content">{diff.value}</span>
-                            </div>
-                          ))}
+            {compareMode === CompareMode.VISUAL && visualResults.filter(vr => vr.hasVisualDifferences).length > 0 && (
+              <ExportButton 
+                onClick={handleExportVisualToPdf}
+                label="Rapor İndir"
+              />
+            )}
+            
+            {compareMode === CompareMode.TEXT && calculateTotalDiffCount() > 0 && (
+              <>
+                <ExportButton onClick={handleExportToExcel} />
+                <div className="all-pages-details">
+                  {result.pageResults.map((page, pageIndex) => {
+                    const pageDifferences = page.differences.filter(diff => diff.added || diff.removed);
+                    let pageDiffCount = 0;
+                    let i = 0;
+                    while (i < pageDifferences.length) {
+                      const currentDiff = pageDifferences[i];
+                      if (currentDiff.removed && pageDifferences[i + 1] && pageDifferences[i + 1].added) {
+                        pageDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
+                        i += 2; // Bir sonraki çifti kontrol et
+                      } else {
+                        pageDiffCount += 1; // Tekli ekleme veya silme olarak say
+                        i += 1; // Bir sonraki farkı kontrol et
+                      }
+                    }
+                    
+                    if (pageDiffCount === 0) return null; // Fark yoksa sayfayı gösterme
+
+                    return (
+                      <div 
+                        key={pageIndex}
+                        className="page-details"
+                        onClick={() => handlePageDetailsClick(page.pageNumber)}
+                      >
+                        <h3>Sayfa {page.pageNumber} <span className="diff-count">({pageDiffCount} fark)</span></h3>
+                        <div className="text-comparison">
+                          <div className="text-diff">
+                            {page.differences
+                              .filter(diff => diff.added || diff.removed)
+                              .map((diff, i) => (
+                                <div 
+                                  key={i} 
+                                  className={diff.added ? 'added-line' : 'removed-line'}
+                                >
+                                  <span className="diff-prefix">{diff.added ? '+' : '-'}</span>
+                                  <span className="diff-content">{diff.value}</span>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
-                      {compareMode === CompareMode.VISUAL && visualResults.length > 0 && (
-            <div className="visual-results">
-              {visualResults.map((vResult, index) => (
-                vResult.hasVisualDifferences && (
-                  <div 
-                    key={index} 
-                    className="visual-page-result"
-                    onClick={() => handleVisualPageClick(vResult.pageNumber)}
-                  >
-                    <h4>Sayfa {vResult.pageNumber}</h4>
-                    <p>Görsel Farklılık: %{vResult.differencePercentage.toFixed(2)}</p>
-                  </div>
-                )
-              ))}
-              {visualResults.filter(vr => vr.hasVisualDifferences).length === 0 && (
-                <p className="no-visual-diff">Görsel farklılık tespit edilmedi.</p>
-              )}
-            </div>
-          )}
+            {compareMode === CompareMode.VISUAL && visualResults.length > 0 && (
+              <div className="visual-results">
+                {visualResults.map((vResult, index) => (
+                  vResult.hasVisualDifferences && (
+                    <div 
+                      key={index} 
+                      className="visual-page-result"
+                      onClick={() => handleVisualPageClick(vResult.pageNumber)}
+                    >
+                      <h4>Sayfa {vResult.pageNumber}</h4>
+                      <p>Görsel Farklılık: %{vResult.differencePercentage.toFixed(2)}</p>
+                    </div>
+                  )
+                ))}
+                {visualResults.filter(vr => vr.hasVisualDifferences).length === 0 && (
+                  <p className="no-visual-diff">Görsel farklılık tespit edilmedi.</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+
   );
 };
 

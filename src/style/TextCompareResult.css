@@ -1,54 +1,13 @@
-.text-compare-result {
-  width: 100%;
-  margin: 20px 0;
-}
-
-.result-container {
-  display: flex;
-  gap: 20px;
-}
-
-.text-files-container {
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
-  width: 100%;
-}
-
 .text-files-previews {
-  flex: 3;
   display: flex;
   flex-direction: row;
   gap: 20px;
-}
-
-.comparison-results {
-  flex: 1;
-  min-width: 250px;
-}
-
-.text-summary-table {
   width: 100%;
-}
-
-@media (max-width: 1024px) {
-  .text-files-container {
-    flex-direction: column-reverse;
-  }
-  
-  .comparison-results {
-    min-width: 100%;
-  }
 }
 
 @media (max-width: 768px) {
   .text-files-previews {
     flex-direction: column;
-  }
-  
-  .result-header {
-    padding: 16px;
-    border-radius: 14px;
   }
 }
 

@@ -1,17 +1,3 @@
-.excel-compare-result {
-  width: 100%;
-  padding: 20px;
-  margin: 0 auto;
-}
-
-.excel-result-container {
-  background-color: var(--background-color);
-  border-radius: 16px;
-  box-shadow: var(--neu-raised-shadow);
-  padding: 25px;
-  margin-top: 20px;
-}
-
 /* Sayfa sekmeleri */
 .sheet-tabs {
   display: flex;
@@ -169,18 +155,7 @@
   }
 } 
 
-.excel-compare-layout {
-  display: flex;
-  gap: 20px;
-}
-
-.excel-preview-section {
-  flex: 3; /* Önizleme alanı daha geniş */
-}
-
-.excel-summary-section {
-  flex: 1; /* Özet alanı daha dar */
-}
+/* Excel karşılaştırma özel stilleri */
 
 .column-header-content {
   display: flex;
@@ -367,70 +342,9 @@
   box-shadow: var(--neu-raised-shadow);
 }
 
-/* Yapı karşılaştırma tablosu stilleri */
-.structure-diff-table {
-  margin-bottom: 20px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px var(--card-shadow-color);
-  max-width: 600px;
-  width: 100%;
-}
-
-.structure-diff-header {
-  display: flex;
-  background-color: var(--subtle-bg-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.structure-diff-row {
-  display: flex;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.structure-diff-row:last-child {
-  border-bottom: none;
-}
-
-.structure-diff-cell {
-  flex: 1;
-  padding: 12px 15px;
-  text-align: center;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.header-cell {
-  font-weight: 600;
-  background-color: var(--subtle-bg-color);
-}
-
-.structure-diff-header .header-cell:first-child {
-  border-top-left-radius: 8px;
-}
-
-.structure-diff-header .header-cell:last-child {
-  border-top-right-radius: 8px;
-}
 
 /* Responsive Tasarım */
 @media (max-width: 768px) {
-  .excel-compare-layout {
-    flex-direction: column;
-  }
-
-  .excel-preview-section,
-  .excel-summary-section {
-    flex: none;
-    width: 100%;
-  }
-
-  .excel-summary-section {
-    margin-top: 20px;
-  }
-
   .differences-table-wrapper {
     overflow-x: auto;
   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import '../style/Header.css';
@@ -12,8 +12,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = false }) => {
-  const location = useLocation();
-  const pathnames = location.pathname.split('/').filter((x) => x);
+  // const location = useLocation(); // Kaldırıldı
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(
     () => {
       // Önce localStorage'dan tema tercihini kontrol et
@@ -73,38 +72,12 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
     }, 200);
   };
 
-  const getPageName = (path: string) => {
-    switch (path) {
-      case 'excel-compare':
-        return 'Excel Karşılaştırma';
-      case 'pdf-compare':
-        return 'PDF Karşılaştırma';
-      case 'text-compare':
-        return 'Metin Karşılaştırma';
-      case 'file-convert':
-        return 'Dosya Dönüştür';
-      default:
-        return '';
-    }
-  };
-
   return (
     <header className="app-header">
       <div className="logo-container">
         <Link to="/" className="logo-link">
           <div className="logo">SYNCHDOC</div>
         </Link>
-        <div className="breadcrumbs">
-          {pathnames.map((value, index) => {
-            const to = `/${pathnames.slice(0, index + 1).join('/')}`;
-            const pageName = getPageName(value);
-            return (
-              <span key={to}>
-                <Link to={to}>{'> ' + pageName}</Link>
-              </span>
-            );
-          })}
-        </div>
       </div>
       <button 
         onClick={handleThemeToggle} 

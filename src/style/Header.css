@@ -39,31 +39,6 @@
   transform: scale(0.98);
 }
 
-.breadcrumbs {
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-.breadcrumbs a {
-  color: var(--text-color);
-  text-decoration: none;
-  transition: color var(--theme-transition-duration) var(--theme-transition-easing);
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.breadcrumbs a:hover {
-  color: var(--primary-color);
-  background: var(--background-color);
-  box-shadow: var(--neu-pressed-shadow);
-}
-
-.breadcrumbs span {
-  margin-left: 0.5rem;
-  color: var(--text-color);
-  opacity: 0.7;
-}
-
 .theme-toggle-button {
   background: var(--background-color);
   border: none;
@@ -184,11 +159,6 @@
   .logo {
     font-size: 1.2rem;
     padding: 6px 12px;
-  }
-  
-  .breadcrumbs {
-    font-size: 1rem;
-    margin-left: 0.5rem;
   }
   
   .theme-toggle-button {

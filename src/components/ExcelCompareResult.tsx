@@ -1,9 +1,13 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ExcelCompareResult as ExcelCompareResultType } from '../types/ExcelTypes';
-import * as XLSX from 'xlsx';
 import '../style/ExcelCompareResult.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faFilter, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { formatFileSize } from '../utils/formatters';
+import { exportExcelCompareResults } from '../utils/exportUtils';
+import NoDiffMessage from './NoDiffMessage';
+import StructureDiffTable from './StructureDiffTable';
+import ExportButton from './ExportButton';
 
 interface ExcelCompareResultProps {
   result: ExcelCompareResultType;
@@ -86,13 +90,6 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     return result.sheetResults.reduce((acc, sheet) => acc + sheet.differences.length, 0);
   };
 
-  // Dosya boyutunu okunabilir formata dönüştür
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return bytes + ' B';
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
-    else return (bytes / 1073741824).toFixed(2) + ' GB';
-  };
 
   // Sütun indeksini Excel harfine dönüştür (1 -> A, 2 -> B, ...)
   const convertColumnIndexToLetter = (colIndex: number): string => {
@@ -108,47 +105,12 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
   
   // Excel'e aktarma işlevi
   const handleExportToExcel = () => {
-    const allRows: any[] = [];
-    
-    // Tüm sayfalardaki tüm farkları birleştir
-    result.sheetResults.forEach(sheet => {
-      sheet.differences.forEach(diff => {
-        allRows.push({
-          'Sayfa': sheet.sheetName,
-          'Satır': diff.row,
-          'Sütun': convertColumnIndexToLetter(diff.col), // Sütun numarasını harfe çevir
-          'Dosya 1 Değeri': diff.value1 !== null ? String(diff.value1) : '(boş)',
-          'Dosya 2 Değeri': diff.value2 !== null ? String(diff.value2) : '(boş)',
-        });
-      });
-    });
-    
-    // Eksik sayfaları raporla
-    result.missingSheets1.forEach(sheetName => {
-      allRows.push({
-        'Sayfa': sheetName,
-        'Satır': '-',
-        'Sütun': '-',
-        'Dosya 1 Değeri': '(sayfa yok)',
-        'Dosya 2 Değeri': 'Sayfa mevcut',
-      });
-    });
-    
-    result.missingSheets2.forEach(sheetName => {
-      allRows.push({
-        'Sayfa': sheetName,
-        'Satır': '-',
-        'Sütun': '-',
-        'Dosya 1 Değeri': 'Sayfa mevcut',
-        'Dosya 2 Değeri': '(sayfa yok)',
-      });
-    });
-
-    // Excel dosyasını oluştur ve indir
-    const ws = XLSX.utils.json_to_sheet(allRows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Excel Farkları');
-    XLSX.writeFile(wb, 'excel_fark_raporu.xlsx');
+    exportExcelCompareResults(
+      result.sheetResults,
+      result.missingSheets1,
+      result.missingSheets2,
+      convertColumnIndexToLetter
+    );
   };
 
   // Sayfa sekmesi için kod
@@ -427,7 +389,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     const activeSheet = result.sheetResults[activeSheetIndex];
     
     if (activeSheet.differences.length === 0) {
-      return <p className="no-diff-message">Bu sayfada fark bulunamadı.</p>;
+      return <NoDiffMessage />;
     }
     
     // Sütun başlıklarını ve bunlara karşılık gelen CellDiff anahtarlarını tanımla
@@ -578,49 +540,41 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     const colDiff = result.file2MaxCols - result.file1MaxCols;
     // Sayfa farkını hesapla
     const sheetDiff = result.sheetCount2 - result.sheetCount1;
+    // Boyut farkını hesapla
+    const sizeDiff = result.file2Size - result.file1Size;
 
-    return (
-      <div className="structure-diff-table">
-        <div className="structure-diff-header">
-          <div className="structure-diff-cell header-cell"></div>
-          <div className="structure-diff-cell header-cell">Dosya 1</div>
-          <div className="structure-diff-cell header-cell">Dosya 2</div>
-          <div className="structure-diff-cell header-cell">Fark</div>
-        </div>
-        <div className="structure-diff-row">
-          <div className="structure-diff-cell header-cell">Sayfa</div>
-          <div className="structure-diff-cell">{result.sheetCount1}</div>
-          <div className="structure-diff-cell">{result.sheetCount2}</div>
-          <div className={`structure-diff-cell ${sheetDiff === 0 ? 'diff-none' : 'diff-high'}`}>
-            {Math.abs(sheetDiff)}
-          </div>
-        </div>
-        <div className="structure-diff-row">
-          <div className="structure-diff-cell header-cell">Sütun</div>
-          <div className="structure-diff-cell">{result.file1MaxCols}</div>
-          <div className="structure-diff-cell">{result.file2MaxCols}</div>
-          <div className={`structure-diff-cell ${colDiff === 0 ? 'diff-none' : 'diff-high'}`}>
-            {Math.abs(colDiff)}
-          </div>
-        </div>
-        <div className="structure-diff-row">
-          <div className="structure-diff-cell header-cell">Satır</div>
-          <div className="structure-diff-cell">{result.file1MaxRows}</div>
-          <div className="structure-diff-cell">{result.file2MaxRows}</div>
-          <div className={`structure-diff-cell ${rowDiff === 0 ? 'diff-none' : 'diff-high'}`}>
-            {Math.abs(rowDiff)}
-          </div>
-        </div>
-        <div className="structure-diff-row">
-          <div className="structure-diff-cell header-cell">Boyut</div>
-          <div className="structure-diff-cell">{formatFileSize(result.file1Size)}</div>
-          <div className="structure-diff-cell">{formatFileSize(result.file2Size)}</div>
-          <div className={`structure-diff-cell ${Math.abs(result.file1Size - result.file2Size) === 0 ? 'diff-none' : 'diff-high'}`}>
-            {formatFileSize(Math.abs(result.file1Size - result.file2Size))}
-          </div>
-        </div>
-      </div>
-    );
+    const rows = [
+      {
+        label: 'Sayfa',
+        value1: result.sheetCount1,
+        value2: result.sheetCount2,
+        diff: Math.abs(sheetDiff),
+        isDiffZero: sheetDiff === 0
+      },
+      {
+        label: 'Sütun',
+        value1: result.file1MaxCols,
+        value2: result.file2MaxCols,
+        diff: Math.abs(colDiff),
+        isDiffZero: colDiff === 0
+      },
+      {
+        label: 'Satır',
+        value1: result.file1MaxRows,
+        value2: result.file2MaxRows,
+        diff: Math.abs(rowDiff),
+        isDiffZero: rowDiff === 0
+      },
+      {
+        label: 'Boyut',
+        value1: formatFileSize(result.file1Size),
+        value2: formatFileSize(result.file2Size),
+        diff: formatFileSize(Math.abs(sizeDiff)),
+        isDiffZero: sizeDiff === 0
+      }
+    ];
+
+    return <StructureDiffTable rows={rows} />;
   };
 
   // Performans uyarısını render et
@@ -630,15 +584,13 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
   };
 
   return (
-    <div className="excel-compare-result">
-      <div className="excel-result-container">
-        <div className="excel-compare-layout">
-          <div className="excel-preview-section">
+        <div className="compare-layout">
+          <div className="preview-section">
             {renderPerformanceWarning()}
             {renderSheetTabs()}
             {renderActiveDifferences()}
           </div>
-          <div className="excel-summary-section">
+          <div className="summary-section">
             <div className="result-header">
               <h2>Excel Karşılaştırma Sonucu</h2>
               <div className="summary-info">
@@ -665,18 +617,12 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
             </div>
 
             {calculateTotalDiffCount() > 0 && (
-              <button 
-                className="export-button"
-                onClick={handleExportToExcel}
-              >
-                Rapor İndir
-              </button>
+              <ExportButton onClick={handleExportToExcel} />
             )}
 
           </div>
         </div>
-      </div>
-    </div>
+
   );
 };
 
