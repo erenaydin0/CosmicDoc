@@ -3,9 +3,9 @@ import { TextCompareResult as TextCompareResultType } from '../services/TextComp
 import '../style/TextCompareResult.css';
 import { formatFileSize } from '../utils/formatters';
 import { exportTextCompareResults } from '../utils/exportUtils';
-import StructureDiffTable from './StructureDiffTable';
 import ExportButton from './ExportButton';
 import ComparisonLayout from './ComparisonLayout';
+import ComparisonResultLayout from './ComparisonResultLayout';
 
 interface TextCompareResultProps {
   result: TextCompareResultType;
@@ -61,29 +61,7 @@ const TextCompareResult: React.FC<TextCompareResultProps> = ({ result }) => {
   let file1DisplayLineCounter = 1;
   let file2DisplayLineCounter = 1;
 
-  const renderTextStructureDiffTable = () => {
-    const rowDiff = file2LineCount - file1LineCount;
-    const sizeDiff = result.file2Size - result.file1Size;
 
-    const rows = [
-      {
-        label: 'Satır',
-        value1: file1LineCount,
-        value2: file2LineCount,
-        diff: Math.abs(rowDiff),
-        isDiffZero: rowDiff === 0
-      },
-      {
-        label: 'Boyut',
-        value1: formatFileSize(result.file1Size),
-        value2: formatFileSize(result.file2Size),
-        diff: formatFileSize(Math.abs(sizeDiff)),
-        isDiffZero: sizeDiff === 0
-      }
-    ];
-
-    return <StructureDiffTable rows={rows} />;
-  };
 
   return (
     <ComparisonLayout
@@ -156,24 +134,29 @@ const TextCompareResult: React.FC<TextCompareResultProps> = ({ result }) => {
         </div>
       }
       summaryContent={
-        <>
-          <div className="result-header">
-            <h2>Metin Karşılaştırma Sonucu</h2>
-            <div className="summary-info">
-              <div className="summary-item">
-                <span>Toplam Fark Sayısı:</span>
-                <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
-                  {calculateTotalDiffCount()}
-                </span>
-              </div>
-              {renderTextStructureDiffTable()}
-            </div>
-          </div>
-
-          {calculateTotalDiffCount() > 0 && (
-            <ExportButton onClick={handleExportToExcel} />
-          )}
-        </>
+        <ComparisonResultLayout
+          title="Metin Karşılaştırma Sonucu"
+          fileName1={result.file1Name}
+          fileName2={result.file2Name}
+          totalDiffCount={calculateTotalDiffCount()}
+          structureDiffRows={[
+            {
+              label: 'Satır',
+              value1: file1LineCount,
+              value2: file2LineCount,
+              diff: Math.abs(file2LineCount - file1LineCount),
+              isDiffZero: file2LineCount - file1LineCount === 0
+            },
+            {
+              label: 'Boyut',
+              value1: formatFileSize(result.file1Size),
+              value2: formatFileSize(result.file2Size),
+              diff: formatFileSize(Math.abs(result.file2Size - result.file1Size)),
+              isDiffZero: result.file2Size - result.file1Size === 0
+            }
+          ]}
+          exportButton={calculateTotalDiffCount() > 0 ? <ExportButton onClick={handleExportToExcel} /> : undefined}
+        />
       }
     />
   );

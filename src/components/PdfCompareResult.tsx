@@ -7,9 +7,9 @@ import '../style/PdfCompareResult.css';
 import { getPdfFile } from '../services/IndexedDBService';
 import { formatFileSize } from '../utils/formatters';
 import { exportPdfCompareResults } from '../utils/exportUtils';
-import StructureDiffTable from './StructureDiffTable';
 import ExportButton from './ExportButton';
 import ComparisonLayout from './ComparisonLayout';
+import ComparisonResultLayout from './ComparisonResultLayout';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
@@ -155,32 +155,7 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
     }
   }, [isLoading]);
 
-  // PDF yapı karşılaştırma tablosunu oluştur
-  const renderPdfStructureDiffTable = () => {
-    // Sayfa farkını hesapla
-    const pageDiff = result.pageCount2 - result.pageCount1;
-    // Boyut farkını hesapla
-    const sizeDiff = result.file2Size - result.file1Size;
 
-    const rows = [
-      {
-        label: 'Sayfa',
-        value1: result.pageCount1,
-        value2: result.pageCount2,
-        diff: Math.abs(pageDiff),
-        isDiffZero: pageDiff === 0
-      },
-      {
-        label: 'Boyut',
-        value1: formatFileSize(result.file1Size),
-        value2: formatFileSize(result.file2Size),
-        diff: formatFileSize(Math.abs(sizeDiff)),
-        isDiffZero: sizeDiff === 0
-      }
-    ];
-
-    return <StructureDiffTable rows={rows} />;
-  };
 
   // PDF görüntüleme alanlarını senkronize et (sadece metin modunda)
   useEffect(() => {
@@ -470,8 +445,37 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
 
   const summaryContent = (
     <>
-      <div className="result-header" ref={comparisonResultsRef}>
-        <h2>PDF Karşılaştırma Sonucu</h2>
+      <div ref={comparisonResultsRef}>
+        <ComparisonResultLayout
+          title="PDF Karşılaştırma Sonucu"
+          fileName1={result.file1Name}
+          fileName2={result.file2Name}
+          totalDiffCount={calculateTotalDiffCount()}
+          structureDiffRows={[
+            {
+              label: 'Sayfa',
+              value1: result.pageCount1,
+              value2: result.pageCount2,
+              diff: Math.abs(result.pageCount2 - result.pageCount1),
+              isDiffZero: result.pageCount2 - result.pageCount1 === 0
+            },
+            {
+              label: 'Boyut',
+              value1: formatFileSize(result.file1Size),
+              value2: formatFileSize(result.file2Size),
+              diff: formatFileSize(Math.abs(result.file2Size - result.file1Size)),
+              isDiffZero: result.file2Size - result.file1Size === 0
+            }
+          ]}
+          exportButton={
+            compareMode === CompareMode.VISUAL && visualResults.filter(vr => vr.hasVisualDifferences).length > 0 ? (
+              <ExportButton onClick={handleExportVisualToPdf} label="Rapor İndir" />
+            ) : compareMode === CompareMode.TEXT && calculateTotalDiffCount() > 0 ? (
+              <ExportButton onClick={handleExportToExcel} />
+            ) : undefined
+          }
+        />
+        
         <div className="compare-mode-buttons">
           <button 
             className={`mode-button ${compareMode === CompareMode.TEXT ? 'active' : ''}`}
@@ -487,72 +491,53 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
             Görsel Karşılaştırma
           </button>
         </div>
-        <div className="summary-info">
-          <div className="summary-item">
-            <span>Toplam Fark Sayısı:</span>
-            <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
-              {calculateTotalDiffCount()}
-            </span>
-          </div>
-          {renderPdfStructureDiffTable()}
-        </div>
       </div>
-
-      {compareMode === CompareMode.VISUAL && visualResults.filter(vr => vr.hasVisualDifferences).length > 0 && (
-        <ExportButton 
-          onClick={handleExportVisualToPdf}
-          label="Rapor İndir"
-        />
-      )}
       
       {compareMode === CompareMode.TEXT && calculateTotalDiffCount() > 0 && (
-        <>
-          <ExportButton onClick={handleExportToExcel} />
-          <div className="all-pages-details">
-            {result.pageResults.map((page, pageIndex) => {
-              const pageDifferences = page.differences.filter(diff => diff.added || diff.removed);
-              let pageDiffCount = 0;
-              let i = 0;
-              while (i < pageDifferences.length) {
-                const currentDiff = pageDifferences[i];
-                if (currentDiff.removed && pageDifferences[i + 1] && pageDifferences[i + 1].added) {
-                  pageDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
-                  i += 2; // Bir sonraki çifti kontrol et
-                } else {
-                  pageDiffCount += 1; // Tekli ekleme veya silme olarak say
-                  i += 1; // Bir sonraki farkı kontrol et
-                }
+        <div className="all-pages-details">
+          {result.pageResults.map((page, pageIndex) => {
+            const pageDifferences = page.differences.filter(diff => diff.added || diff.removed);
+            let pageDiffCount = 0;
+            let i = 0;
+            while (i < pageDifferences.length) {
+              const currentDiff = pageDifferences[i];
+              if (currentDiff.removed && pageDifferences[i + 1] && pageDifferences[i + 1].added) {
+                pageDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
+                i += 2; // Bir sonraki çifti kontrol et
+              } else {
+                pageDiffCount += 1; // Tekli ekleme veya silme olarak say
+                i += 1; // Bir sonraki farkı kontrol et
               }
-              
-              if (pageDiffCount === 0) return null; // Fark yoksa sayfayı gösterme
+            }
+            
+            if (pageDiffCount === 0) return null; // Fark yoksa sayfayı gösterme
 
-              return (
-                <div 
-                  key={pageIndex}
-                  className="page-details"
-                  onClick={() => handlePageDetailsClick(page.pageNumber)}
-                >
-                  <h3>Sayfa {page.pageNumber} <span className="diff-count">({pageDiffCount} fark)</span></h3>
-                  <div className="text-comparison">
-                    <div className="text-diff">
-                      {page.differences
-                        .filter(diff => diff.added || diff.removed)
-                        .map((diff, i) => (
-                          <div 
-                            key={i} 
-                            className={diff.added ? 'added-line' : 'removed-line'}
-                          >
-                            <span className="diff-prefix">{diff.added ? '+' : '-'}</span>
-                            <span className="diff-content">{diff.value}</span>
-                          </div>
-                        ))}
-                    </div>
+            return (
+              <div 
+                key={pageIndex}
+                className="page-details"
+                onClick={() => handlePageDetailsClick(page.pageNumber)}
+              >
+                <h3>Sayfa {page.pageNumber} <span className="diff-count">({pageDiffCount} fark)</span></h3>
+                <div className="text-comparison">
+                  <div className="text-diff">
+                    {page.differences
+                      .filter(diff => diff.added || diff.removed)
+                      .map((diff, i) => (
+                        <div 
+                          key={i} 
+                          className={diff.added ? 'added-line' : 'removed-line'}
+                        >
+                          <span className="diff-prefix">{diff.added ? '+' : '-'}</span>
+                          <span className="diff-content">{diff.value}</span>
+                        </div>
+                      ))}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {compareMode === CompareMode.VISUAL && visualResults.length > 0 && (

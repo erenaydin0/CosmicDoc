@@ -5,9 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faFilter, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
-import StructureDiffTable from './StructureDiffTable';
 import ExportButton from './ExportButton';
 import ComparisonLayout from './ComparisonLayout';
+import ComparisonResultLayout from './ComparisonResultLayout';
 
 interface ExcelCompareResultProps {
   result: ExcelCompareResultType;
@@ -543,50 +543,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     );
   };
 
-  // Sayfa, Satır, Sütun karşılaştırma özet tablosu
-  const renderStructureDiffTable = () => {
-    // Satır farkını hesapla
-    const rowDiff = result.file2MaxRows - result.file1MaxRows;
-    // Sütun farkını hesapla
-    const colDiff = result.file2MaxCols - result.file1MaxCols;
-    // Sayfa farkını hesapla
-    const sheetDiff = result.sheetCount2 - result.sheetCount1;
-    // Boyut farkını hesapla
-    const sizeDiff = result.file2Size - result.file1Size;
 
-    const rows = [
-      {
-        label: 'Sayfa',
-        value1: result.sheetCount1,
-        value2: result.sheetCount2,
-        diff: Math.abs(sheetDiff),
-        isDiffZero: sheetDiff === 0
-      },
-      {
-        label: 'Sütun',
-        value1: result.file1MaxCols,
-        value2: result.file2MaxCols,
-        diff: Math.abs(colDiff),
-        isDiffZero: colDiff === 0
-      },
-      {
-        label: 'Satır',
-        value1: result.file1MaxRows,
-        value2: result.file2MaxRows,
-        diff: Math.abs(rowDiff),
-        isDiffZero: rowDiff === 0
-      },
-      {
-        label: 'Boyut',
-        value1: formatFileSize(result.file1Size),
-        value2: formatFileSize(result.file2Size),
-        diff: formatFileSize(Math.abs(sizeDiff)),
-        isDiffZero: sizeDiff === 0
-      }
-    ];
-
-    return <StructureDiffTable rows={rows} />;
-  };
 
   // Performans uyarısını render et
   const renderPerformanceWarning = () => {
@@ -607,17 +564,43 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
         </>
       }
       summaryContent={
-        <>
-          <div className="result-header">
-            <h2>Excel Karşılaştırma Sonucu</h2>
-            <div className="summary-info">
-              <div className="summary-item">
-                <span>Toplam Fark Sayısı:</span>
-                <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
-                  {calculateTotalDiffCount()}
-                </span>
-              </div>
-              {renderStructureDiffTable()}
+        <ComparisonResultLayout
+          title="Excel Karşılaştırma Sonucu"
+          fileName1={result.file1Name}
+          fileName2={result.file2Name}
+          totalDiffCount={calculateTotalDiffCount()}
+          structureDiffRows={[
+            {
+              label: 'Sayfa',
+              value1: result.sheetCount1,
+              value2: result.sheetCount2,
+              diff: Math.abs(result.sheetCount2 - result.sheetCount1),
+              isDiffZero: result.sheetCount2 - result.sheetCount1 === 0
+            },
+            {
+              label: 'Sütun',
+              value1: result.file1MaxCols,
+              value2: result.file2MaxCols,
+              diff: Math.abs(result.file2MaxCols - result.file1MaxCols),
+              isDiffZero: result.file2MaxCols - result.file1MaxCols === 0
+            },
+            {
+              label: 'Satır',
+              value1: result.file1MaxRows,
+              value2: result.file2MaxRows,
+              diff: Math.abs(result.file2MaxRows - result.file1MaxRows),
+              isDiffZero: result.file2MaxRows - result.file1MaxRows === 0
+            },
+            {
+              label: 'Boyut',
+              value1: formatFileSize(result.file1Size),
+              value2: formatFileSize(result.file2Size),
+              diff: formatFileSize(Math.abs(result.file2Size - result.file1Size)),
+              isDiffZero: result.file2Size - result.file1Size === 0
+            }
+          ]}
+          additionalSummaryItems={
+            <>
               {result.missingSheets1.length > 0 && (
                 <div className="summary-item diff-high">
                   <span>Dosya 1'de Eksik Sayfalar:</span>
@@ -630,13 +613,10 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                   <span>{result.missingSheets2.join(', ')}</span>
                 </div>
               )}
-            </div>
-          </div>
-
-          {calculateTotalDiffCount() > 0 && (
-            <ExportButton onClick={handleExportToExcel} />
-          )}
-        </>
+            </>
+          }
+          exportButton={calculateTotalDiffCount() > 0 ? <ExportButton onClick={handleExportToExcel} /> : undefined}
+        />
       }
     />
   );
