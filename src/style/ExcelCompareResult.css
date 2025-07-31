@@ -401,23 +401,6 @@
   cursor: not-allowed;
 }
 
-/* Performance uyarısı */
-.performance-warning {
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
-  color: #856404;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  font-size: 0.9rem;
-}
-
-.performance-warning.error {
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-  color: #721c24;
-}
-
 /* Mobile responsive pagination */
 @media (max-width: 768px) {
   .pagination-controls {

@@ -7,9 +7,8 @@ import '../style/PdfCompareResult.css';
 import { getPdfFile } from '../services/IndexedDBService';
 import { formatFileSize } from '../utils/formatters';
 import { exportPdfCompareResults } from '../utils/exportUtils';
-import ExportButton from './ExportButton';
-import ComparisonLayout from './ComparisonLayout';
-import ComparisonResultLayout from './ComparisonResultLayout';
+import { calculatePdfDiffCount, calculatePageDiffCount } from '../utils/diffUtils';
+import ComparisonLayout, { ComparisonResultLayout, ExportButton } from './ComparisonResult';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
@@ -42,22 +41,7 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
   
   // Toplam fark sayısını hesapla
   const calculateTotalDiffCount = () => {
-    let totalDiffCount = 0;
-    result.pageResults.forEach(page => {
-      const differences = page.differences.filter(diff => diff.added || diff.removed);
-      let i = 0;
-      while (i < differences.length) {
-        const currentDiff = differences[i];
-        if (currentDiff.removed && differences[i + 1] && differences[i + 1].added) {
-          totalDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
-          i += 2; // Bir sonraki çifti kontrol et
-        } else {
-          totalDiffCount += 1; // Tekli ekleme veya silme olarak say
-          i += 1; // Bir sonraki farkı kontrol et
-        }
-      }
-    });
-    return totalDiffCount;
+    return calculatePdfDiffCount(result.pageResults);
   };
 
   // PDF sayfalarını oluştur
@@ -497,18 +481,7 @@ const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
         <div className="all-pages-details">
           {result.pageResults.map((page, pageIndex) => {
             const pageDifferences = page.differences.filter(diff => diff.added || diff.removed);
-            let pageDiffCount = 0;
-            let i = 0;
-            while (i < pageDifferences.length) {
-              const currentDiff = pageDifferences[i];
-              if (currentDiff.removed && pageDifferences[i + 1] && pageDifferences[i + 1].added) {
-                pageDiffCount += 1; // Değişiklik olarak say (silindi + eklendi)
-                i += 2; // Bir sonraki çifti kontrol et
-              } else {
-                pageDiffCount += 1; // Tekli ekleme veya silme olarak say
-                i += 1; // Bir sonraki farkı kontrol et
-              }
-            }
+            const pageDiffCount = calculatePageDiffCount(pageDifferences);
             
             if (pageDiffCount === 0) return null; // Fark yoksa sayfayı gösterme
 

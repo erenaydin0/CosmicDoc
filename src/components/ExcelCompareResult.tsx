@@ -5,9 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faFilter, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
-import ExportButton from './ExportButton';
-import ComparisonLayout from './ComparisonLayout';
-import ComparisonResultLayout from './ComparisonResultLayout';
+import { calculateExcelDiffCount } from '../utils/diffUtils';
+import ComparisonLayout, { ComparisonResultLayout, ExportButton } from './ComparisonResult';
 
 interface ExcelCompareResultProps {
   result: ExcelCompareResultType;
@@ -98,7 +97,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
 
   // Toplam fark sayısını hesapla
   const calculateTotalDiffCount = () => {
-    return result.sheetResults.reduce((acc, sheet) => acc + sheet.differences.length, 0);
+    return calculateExcelDiffCount(result);
   };
 
 
@@ -543,14 +542,6 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     );
   };
 
-
-
-  // Performans uyarısını render et
-  const renderPerformanceWarning = () => {
-    // Uyarı kaldırıldı
-    return null;
-  };
-
   return (
     <ComparisonLayout
       isLoading={isLoading}
@@ -558,7 +549,6 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
       noDifference={calculateTotalDiffCount() === 0}
       previewContent={
         <>
-          {renderPerformanceWarning()}
           {renderSheetTabs()}
           {renderActiveDifferences()}
         </>

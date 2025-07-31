@@ -1,6 +1,33 @@
 import React from 'react';
 import '../style/Components.css';
 
+// Export düğmesi için prop tipleri
+interface ExportButtonProps {
+  onClick: () => void;
+  label?: string;
+  disabled?: boolean;
+}
+
+/**
+ * Rapor indirme düğmesi bileşeni
+ */
+export const ExportButton: React.FC<ExportButtonProps> = ({ 
+  onClick, 
+  label = "Rapor İndir", 
+  disabled = false 
+}) => {
+  return (
+    <button 
+      className="export-button"
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {label}
+    </button>
+  );
+};
+
+// Yapı karşılaştırma tablosu için satır tipi
 interface StructureDiffRow {
   label: string;
   value1: string | number;
@@ -9,6 +36,19 @@ interface StructureDiffRow {
   isDiffZero: boolean;
 }
 
+// Ana düzen için prop tipleri
+interface ComparisonLayoutProps {
+  previewContent: React.ReactNode;
+  summaryContent: React.ReactNode;
+  noDifference?: boolean;
+  noDifferenceMessage?: string;
+  isLoading?: boolean;
+  loadingMessage?: string;
+  error?: string;
+  onRetry?: () => void;
+}
+
+// Sonuç düzeni için prop tipleri
 interface ComparisonResultLayoutProps {
   title: string;
   fileName1: string;
@@ -20,7 +60,8 @@ interface ComparisonResultLayoutProps {
   children?: React.ReactNode;
 }
 
-const ComparisonResultLayout: React.FC<ComparisonResultLayoutProps> = ({
+// Sonuç içeriği bileşeni
+export const ComparisonResultLayout: React.FC<ComparisonResultLayoutProps> = ({
   title,
   fileName1,
   fileName2,
@@ -84,4 +125,47 @@ const ComparisonResultLayout: React.FC<ComparisonResultLayoutProps> = ({
   );
 };
 
-export default ComparisonResultLayout;
+// Ana karşılaştırma düzeni bileşeni
+const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
+  previewContent,
+  summaryContent,
+  noDifference = false,
+  noDifferenceMessage = "Dosyalar arasında fark bulunamadı.",
+  isLoading = false,
+  loadingMessage = "Dosyalar karşılaştırılıyor",
+  error,
+  onRetry
+}) => {
+  return (
+    <div className="result-container">
+      {isLoading ? (
+        <div className="loading-container full-page">
+          <div className="loading-spinner"></div>
+          <p className="loading-message">{loadingMessage}</p>
+        </div>
+      ) : error ? (
+        <div className="error-container full-page">
+          <p className="error-message">{error}</p>
+          {onRetry && (
+            <button onClick={onRetry} className="retry-button">Tekrar Dene</button>
+          )}
+        </div>
+      ) : (
+        <div className="compare-layout">
+          <div className="preview-section">
+            {noDifference ? (
+              <p className="no-diff-message">{noDifferenceMessage}</p>
+            ) : (
+              previewContent
+            )}
+          </div>
+          <div className="summary-section">
+            {summaryContent}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ComparisonLayout;

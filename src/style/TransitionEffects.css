@@ -1,3 +1,57 @@
+/* ===== SAYFA GEÇİŞ ANIMASYONLARI ===== */
+
+/* Basit sayfa geçiş animasyonu */
+.page-transition-enter {
+  opacity: 0;
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+}
+
+/* Genel konteyner stilleri */
+.page-transition-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.page-transition-container {
+  width: 100%;
+}
+
+/* Sayfa içerik stilleri */
+.page-content-wrapper {
+  position: relative;
+  animation-fill-mode: both;
+  min-height: 70vh;
+  width: 100%;
+  animation: fadeInScale 400ms ease-out;
+}
+
+/* Animasyon keyframe tanımlamaları */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== TEMA GEÇİŞ ANIMASYONLARI ===== */
+
 .theme-transition-overlay {
   position: fixed;
   top: 0;
@@ -51,4 +105,4 @@
   .theme-transition-overlay {
     animation-duration: 0.3s;
   }
-} 
+}

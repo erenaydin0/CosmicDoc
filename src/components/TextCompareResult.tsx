@@ -3,9 +3,8 @@ import { TextCompareResult as TextCompareResultType } from '../services/TextComp
 import '../style/TextCompareResult.css';
 import { formatFileSize } from '../utils/formatters';
 import { exportTextCompareResults } from '../utils/exportUtils';
-import ExportButton from './ExportButton';
-import ComparisonLayout from './ComparisonLayout';
-import ComparisonResultLayout from './ComparisonResultLayout';
+import { calculateTextDiffCount } from '../utils/diffUtils';
+import ComparisonLayout, { ComparisonResultLayout, ExportButton } from './ComparisonResult';
 
 interface TextCompareResultProps {
   result: TextCompareResultType;
@@ -26,7 +25,7 @@ const TextCompareResult: React.FC<TextCompareResultProps> = ({ result }) => {
 
   // Toplam fark sayısını hesapla
   const calculateTotalDiffCount = () => {
-    return result.differences.filter(diff => diff.added || diff.removed).length;
+    return calculateTextDiffCount(result);
   };
 
   // Toplam satır sayılarını hesapla
