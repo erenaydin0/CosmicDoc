@@ -9,9 +9,7 @@ import '../style/PdfCompareResult.css';
 
 const PdfCompare: React.FC = () => {
   const allowedPdfTypes = ['.pdf'];
-  const [isComparing, setIsComparing] = useState(false);
   const [compareResult, setCompareResult] = useState<PdfCompareResultType | null>(null);
-  const [compareError, setCompareError] = useState<string | null>(null);
   
   // Component ilk yüklendiğinde verileri temizle
   useEffect(() => {
@@ -24,9 +22,7 @@ const PdfCompare: React.FC = () => {
   }, []);
   
   const handleCompare = async (file1: File, file2: File) => {
-    setIsComparing(true);
     setCompareResult(null);
-    setCompareError(null);
     
     try {
       // Yeni bir timestamp oluştur
@@ -84,9 +80,6 @@ const PdfCompare: React.FC = () => {
       setCompareResult(resultWithTimestamp);
     } catch (error) {
       console.error('PDF karşılaştırma hatası:', error);
-      setCompareError(error instanceof Error ? error.message : 'PDF karşılaştırılırken bir hata oluştu');
-    } finally {
-      setIsComparing(false);
     }
   };
 
@@ -103,19 +96,6 @@ const PdfCompare: React.FC = () => {
         pageType="pdf" 
         allowedFileTypes={allowedPdfTypes}
       />
-      
-      {isComparing && (
-        <div className="loading-message">
-          <p>PDF dosyaları karşılaştırılıyor, lütfen bekleyiniz...</p>
-          <div className="loader"></div>
-        </div>
-      )}
-      
-      {compareError && (
-        <div className="error-message">
-          <p>Hata: {compareError}</p>
-        </div>
-      )}
       
       {compareResult && <PdfCompareResult result={compareResult} />}
     </div>

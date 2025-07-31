@@ -5,9 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortUp, faSortDown, faFilter, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
-import NoDiffMessage from './NoDiffMessage';
 import StructureDiffTable from './StructureDiffTable';
 import ExportButton from './ExportButton';
+import ComparisonLayout from './ComparisonLayout';
 
 interface ExcelCompareResultProps {
   result: ExcelCompareResultType;
@@ -20,6 +20,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
   const [showFilterDropdown, setShowFilterDropdown] = useState<string | null>(null); // Hangi kolonun filtresi açık
   const [filterSearchTerms, setFilterSearchTerms] = useState<{ [key: string]: string }>({}); // Her filtre için arama terimi
   const [cachedFilterValues, setCachedFilterValues] = useState<{ [key: string]: any[] }>({}); // Önbelleğe alınmış filtre değerleri
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
   // Pagination state'leri
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -54,6 +55,16 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showFilterDropdown, activeSheetIndex, result.sheetResults]); // result.sheetResults bağımlılık olarak eklendi
+
+  // Bileşen yüklendiğinde
+  useEffect(() => {
+    // Veri hazırlama işlemi için kısa bir gecikme ekleyelim
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Aktif sayfa değiştiğinde filtre değerlerini önbelleğe al
   useEffect(() => {
@@ -389,7 +400,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
     const activeSheet = result.sheetResults[activeSheetIndex];
     
     if (activeSheet.differences.length === 0) {
-      return <NoDiffMessage />;
+      return <p className="no-diff-message">Dosyalar arasında fark bulunamadı.</p>;
     }
     
     // Sütun başlıklarını ve bunlara karşılık gelen CellDiff anahtarlarını tanımla
@@ -489,7 +500,7 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
                               ))
                             ) : (
                               <div className="filter-loading">
-                                <div className="filter-spinner"></div>
+                                <div className="loading-spinner"></div>
                                 <span>Yükleniyor...</span>
                               </div>
                             )}
@@ -584,45 +595,50 @@ const ExcelCompareResult: React.FC<ExcelCompareResultProps> = ({ result }) => {
   };
 
   return (
-        <div className="compare-layout">
-          <div className="preview-section">
-            {renderPerformanceWarning()}
-            {renderSheetTabs()}
-            {renderActiveDifferences()}
-          </div>
-          <div className="summary-section">
-            <div className="result-header">
-              <h2>Excel Karşılaştırma Sonucu</h2>
-              <div className="summary-info">
-                <div className="summary-item">
-                  <span>Toplam Fark Sayısı:</span>
-                  <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
-                    {calculateTotalDiffCount()}
-                  </span>
-                </div>
-                {renderStructureDiffTable()}
-                {result.missingSheets1.length > 0 && (
-                  <div className="summary-item diff-high">
-                    <span>Dosya 1'de Eksik Sayfalar:</span>
-                    <span>{result.missingSheets1.join(', ')}</span>
-                  </div>
-                )}
-                {result.missingSheets2.length > 0 && (
-                  <div className="summary-item diff-high">
-                    <span>Dosya 2'de Eksik Sayfalar:</span>
-                    <span>{result.missingSheets2.join(', ')}</span>
-                  </div>
-                )}
+    <ComparisonLayout
+      isLoading={isLoading}
+      loadingMessage="Dosyalar karşılaştırılıyor"
+      noDifference={calculateTotalDiffCount() === 0}
+      previewContent={
+        <>
+          {renderPerformanceWarning()}
+          {renderSheetTabs()}
+          {renderActiveDifferences()}
+        </>
+      }
+      summaryContent={
+        <>
+          <div className="result-header">
+            <h2>Excel Karşılaştırma Sonucu</h2>
+            <div className="summary-info">
+              <div className="summary-item">
+                <span>Toplam Fark Sayısı:</span>
+                <span className={calculateTotalDiffCount() > 0 ? 'diff-high' : 'diff-none'}>
+                  {calculateTotalDiffCount()}
+                </span>
               </div>
+              {renderStructureDiffTable()}
+              {result.missingSheets1.length > 0 && (
+                <div className="summary-item diff-high">
+                  <span>Dosya 1'de Eksik Sayfalar:</span>
+                  <span>{result.missingSheets1.join(', ')}</span>
+                </div>
+              )}
+              {result.missingSheets2.length > 0 && (
+                <div className="summary-item diff-high">
+                  <span>Dosya 2'de Eksik Sayfalar:</span>
+                  <span>{result.missingSheets2.join(', ')}</span>
+                </div>
+              )}
             </div>
-
-            {calculateTotalDiffCount() > 0 && (
-              <ExportButton onClick={handleExportToExcel} />
-            )}
-
           </div>
-        </div>
 
+          {calculateTotalDiffCount() > 0 && (
+            <ExportButton onClick={handleExportToExcel} />
+          )}
+        </>
+      }
+    />
   );
 };
 
