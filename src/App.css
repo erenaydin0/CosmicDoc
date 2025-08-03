@@ -39,10 +39,6 @@
   --hover-shadow-color: rgba(163, 177, 198, 0.8);
   --subtle-bg-color: rgba(163, 177, 198, 0.1);
   --border-color: rgba(163, 177, 198, 0.3);
-  
-  /* Tema geçiş süreleri */
-  --theme-transition-duration: 0.8s;
-  --theme-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme='dark'] {
@@ -83,127 +79,25 @@
   --border-color: rgba(58, 76, 99, 0.3);
 }
 
-/* Tema geçiş animasyonu için root element */
-html {
-  transition: all var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
 body {
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: 'Montserrat', sans-serif;
-  transition: background-color var(--theme-transition-duration) var(--theme-transition-easing), 
-              color var(--theme-transition-duration) var(--theme-transition-easing);
   margin: 0;
   padding: 0;
   overflow-x: hidden;
   position: relative;
 }
 
-/* Tema değişimi sırasında yumuşak geçiş overlay */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, 
-              rgba(var(--primary-color-rgb), 0.02) 0%, 
-              transparent 50%,
-              rgba(var(--primary-color-rgb), 0.01) 100%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transition: opacity var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
-/* Tema geçişi aktifken overlay göster */
-body.theme-transitioning::before {
-  opacity: 1;
-}
-
 .container {
   padding: 2rem;
   text-align: center;
   margin: 0 auto;
-  transition: all var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
-/* Gelişmiş tema geçişleri için tüm elementler */
-* {
-  transition: background-color var(--theme-transition-duration) var(--theme-transition-easing), 
-              color var(--theme-transition-duration) var(--theme-transition-easing), 
-              border-color var(--theme-transition-duration) var(--theme-transition-easing), 
-              box-shadow var(--theme-transition-duration) var(--theme-transition-easing),
-              fill var(--theme-transition-duration) var(--theme-transition-easing),
-              stroke var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
-/* Özel elementler için hızlandırılmış geçişler */
-button, 
-.card, 
-.drop-zone,
-.theme-toggle-button {
-  transition: background-color var(--theme-transition-duration) var(--theme-transition-easing), 
-              color var(--theme-transition-duration) var(--theme-transition-easing), 
-              border-color var(--theme-transition-duration) var(--theme-transition-easing), 
-              box-shadow var(--theme-transition-duration) var(--theme-transition-easing),
-              transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-/* Tema geçişi sırasında hafif ölçek efekti */
-@keyframes themeTransition {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.001); }
-  100% { transform: scale(1); }
-}
-
-/* Aktif tema geçişi sırasında animasyon */
-.theme-transitioning .container {
-  animation: themeTransition var(--theme-transition-duration) var(--theme-transition-easing);
 }
 
 /* Mobil düzenlemeler */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
-  }
-  
-  /* Mobilde daha hızlı geçişler */
-  :root {
-    --theme-transition-duration: 0.6s;
-  }
-}
-
-/* Kaydırma çubuğu tema geçişleri */
-::-webkit-scrollbar {
-  width: 8px;
-  transition: all var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background-color);
-  transition: background var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
-  border-radius: 4px;
-  transition: background var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
-/* Reduced motion için */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --theme-transition-duration: 0.3s;
-  }
-  
-  *, body, html {
-    transition-duration: 0.3s !important;
-  }
-  
-  .theme-transitioning .container {
-    animation: none;
   }
 }

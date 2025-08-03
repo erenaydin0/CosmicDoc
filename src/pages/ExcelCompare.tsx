@@ -396,7 +396,7 @@ const ExcelCompare: React.FC = () => {
               <option value={250}>250</option>
               <option value={500}>500</option>
             </select>
-            <span>satır/sayfa</span>
+            <span>satır</span>
           </div>
           
           <div className="pagination-buttons">
