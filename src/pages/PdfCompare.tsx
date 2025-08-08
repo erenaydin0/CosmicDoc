@@ -503,6 +503,21 @@ const PdfCompare: React.FC = () => {
   
     const summaryContent = (
       <>
+      <div className="compare-mode-buttons">
+            <button 
+              className={`mode-button ${compareMode === CompareMode.TEXT ? 'active' : ''}`}
+              onClick={() => handleModeChange(CompareMode.TEXT)}
+            >
+              Metin Karşılaştırma
+            </button>
+            <button 
+              className={`mode-button ${compareMode === CompareMode.VISUAL ? 'active' : ''}`}
+              onClick={() => handleModeChange(CompareMode.VISUAL)}
+              disabled={isComparingVisually}
+            >
+              Görsel Karşılaştırma
+            </button>
+          </div>
         <div ref={comparisonResultsRef}>
           <ComparisonResultLayout
             title="PDF Karşılaştırma Sonucu"
@@ -533,22 +548,6 @@ const PdfCompare: React.FC = () => {
               ) : undefined
             }
           />
-          
-          <div className="compare-mode-buttons">
-            <button 
-              className={`mode-button ${compareMode === CompareMode.TEXT ? 'active' : ''}`}
-              onClick={() => handleModeChange(CompareMode.TEXT)}
-            >
-              Metin Karşılaştırma
-            </button>
-            <button 
-              className={`mode-button ${compareMode === CompareMode.VISUAL ? 'active' : ''}`}
-              onClick={() => handleModeChange(CompareMode.VISUAL)}
-              disabled={isComparingVisually}
-            >
-              Görsel Karşılaştırma
-            </button>
-          </div>
         </div>
         
         {compareMode === CompareMode.TEXT && calculateTotalDiffCount() > 0 && (
