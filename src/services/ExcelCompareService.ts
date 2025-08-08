@@ -319,17 +319,19 @@ export class ExcelCompareService {
    * İki hücre değerinin farklı olup olmadığını kontrol eder
    */
   private static cellValuesAreDifferent(value1: any, value2: any): boolean {
-    // İki değer de null veya undefined ise farklı değiller
-    if (value1 == null && value2 == null) return false;
-    
-    // Değerlerden biri null veya undefined ise farklılar
-    if (value1 == null || value2 == null) return true;
-    
+    const isEmpty = (v: any) => v == null || (typeof v === 'string' && v.trim() === '');
+
+    // İki değer de boşsa farklı değiller
+    if (isEmpty(value1) && isEmpty(value2)) return false;
+
+    // Biri boş diğeri değilse farklılar
+    if (isEmpty(value1) !== isEmpty(value2)) return true;
+
     // Sayısal değerleri karşılaştır
     if (typeof value1 === 'number' && typeof value2 === 'number') {
       return Math.abs(value1 - value2) > 0.0001; // Küçük farkları yok say
     }
-    
+
     // Diğer değerleri string'e çevirerek karşılaştır
     return String(value1) !== String(value2);
   }
