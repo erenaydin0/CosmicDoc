@@ -617,6 +617,7 @@
   max-height: 550px;
   overflow-y: auto;
   padding-right: 10px;
+  width: 100%;
 }
 
 .page-details {
@@ -667,8 +668,8 @@
 /* Karşılaştırma modu butonları */
 .compare-mode-buttons {
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 15px;
+  margin: 15px;
   justify-content: center;
 }
 
