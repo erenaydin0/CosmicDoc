@@ -676,7 +676,14 @@ const ExcelCompare: React.FC = () => {
         Yüklediğiniz tablolardaki veri farklılıkları anında tespit edilir.
       </p>
       
-      <div className="comparison-options">
+      
+      
+      <FileUpload 
+        onCompare={handleCompare} 
+        pageType="excel" 
+        allowedFileTypes={allowedExcelTypes}
+      />
+<div className="comparison-options">
         <label className="checkbox-label">
           <input
             type="checkbox"
@@ -700,13 +707,6 @@ const ExcelCompare: React.FC = () => {
           </small>
         </label>
       </div>
-      
-      <FileUpload 
-        onCompare={handleCompare} 
-        pageType="excel" 
-        allowedFileTypes={allowedExcelTypes}
-      />
-
       {compareResult && (
         <ExcelCompareResult result={compareResult} />
       )}
