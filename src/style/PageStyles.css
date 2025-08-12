@@ -376,6 +376,8 @@
   background-color: var(--background-color);
   border-radius: 16px;
   border: 1px solid var(--neu-shadow-light);
+  display: flex;
+  gap: 1rem;
 }
 
 .checkbox-label {
