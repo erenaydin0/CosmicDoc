@@ -9,7 +9,7 @@ export class ExcelCompareService {
   /**
    * İki Excel dosyasını karşılaştırır
    */
-  public static async compareExcelFiles(file1: File, file2: File, matchColumns: boolean = false): Promise<ExcelCompareResult> {
+  public static async compareExcelFiles(file1: File, file2: File, matchColumns: boolean = false, ignoreSheetNames: boolean = false): Promise<ExcelCompareResult> {
     try {
       // Dosyaları yükle ve içeriğini çıkar
       const workbook1 = await this.readExcelFile(file1);
@@ -23,8 +23,21 @@ export class ExcelCompareService {
       const sheetCountDiffers = sheets1.length !== sheets2.length;
       
       // Hangi sayfaların eksik olduğunu belirle
-      const missingSheets1 = sheets2.filter(sheet => !sheets1.includes(sheet));
-      const missingSheets2 = sheets1.filter(sheet => !sheets2.includes(sheet));
+      let missingSheets1: string[] = [];
+      let missingSheets2: string[] = [];
+      
+      if (!ignoreSheetNames) {
+        // Normal mod: sayfa isimlerine göre karşılaştır
+        missingSheets1 = sheets2.filter(sheet => !sheets1.includes(sheet));
+        missingSheets2 = sheets1.filter(sheet => !sheets2.includes(sheet));
+      } else {
+        // Sayfa isimlerini yoksay modu: sıra numaralarına göre karşılaştır
+        if (sheets1.length < sheets2.length) {
+          missingSheets1 = sheets2.slice(sheets1.length);
+        } else if (sheets2.length < sheets1.length) {
+          missingSheets2 = sheets1.slice(sheets2.length);
+        }
+      }
       
       // Her sayfayı karşılaştır
       const sheetResults: SheetDiff[] = [];
@@ -36,12 +49,57 @@ export class ExcelCompareService {
       let file1MaxCols = 0;
       let file2MaxCols = 0;
       
-      // Birinci dosyanın tüm sayfalarını işle
-      for (const sheetName of sheets1) {
-        if (sheets2.includes(sheetName)) {
-          // Her iki dosyada da bulunan sayfaları karşılaştır
-          const sheet1 = workbook1.Sheets[sheetName];
-          const sheet2 = workbook2.Sheets[sheetName];
+      if (!ignoreSheetNames) {
+        // Normal mod: aynı isimli sayfaları karşılaştır
+        for (const sheetName of sheets1) {
+          if (sheets2.includes(sheetName)) {
+            // Her iki dosyada da bulunan sayfaları karşılaştır
+            const sheet1 = workbook1.Sheets[sheetName];
+            const sheet2 = workbook2.Sheets[sheetName];
+            
+            // Sayfaları JSON'a dönüştür
+            const json1 = XLSX.utils.sheet_to_json(sheet1, { header: 1, defval: null }) as any[][];
+            const json2 = XLSX.utils.sheet_to_json(sheet2, { header: 1, defval: null }) as any[][];
+            
+            // Her dosyanın satır ve sütun sayılarını güncelle
+            file1MaxRows = Math.max(file1MaxRows, json1.length);
+            file2MaxRows = Math.max(file2MaxRows, json2.length);
+            
+            // Her satırdaki maksimum sütun sayısını hesapla
+            for (const row of json1) {
+              file1MaxCols = Math.max(file1MaxCols, row.length);
+            }
+            for (const row of json2) {
+              file2MaxCols = Math.max(file2MaxCols, row.length);
+            }
+            
+            // Sayfaları karşılaştır
+            const differences = await this.compareSheets(json1, json2, sheetName, matchColumns);
+            
+            // Farklılık yüzdesini hesapla
+            const totalCells = this.countCells(json1) + this.countCells(json2);
+            const diffPercentage = totalCells > 0 ? (differences.length / totalCells) * 100 : 0;
+            
+            sheetResults.push({
+              sheetName,
+              differences,
+              diffPercentage
+            });
+            
+            processedSheets.add(sheetName);
+          }
+        }
+      } else {
+        // Sayfa isimlerini yoksay modu: sıra numaralarına göre karşılaştır
+        const minSheetCount = Math.min(sheets1.length, sheets2.length);
+        
+        for (let i = 0; i < minSheetCount; i++) {
+          const sheetName1 = sheets1[i];
+          const sheetName2 = sheets2[i];
+          const displayName = `${sheetName1} ↔ ${sheetName2}`;
+          
+          const sheet1 = workbook1.Sheets[sheetName1];
+          const sheet2 = workbook2.Sheets[sheetName2];
           
           // Sayfaları JSON'a dönüştür
           const json1 = XLSX.utils.sheet_to_json(sheet1, { header: 1, defval: null }) as any[][];
@@ -60,19 +118,19 @@ export class ExcelCompareService {
           }
           
           // Sayfaları karşılaştır
-          const differences = await this.compareSheets(json1, json2, sheetName, matchColumns);
+          const differences = await this.compareSheets(json1, json2, displayName, matchColumns);
           
           // Farklılık yüzdesini hesapla
           const totalCells = this.countCells(json1) + this.countCells(json2);
           const diffPercentage = totalCells > 0 ? (differences.length / totalCells) * 100 : 0;
           
           sheetResults.push({
-            sheetName,
+            sheetName: displayName,
             differences,
             diffPercentage
           });
           
-          processedSheets.add(sheetName);
+          processedSheets.add(displayName);
         }
       }
       
@@ -106,7 +164,7 @@ export class ExcelCompareService {
   /**
    * ID ile IndexedDB'den Excel dosyası yükler ve karşılaştırır
    */
-  public static async compareExcelFilesFromDB(id1: string, id2: string, matchColumns: boolean = false): Promise<ExcelCompareResult | null> {
+  public static async compareExcelFilesFromDB(id1: string, id2: string, matchColumns: boolean = false, ignoreSheetNames: boolean = false): Promise<ExcelCompareResult | null> {
     try {
       // IndexedDB'den dosyaları al
       const fileData1 = await getExcelFile<any>(id1);
@@ -136,8 +194,21 @@ export class ExcelCompareService {
       const sheetCountDiffers = sheets1.length !== sheets2.length;
       
       // Hangi sayfaların eksik olduğunu belirle
-      const missingSheets1 = sheets2.filter(sheet => !sheets1.includes(sheet));
-      const missingSheets2 = sheets1.filter(sheet => !sheets2.includes(sheet));
+      let missingSheets1: string[] = [];
+      let missingSheets2: string[] = [];
+      
+      if (!ignoreSheetNames) {
+        // Normal mod: sayfa isimlerine göre karşılaştır
+        missingSheets1 = sheets2.filter(sheet => !sheets1.includes(sheet));
+        missingSheets2 = sheets1.filter(sheet => !sheets2.includes(sheet));
+      } else {
+        // Sayfa isimlerini yoksay modu: sıra numaralarına göre karşılaştır
+        if (sheets1.length < sheets2.length) {
+          missingSheets1 = sheets2.slice(sheets1.length);
+        } else if (sheets2.length < sheets1.length) {
+          missingSheets2 = sheets1.slice(sheets2.length);
+        }
+      }
       
       // Her sayfayı karşılaştır
       const sheetResults: SheetDiff[] = [];
@@ -149,12 +220,57 @@ export class ExcelCompareService {
       let file1MaxCols = 0;
       let file2MaxCols = 0;
       
-      // Birinci dosyanın tüm sayfalarını işle
-      for (const sheetName of sheets1) {
-        if (sheets2.includes(sheetName)) {
-          // Her iki dosyada da bulunan sayfaları karşılaştır
-          const sheet1 = workbook1.Sheets[sheetName];
-          const sheet2 = workbook2.Sheets[sheetName];
+      if (!ignoreSheetNames) {
+        // Normal mod: aynı isimli sayfaları karşılaştır
+        for (const sheetName of sheets1) {
+          if (sheets2.includes(sheetName)) {
+            // Her iki dosyada da bulunan sayfaları karşılaştır
+            const sheet1 = workbook1.Sheets[sheetName];
+            const sheet2 = workbook2.Sheets[sheetName];
+            
+            // Sayfaları JSON'a dönüştür
+            const json1 = XLSX.utils.sheet_to_json(sheet1, { header: 1, defval: null }) as any[][];
+            const json2 = XLSX.utils.sheet_to_json(sheet2, { header: 1, defval: null }) as any[][];
+            
+            // Her dosyanın satır ve sütun sayılarını güncelle
+            file1MaxRows = Math.max(file1MaxRows, json1.length);
+            file2MaxRows = Math.max(file2MaxRows, json2.length);
+            
+            // Her satırdaki maksimum sütun sayısını hesapla
+            for (const row of json1) {
+              file1MaxCols = Math.max(file1MaxCols, row.length);
+            }
+            for (const row of json2) {
+              file2MaxCols = Math.max(file2MaxCols, row.length);
+            }
+            
+            // Sayfaları karşılaştır
+            const differences = await this.compareSheets(json1, json2, sheetName, matchColumns);
+            
+            // Farklılık yüzdesini hesapla
+            const totalCells = this.countCells(json1) + this.countCells(json2);
+            const diffPercentage = totalCells > 0 ? (differences.length / totalCells) * 100 : 0;
+            
+            sheetResults.push({
+              sheetName,
+              differences,
+              diffPercentage
+            });
+            
+            processedSheets.add(sheetName);
+          }
+        }
+      } else {
+        // Sayfa isimlerini yoksay modu: sıra numaralarına göre karşılaştır
+        const minSheetCount = Math.min(sheets1.length, sheets2.length);
+        
+        for (let i = 0; i < minSheetCount; i++) {
+          const sheetName1 = sheets1[i];
+          const sheetName2 = sheets2[i];
+          const displayName = `${sheetName1} ↔ ${sheetName2}`;
+          
+          const sheet1 = workbook1.Sheets[sheetName1];
+          const sheet2 = workbook2.Sheets[sheetName2];
           
           // Sayfaları JSON'a dönüştür
           const json1 = XLSX.utils.sheet_to_json(sheet1, { header: 1, defval: null }) as any[][];
@@ -173,19 +289,19 @@ export class ExcelCompareService {
           }
           
           // Sayfaları karşılaştır
-          const differences = await this.compareSheets(json1, json2, sheetName, matchColumns);
+          const differences = await this.compareSheets(json1, json2, displayName, matchColumns);
           
           // Farklılık yüzdesini hesapla
           const totalCells = this.countCells(json1) + this.countCells(json2);
           const diffPercentage = totalCells > 0 ? (differences.length / totalCells) * 100 : 0;
           
           sheetResults.push({
-            sheetName,
+            sheetName: displayName,
             differences,
             diffPercentage
           });
           
-          processedSheets.add(sheetName);
+          processedSheets.add(displayName);
         }
       }
       
