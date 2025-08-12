@@ -1,0 +1,142 @@
+{
+  "header": {
+    "logo": "SYNCHDOC",
+    "settings": "Ayarlar",
+    "theme": {
+      "light": "Aydınlık Tema",
+      "dark": "Karanlık Tema",
+      "system": "Sistem Teması"
+    },
+    "language": "Dil"
+  },
+  "home": {
+    "title": "Dosya Karşılaştırma & Dönüştürme Merkezi",
+    "subtitle": "Dosyalarınızı kolayca karşılaştırın ve dönüştürün",
+    "features": {
+      "excel": {
+        "title": "Excel Karşılaştırma",
+        "description": "Excel dosyalarını hızlıca karşılaştırın"
+      },
+      "pdf": {
+        "title": "PDF Karşılaştırma", 
+        "description": "PDF dosyalarını karşılaştırın"
+      },
+      "text": {
+        "title": "Metin Karşılaştırma",
+        "description": "Metin dosyalarını karşılaştırın"
+      },
+      "convert": {
+        "title": "Dosya Dönüştürme",
+        "description": "Dosyaları farklı formatlara dönüştürün"
+      }
+    }
+  },
+  "excel": {
+    "title": "Excel Karşılaştırma",
+    "description": "Excel Karşılaştırma aracı ile iki Excel dosyasının içeriğini kolayca karşılaştırın. Yüklediğiniz tablolardaki veri farklılıkları anında tespit edilir.",
+    "options": {
+      "matchColumns": "Sütunları Eşle",
+      "matchColumnsDesc": "Sütunları pozisyonlarına değil başlık isimlerine göre eşleştirir",
+      "ignoreSheetNames": "Sayfa İsimlerini Yoksay", 
+      "ignoreSheetNamesDesc": "Sayfa isimlerine değil sıralarına göre karşılaştırır (1. sayfa ile 1. sayfa)"
+    },
+    "results": {
+      "title": "Excel Karşılaştırma Sonucu",
+      "noCommonSheets": "Karşılaştırılacak ortak sayfa bulunamadı.",
+      "noDifference": "Dosyalar arasında fark bulunamadı.",
+      "exportToExcel": "Excel'e Aktar",
+      "columns": {
+        "column": "Sütun",
+        "row": "Satır", 
+        "file1Value": "Dosya 1 Değeri",
+        "file2Value": "Dosya 2 Değeri"
+      },
+      "summary": {
+        "sheet": "Sayfa",
+        "column": "Sütun",
+        "row": "Satır",
+        "size": "Boyut",
+        "missingSheets1": "Dosya 1'de Eksik Sayfalar:",
+        "missingSheets2": "Dosya 2'de Eksik Sayfalar:"
+      },
+      "pagination": {
+        "showing": "{{start}}-{{end}} / {{total}} sonuç gösteriliyor",
+        "rows": "satır"
+      },
+      "filters": {
+        "search": "Ara...",
+        "clearSearch": "Aramayı temizle",
+        "selectAll": "Tümünü Seç",
+        "deselectAll": "Tümünü Kaldır",
+        "loading": "Yükleniyor...",
+        "empty": "(boş)"
+      }
+    }
+  },
+  "pdf": {
+    "title": "PDF Karşılaştırma",
+    "description": "PDF Karşılaştırma aracı ile iki PDF dosyasının içeriğini kolayca karşılaştırın. Yüklediğiniz belgelerdeki metin farklılıkları anında tespit edilir.",
+    "modes": {
+      "text": "Metin Karşılaştırma",
+      "visual": "Görsel Karşılaştırma"
+    },
+    "results": {
+      "title": "PDF Karşılaştırma Sonucu",
+      "summary": {
+        "page": "Sayfa",
+        "size": "Boyut"
+      }
+    },
+    "exportReport": "Rapor İndir"
+  },
+  "text": {
+    "title": "Metin Karşılaştırma", 
+    "description": "Metin Karşılaştırma aracı ile iki metin dosyasının içeriğini kolayca karşılaştırın. Yüklediğiniz belgelerdeki metin farklılıkları anında tespit edilir.",
+    "results": {
+      "title": "Metin Karşılaştırma Sonucu",
+      "summary": {
+        "line": "Satır",
+        "size": "Boyut"
+      }
+    },
+    "error": {
+      "compareError": "Dosyalar karşılaştırılırken bir hata oluştu."
+    }
+  },
+  "convert": {
+    "title": "Dosya Dönüştürme",
+    "description": "Dosyalarınızı farklı formatlara dönüştürün."
+  },
+  "fileUpload": {
+    "selectFile": "Dosya Seç",
+    "dragDrop": "Dosyaları buraya sürükleyip bırakın",
+    "file1": "Dosya 1: Sürükle ve bırak veya seçmek için tıkla",
+    "file2": "Dosya 2: Sürükle ve bırak veya seçmek için tıkla",
+    "compare": "Karşılaştır",
+    "uploading": "Yükleniyor...",
+    "processing": "İşleniyor...",
+    "supportedFormats": "Desteklenen formatlar",
+    "supportedTypes": "İzin verilen türler",
+    "removeFile": "Dosyayı Kaldır",
+    "dropHint": "Dosyayı bırakın",
+    "fileSelected": "Dosya seçildi: {{fileName}}",
+    "andOthers": " ve diğer {{count}} tür",
+    "error": {
+      "general": "Hata oluştu",
+      "unsupportedType": "Desteklenmeyen dosya türü. İzin verilen türler: {{types}}",
+      "uploadError": "Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin."
+    }
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "success": "Başarılı",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "close": "Kapat",
+    "back": "Geri",
+    "next": "İleri",
+    "previous": "Önceki",
+    "retry": "Tekrar Dene"
+  }
+}

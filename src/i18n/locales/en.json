@@ -1,0 +1,142 @@
+{
+  "header": {
+    "logo": "SYNCHDOC",
+    "settings": "Settings",
+    "theme": {
+      "light": "Light Theme",
+      "dark": "Dark Theme", 
+      "system": "System Theme"
+    },
+    "language": "Language"
+  },
+  "home": {
+    "title": "File Comparison & Conversion Center",
+    "subtitle": "Easily compare and convert your files",
+    "features": {
+      "excel": {
+        "title": "Excel Comparison",
+        "description": "Quickly compare Excel files"
+      },
+      "pdf": {
+        "title": "PDF Comparison",
+        "description": "Compare PDF files"
+      },
+      "text": {
+        "title": "Text Comparison", 
+        "description": "Compare text files"
+      },
+      "convert": {
+        "title": "File Conversion",
+        "description": "Convert files to different formats"
+      }
+    }
+  },
+  "excel": {
+    "title": "Excel Comparison",
+    "description": "Compare the contents of two Excel files easily with the Excel Comparison tool. Data differences in uploaded spreadsheets are detected instantly.",
+    "options": {
+      "matchColumns": "Match Columns",
+      "matchColumnsDesc": "Matches columns by header names instead of positions",
+      "ignoreSheetNames": "Ignore Sheet Names",
+      "ignoreSheetNamesDesc": "Compares by sheet order instead of names (1st sheet with 1st sheet)"
+    },
+    "results": {
+      "title": "Excel Comparison Result",
+      "noCommonSheets": "No common sheets found to compare.",
+      "noDifference": "No differences found between files.",
+      "exportToExcel": "Export to Excel",
+      "columns": {
+        "column": "Column",
+        "row": "Row",
+        "file1Value": "File 1 Value", 
+        "file2Value": "File 2 Value"
+      },
+      "summary": {
+        "sheet": "Sheet",
+        "column": "Column",
+        "row": "Row", 
+        "size": "Size",
+        "missingSheets1": "Missing Sheets in File 1:",
+        "missingSheets2": "Missing Sheets in File 2:"
+      },
+      "pagination": {
+        "showing": "Showing {{start}}-{{end}} / {{total}} results",
+        "rows": "rows"
+      },
+      "filters": {
+        "search": "Search...",
+        "clearSearch": "Clear search",
+        "selectAll": "Select All",
+        "deselectAll": "Deselect All", 
+        "loading": "Loading...",
+        "empty": "(empty)"
+      }
+    }
+  },
+  "pdf": {
+    "title": "PDF Comparison",
+    "description": "Compare the contents of two PDF files easily with the PDF Comparison tool. Text differences in uploaded documents are detected instantly.",
+    "modes": {
+      "text": "Text Comparison",
+      "visual": "Visual Comparison"
+    },
+    "results": {
+      "title": "PDF Comparison Result",
+      "summary": {
+        "page": "Page",
+        "size": "Size"
+      }
+    },
+    "exportReport": "Download Report"
+  },
+  "text": {
+    "title": "Text Comparison",
+    "description": "Compare the contents of two text files easily with the Text Comparison tool. Text differences in uploaded documents are detected instantly.",
+    "results": {
+      "title": "Text Comparison Result",
+      "summary": {
+        "line": "Line",
+        "size": "Size"
+      }
+    },
+    "error": {
+      "compareError": "An error occurred while comparing files."
+    }
+  },
+  "convert": {
+    "title": "File Conversion", 
+    "description": "Convert your files to different formats."
+  },
+  "fileUpload": {
+    "selectFile": "Select File",
+    "dragDrop": "Drag and drop files here",
+    "file1": "File 1: Drag and drop or click to select",
+    "file2": "File 2: Drag and drop or click to select",
+    "compare": "Compare",
+    "uploading": "Uploading...",
+    "processing": "Processing...",
+    "supportedFormats": "Supported formats",
+    "supportedTypes": "Allowed types",
+    "removeFile": "Remove File",
+    "dropHint": "Drop the file",
+    "fileSelected": "File selected: {{fileName}}",
+    "andOthers": " and {{count}} other types",
+    "error": {
+      "general": "Error occurred",
+      "unsupportedType": "Unsupported file type. Allowed types: {{types}}",
+      "uploadError": "An error occurred while uploading the file. Please try again."
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous", 
+    "retry": "Retry"
+  }
+}
