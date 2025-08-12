@@ -368,3 +368,59 @@
     height: 70px;
   }
 }
+
+/* Karşılaştırma seçenekleri */
+.comparison-options {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background-color: var(--background-color);
+  border-radius: 16px;
+  border: 1px solid var(--neu-shadow-light);
+}
+
+.checkbox-label {
+  position: relative; /* Tooltip için gerekli */
+  display: flex;
+  flex-direction: row; /* Yan yana olması için */
+  align-items: center; /* Dikeyde ortala */
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.checkbox-label span {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.option-description {
+  position: absolute;
+  bottom: 120%; /* Checkbox'ın üzerinde göster */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--secondary-bg-color); /* Koyu arkaplan */
+  color: var(--white-color); /* Beyaz yazı */
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap; /* Tek satırda kalmasını sağla */
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  box-shadow: var(--neu-raised-shadow);
+}
+
+.checkbox-label:hover .option-description {
+  opacity: 1;
+  visibility: visible;
+}
