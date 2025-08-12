@@ -1,10 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const FileConvert: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
-    <div>
-      <h2>Dosya Dönüştür</h2>
-      <p>Bu sayfada dosyalar farklı formatlara dönüştürülecektir.</p>
+    <div className="page-content">
+      <h1>{t('convert.title')}</h1>
+      <p className="page-description">{t('convert.description')}</p>
     </div>
   );
 };

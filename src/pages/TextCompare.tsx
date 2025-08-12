@@ -6,8 +6,10 @@ import { formatFileSize } from '../utils/formatters';
 import { exportTextCompareResults } from '../utils/exportUtils';
 import { calculateTextDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
+import { useTranslation } from 'react-i18next';
 
 const TextCompare: React.FC = () => {
+  const { t } = useTranslation();
   const [compareResult, setCompareResult] = useState<TextCompareResultType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,7 @@ const TextCompare: React.FC = () => {
       setCompareResult(result);
     } catch (error) {
       console.error('Karşılaştırma hatası:', error);
-      setError('Dosyalar karşılaştırılırken bir hata oluştu.');
+      setError(t('text.error.compareError'));
     } finally {
       setIsLoading(false);
     }
@@ -153,20 +155,20 @@ const TextCompare: React.FC = () => {
         }
         summaryContent={
           <ComparisonResultLayout
-            title="Metin Karşılaştırma Sonucu"
+            title={t('text.results.title')}
             fileName1={result.file1Name}
             fileName2={result.file2Name}
             totalDiffCount={calculateTotalDiffCount()}
             structureDiffRows={[
               {
-                label: 'Satır',
+                label: t('text.results.summary.line'),
                 value1: file1LineCount,
                 value2: file2LineCount,
                 diff: Math.abs(file2LineCount - file1LineCount),
                 isDiffZero: file2LineCount - file1LineCount === 0
               },
               {
-                label: 'Boyut',
+                label: t('text.results.summary.size'),
                 value1: formatFileSize(result.file1Size),
                 value2: formatFileSize(result.file2Size),
                 diff: formatFileSize(Math.abs(result.file2Size - result.file1Size)),
@@ -182,10 +184,9 @@ const TextCompare: React.FC = () => {
 
   return (
     <div className="page-content">
-      <h1>Metin Karşılaştırma</h1>
+      <h1>{t('text.title')}</h1>
       <p className="page-description">
-        Metin Karşılaştırma aracı ile iki metin dosyasının içeriğini kolayca karşılaştırın. 
-        Yüklediğiniz belgelerdeki metin farklılıkları anında tespit edilir.
+        {t('text.description')}
       </p>
 
       <FileUpload 

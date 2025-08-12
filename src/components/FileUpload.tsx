@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import '../style/FileUpload.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload, faCheck, faExclamationTriangle, faTimes, faExchangeAlt, faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 
 interface FileUploadProps {
   onCompare: (file1: File, file2: File) => void;
@@ -10,6 +11,7 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', allowedFileTypes }) => {
+  const { t } = useTranslation();
   const [file1, setFile1] = useState<File | null>(null);
   const [file2, setFile2] = useState<File | null>(null);
   const [isDragging1, setIsDragging1] = useState(false);
@@ -85,7 +87,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
         if (validateFileType(file)) {
           setFile(file);
         } else {
-          setError(`Desteklenmeyen dosya türü. İzin verilen türler: ${effectiveAllowedTypes.join(', ')}`);
+          setError(t('fileUpload.error.unsupportedType', { types: effectiveAllowedTypes.join(', ') }));
           setFile(null);
         }
         e.dataTransfer.clearData();
@@ -94,7 +96,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
       }
     } catch (err) {
       console.error('Dosya sürükle bırak hatası:', err);
-      setError('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+      setError(t('fileUpload.error.uploadError'));
     }
   };
 
@@ -112,14 +114,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
         if (validateFileType(file)) {
           setFile(file);
         } else {
-          setError(`Desteklenmeyen dosya türü. İzin verilen türler: ${effectiveAllowedTypes.join(', ')}`);
+          setError(t('fileUpload.error.unsupportedType', { types: effectiveAllowedTypes.join(', ') }));
           setFile(null);
           e.target.value = '';
         }
       }
     } catch (err) {
       console.error('Dosya seçme hatası:', err);
-      setError('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+      setError(t('fileUpload.error.uploadError'));
     }
   };
 
@@ -166,7 +168,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
       data-tauri-drag-region
       tabIndex={0}
       role="button"
-      aria-label={`${file ? 'Dosya seçildi: ' + file.name : placeholder}`}
+      aria-label={file ? t('fileUpload.fileSelected', { fileName: file.name }) : placeholder}
     >
       <input
         type="file"
@@ -180,7 +182,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
         <button 
           className="clear-file-button" 
           onClick={(e) => handleClearFile(e, setFile)}
-          title="Dosyayı Kaldır"
+          title={t('fileUpload.removeFile')}
         >
           <FontAwesomeIcon icon={faTimes} />
         </button>
@@ -215,7 +217,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
                   size="2x" 
                   className="upload-icon drop-ready" 
                 />
-                <p className="drop-hint">Dosyayı bırakın</p>
+                <p className="drop-hint">{t('fileUpload.dropHint')}</p>
               </>
             ) : (
               <>
@@ -225,9 +227,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
                   className="upload-icon" 
                 />
                 <p>{placeholder}</p>
-                <p className="file-types-hint" title={`İzin verilen dosya türleri: ${effectiveAllowedTypes.join(', ')}`}>
-                  İzin verilen türler: {effectiveAllowedTypes.slice(0, 3).join(', ')}
-                  {effectiveAllowedTypes.length > 3 ? ' ve diğer ' + (effectiveAllowedTypes.length - 3) + ' tür' : ''}
+                <p className="file-types-hint" title={t('fileUpload.supportedFormats') + ': ' + effectiveAllowedTypes.join(', ')}>
+                  {t('fileUpload.supportedTypes')}: {effectiveAllowedTypes.slice(0, 3).join(', ')}
+                  {effectiveAllowedTypes.length > 3 ? t('fileUpload.andOthers', { count: effectiveAllowedTypes.length - 3 }) : ''}
                 </p>
               </>
             )}
@@ -239,16 +241,16 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
 
   return (
     <div className="file-upload-container" data-tauri-drag-region>
-      {createDropZone(file1, setFile1, isDragging1, setIsDragging1, inputRef1, 'Dosya 1: Sürükle ve bırak veya seçmek için tıkla', error1, setError1)}
+      {createDropZone(file1, setFile1, isDragging1, setIsDragging1, inputRef1, t('fileUpload.file1'), error1, setError1)}
       <button
         className="compare-button"
         onClick={handleCompareClick}
         disabled={!file1 || !file2}
       >
         <FontAwesomeIcon icon={faExchangeAlt} className="button-icon" />
-        Karşılaştır
+        {t('fileUpload.compare')}
       </button>
-      {createDropZone(file2, setFile2, isDragging2, setIsDragging2, inputRef2, 'Dosya 2: Sürükle ve bırak veya seçmek için tıkla', error2, setError2)}
+      {createDropZone(file2, setFile2, isDragging2, setIsDragging2, inputRef2, t('fileUpload.file2'), error2, setError2)}
     </div>
   );
 };

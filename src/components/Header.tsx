@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon, faGear, faLanguage, faDesktop, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 import '../style/Header.css';
 
 const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
@@ -14,6 +15,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = false }) => {
+  const { t, i18n } = useTranslation();
+  
   // Sistem temasını algıla
   const getSystemTheme = (): 'light' | 'dark' => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -48,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
   const [isRotating, setIsRotating] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'tr' | 'en'>('tr');
+  const [currentLanguage, setCurrentLanguage] = useState<'tr' | 'en'>(i18n.language as 'tr' | 'en');
   const settingsRef = useRef<HTMLDivElement>(null);
   const themeRef = useRef<HTMLDivElement>(null);
 
@@ -169,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
 
   const handleLanguageChange = (language: 'tr' | 'en') => {
     setCurrentLanguage(language);
-    // Dil değişikliği mantığı buraya eklenebilir
+    i18n.changeLanguage(language);
     setIsSettingsOpen(false);
   };
 
@@ -189,13 +192,13 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
   const getThemeLabel = (theme: ThemeOption) => {
     switch (theme) {
       case 'light':
-        return 'Aydınlık Tema';
+        return t('header.theme.light');
       case 'dark':
-        return 'Karanlık Tema';
+        return t('header.theme.dark');
       case 'system':
-        return 'Sistem Teması';
+        return t('header.theme.system');
       default:
-        return 'Aydınlık Tema';
+        return t('header.theme.light');
     }
   };
 
@@ -210,7 +213,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
         <button 
           onClick={handleSettingsToggle} 
           className={`settings-button ${isSettingsOpen ? 'active' : ''}`}
-          aria-label="Ayarlar"
+          aria-label={t('header.settings')}
         >
           <FontAwesomeIcon 
             icon={faGear} 
@@ -240,21 +243,21 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
                     onClick={() => handleThemeChange('light')}
                   >
                     <FontAwesomeIcon icon={faSun} className="theme-option-icon" />
-                    <span>Aydınlık Tema</span>
+                    <span>{t('header.theme.light')}</span>
                   </div>
                   <div 
                     className={`theme-option ${themePreference === 'dark' ? 'active' : ''}`}
                     onClick={() => handleThemeChange('dark')}
                   >
                     <FontAwesomeIcon icon={faMoon} className="theme-option-icon" />
-                    <span>Karanlık Tema</span>
+                    <span>{t('header.theme.dark')}</span>
                   </div>
                   <div 
                     className={`theme-option ${themePreference === 'system' ? 'active' : ''}`}
                     onClick={() => handleThemeChange('system')}
                   >
                     <FontAwesomeIcon icon={faDesktop} className="theme-option-icon" />
-                    <span>Sistem Teması</span>
+                    <span>{t('header.theme.system')}</span>
                   </div>
                 </div>
               )}
@@ -265,7 +268,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
                 icon={faLanguage} 
                 className="language-icon"
               />
-              <span>Dil</span>
+              <span>{t('header.language')}</span>
               <div className="language-options">
                 <button 
                   className={`language-option ${currentLanguage === 'tr' ? 'active' : ''}`}

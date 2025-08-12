@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel, faFilePdf, faFileAlt, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 import '../style/PageStyles.css';
 
 interface RippleStyles {
@@ -12,6 +13,7 @@ interface RippleStyles {
 }
 
 const Home: React.FC = () => {
+  const { t } = useTranslation();
   const [ripples, setRipples] = useState<Record<string, RippleStyles[]>>({
     excel: [],
     pdf: [],
@@ -53,8 +55,8 @@ const Home: React.FC = () => {
 
   return (
     <div className="page-content">
-      <h1 className="page-title">SynchDoc ile Dokümanlarınızı Yönetin</h1>
-      <p className="page-description">Dosyalarınızı karşılaştırın ve dönüştürün</p>
+      <h1 className="page-title">{t('home.title')}</h1>
+      <p className="page-description">{t('home.subtitle')}</p>
       
       <div className="card-container">
         <Link 
@@ -68,8 +70,8 @@ const Home: React.FC = () => {
           <div className="icon-container excel-icon">
             <FontAwesomeIcon icon={faFileExcel} size="3x" />
           </div>
-          <h2>Excel Karşılaştırma</h2>
-          <p>İki Excel dosyasını karşılaştırın ve farkları hızlıca tespit edin.</p>
+          <h2>{t('home.features.excel.title')}</h2>
+          <p>{t('home.features.excel.description')}</p>
         </Link>
         
         <Link 
@@ -83,8 +85,8 @@ const Home: React.FC = () => {
           <div className="icon-container pdf-icon">
             <FontAwesomeIcon icon={faFilePdf} size="3x" />
           </div>
-          <h2>PDF Karşılaştırma</h2>
-          <p>PDF dosyalarınızı yan yana karşılaştırarak değişiklikleri görün.</p>
+          <h2>{t('home.features.pdf.title')}</h2>
+          <p>{t('home.features.pdf.description')}</p>
         </Link>
         
         <Link 
@@ -98,8 +100,8 @@ const Home: React.FC = () => {
           <div className="icon-container text-icon">
             <FontAwesomeIcon icon={faFileAlt} size="3x" />
           </div>
-          <h2>Metin Karşılaştırma</h2>
-          <p>İki metin dosyasını satır satır karşılaştırıp farkları analiz edin.</p>
+          <h2>{t('home.features.text.title')}</h2>
+          <p>{t('home.features.text.description')}</p>
         </Link>
         
         <Link 
@@ -113,8 +115,8 @@ const Home: React.FC = () => {
           <div className="icon-container convert-icon">
             <FontAwesomeIcon icon={faSyncAlt} size="3x" />
           </div>
-          <h2>Dosya Dönüştür</h2>
-          <p>Dosyalarınızı farklı formatlara hızlı ve güvenli şekilde dönüştürün.</p>
+          <h2>{t('home.features.convert.title')}</h2>
+          <p>{t('home.features.convert.description')}</p>
         </Link>
       </div>
     </div>

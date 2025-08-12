@@ -10,8 +10,10 @@ import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
 import { calculateExcelDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
+import { useTranslation } from 'react-i18next';
 
 const ExcelCompare: React.FC = () => {
+  const { t } = useTranslation();
   const allowedExcelTypes = ['.xlsx', '.xls', '.xlsm', '.xlsb', '.csv'];
   const [compareResult, setCompareResult] = useState<ExcelCompareResultType | null>(null);
   const [matchColumns, setMatchColumns] = useState<boolean>(false);
@@ -451,20 +453,20 @@ const ExcelCompare: React.FC = () => {
   
     // Aktif sayfanın farklarını göster
     const renderActiveDifferences = () => {
-      if (result.sheetResults.length === 0) return <p>Karşılaştırılacak ortak sayfa bulunamadı.</p>;
+      if (result.sheetResults.length === 0) return <p>{t('excel.results.noCommonSheets')}</p>;
       
       const activeSheet = result.sheetResults[activeSheetIndex];
       
       if (activeSheet.differences.length === 0) {
-        return <p className="no-diff-message">Dosyalar arasında fark bulunamadı.</p>;
+        return <p className="no-diff-message">{t('excel.results.noDifference')}</p>;
       }
       
       // Sütun başlıklarını ve bunlara karşılık gelen CellDiff anahtarlarını tanımla
       const columnHeaders = [
-        { label: 'Sütun', key: 'col' },
-        { label: 'Satır', key: 'row' },
-        { label: 'Dosya 1 Değeri', key: 'value1' },
-        { label: 'Dosya 2 Değeri', key: 'value2' },
+        { label: t('excel.results.columns.column'), key: 'col' },
+        { label: t('excel.results.columns.row'), key: 'row' },
+        { label: t('excel.results.columns.file1Value'), key: 'value1' },
+        { label: t('excel.results.columns.file2Value'), key: 'value2' },
       ];
   
       return (
@@ -670,10 +672,9 @@ const ExcelCompare: React.FC = () => {
 
   return (
     <div className="page-content">
-      <h1>Excel Karşılaştırma</h1>
+      <h1>{t('excel.title')}</h1>
       <p className="page-description">
-        Excel Karşılaştırma aracı ile iki Excel dosyasının içeriğini kolayca karşılaştırın.
-        Yüklediğiniz tablolardaki veri farklılıkları anında tespit edilir.
+        {t('excel.description')}
       </p>
       
       
@@ -690,9 +691,9 @@ const ExcelCompare: React.FC = () => {
             checked={matchColumns}
             onChange={(e) => setMatchColumns(e.target.checked)}
           />
-          <span>Sütunları Eşle</span>
+          <span>{t('excel.options.matchColumns')}</span>
           <small className="option-description">
-            Sütunları pozisyonlarına değil başlık isimlerine göre eşleştirir
+            {t('excel.options.matchColumnsDesc')}
           </small>
         </label>
         <label className="checkbox-label">
@@ -701,9 +702,9 @@ const ExcelCompare: React.FC = () => {
             checked={ignoreSheetNames}
             onChange={(e) => setIgnoreSheetNames(e.target.checked)}
           />
-          <span>Sayfa İsimlerini Yoksay</span>
+          <span>{t('excel.options.ignoreSheetNames')}</span>
           <small className="option-description">
-            Sayfa isimlerine değil sıralarına göre karşılaştırır (1. sayfa ile 1. sayfa)
+            {t('excel.options.ignoreSheetNamesDesc')}
           </small>
         </label>
       </div>

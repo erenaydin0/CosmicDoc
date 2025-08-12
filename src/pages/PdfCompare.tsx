@@ -10,12 +10,14 @@ import { formatFileSize } from '../utils/formatters';
 import { exportPdfCompareResults } from '../utils/exportUtils';
 import { calculatePdfDiffCount, calculatePageDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
+import { useTranslation } from 'react-i18next';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
 
 
 const PdfCompare: React.FC = () => {
+  const { t } = useTranslation();
   const allowedPdfTypes = ['.pdf'];
   const [compareResult, setCompareResult] = useState<PdfCompareResultType | null>(null);
   
@@ -508,32 +510,32 @@ const PdfCompare: React.FC = () => {
               className={`mode-button ${compareMode === CompareMode.TEXT ? 'active' : ''}`}
               onClick={() => handleModeChange(CompareMode.TEXT)}
             >
-              Metin Karşılaştırma
+              {t('pdf.modes.text')}
             </button>
             <button 
               className={`mode-button ${compareMode === CompareMode.VISUAL ? 'active' : ''}`}
               onClick={() => handleModeChange(CompareMode.VISUAL)}
               disabled={isComparingVisually}
             >
-              Görsel Karşılaştırma
+              {t('pdf.modes.visual')}
             </button>
           </div>
         <div ref={comparisonResultsRef}>
           <ComparisonResultLayout
-            title="PDF Karşılaştırma Sonucu"
+            title={t('pdf.results.title')}
             fileName1={result.file1Name}
             fileName2={result.file2Name}
             totalDiffCount={calculateTotalDiffCount()}
             structureDiffRows={[
               {
-                label: 'Sayfa',
+                label: t('pdf.results.summary.page'),
                 value1: result.pageCount1,
                 value2: result.pageCount2,
                 diff: Math.abs(result.pageCount2 - result.pageCount1),
                 isDiffZero: result.pageCount2 - result.pageCount1 === 0
               },
               {
-                label: 'Boyut',
+                label: t('pdf.results.summary.size'),
                 value1: formatFileSize(result.file1Size),
                 value2: formatFileSize(result.file2Size),
                 diff: formatFileSize(Math.abs(result.file2Size - result.file1Size)),
@@ -542,7 +544,7 @@ const PdfCompare: React.FC = () => {
             ]}
             exportButton={
               compareMode === CompareMode.VISUAL && visualResults.filter(vr => vr.hasVisualDifferences).length > 0 ? (
-                <ExportButton onClick={handleExportVisualToPdf} label="Rapor İndir" />
+                <ExportButton onClick={handleExportVisualToPdf} label={t('pdf.exportReport')} />
               ) : compareMode === CompareMode.TEXT && calculateTotalDiffCount() > 0 ? (
                 <ExportButton onClick={handleExportToExcel} />
               ) : undefined
@@ -617,10 +619,9 @@ const PdfCompare: React.FC = () => {
 
   return (
     <div className="page-content">
-      <h1>PDF Karşılaştırma</h1>
+      <h1>{t('pdf.title')}</h1>
       <p className="page-description">
-        PDF Karşılaştırma aracı ile iki PDF dosyasının içeriğini kolayca karşılaştırın. 
-        Yüklediğiniz belgelerdeki metin farklılıkları anında tespit edilir.
+        {t('pdf.description')}
       </p>
       
       <FileUpload 
