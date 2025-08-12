@@ -15,6 +15,8 @@ const ExcelCompare: React.FC = () => {
   const allowedExcelTypes = ['.xlsx', '.xls', '.xlsm', '.xlsb', '.csv'];
   const [compareResult, setCompareResult] = useState<ExcelCompareResultType | null>(null);
   const [matchColumns, setMatchColumns] = useState<boolean>(false);
+  const [ignoreSheetNames, setIgnoreSheetNames] = useState<boolean>(false);
+
   
   const handleCompare = async (file1: File, file2: File) => {
     try {
@@ -55,7 +57,7 @@ const ExcelCompare: React.FC = () => {
       ]);
       
       // Excel dosyalarını karşılaştır
-      const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns);
+      const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns, ignoreSheetNames);
       console.log('Karşılaştırma sonucu:', result);
       
       // Sonuçları ayarla
@@ -683,7 +685,18 @@ const ExcelCompare: React.FC = () => {
           />
           <span>Sütunları Eşle</span>
           <small className="option-description">
-            İşaretli olduğunda, sütunları pozisyonlarına değil başlık isimlerine göre eşleştirir
+            Sütunları pozisyonlarına değil başlık isimlerine göre eşleştirir
+          </small>
+        </label>
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={ignoreSheetNames}
+            onChange={(e) => setIgnoreSheetNames(e.target.checked)}
+          />
+          <span>Sayfa İsimlerini Yoksay</span>
+          <small className="option-description">
+            Sayfa isimlerine değil sıralarına göre karşılaştırır (1. sayfa ile 1. sayfa)
           </small>
         </label>
       </div>
