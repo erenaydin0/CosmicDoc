@@ -39,7 +39,13 @@
   transform: scale(0.98);
 }
 
-.theme-toggle-button {
+/* Ayarlar container */
+.settings-container {
+  position: relative;
+}
+
+/* Ayarlar butonu */
+.settings-button {
   background: var(--background-color);
   border: none;
   color: var(--primary-color);
@@ -57,48 +63,230 @@
   box-shadow: var(--neu-raised-shadow);
 }
 
-.theme-toggle-button:hover:not(:disabled) {
+.settings-button:hover {
   transform: scale(1.05);
   color: var(--text-color);
   box-shadow: var(--neu-pressed-shadow);
 }
 
-.theme-toggle-button:active:not(:disabled) {
+.settings-button:active {
   transform: scale(0.95);
   box-shadow: var(--neu-pressed-shadow);
 }
 
-/* Tema geçişi sırasında buton durumu */
-.theme-toggle-button.transitioning {
-  cursor: not-allowed;
-  opacity: 0.7;
-  animation: themeButtonPulse 0.8s infinite;
+.settings-button.active {
+  color: var(--text-color);
+  box-shadow: var(--neu-pressed-shadow);
+  transform: scale(0.98);
 }
 
-.theme-toggle-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Rotasyon animasyonu - daha yumuşak */
-.theme-toggle-button.rotating .theme-icon {
-  animation: rotate-theme-smooth 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Tema geçişi sırasında buton nabız efekti */
-@keyframes themeButtonPulse {
-  0%, 100% { 
-    box-shadow: var(--neu-raised-shadow);
-    transform: scale(1);
-  }
-  50% { 
-    box-shadow: var(--neu-pressed-shadow);
-    transform: scale(1.02);
-  }
-}
-
-.theme-icon {
+.settings-icon {
   font-size: 1.4rem;
+  transition: transform 0.3s ease, color var(--theme-transition-duration) var(--theme-transition-easing);
+}
+
+.settings-button.active .settings-icon {
+  transform: rotate(180deg);
+}
+
+/* Ayarlar menüsü */
+.settings-menu {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background: var(--background-color);
+  border-radius: 15px;
+  box-shadow: var(--neu-raised-shadow);
+  padding: 15px;
+  min-width: 200px;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: settingsMenuSlideIn 0.3s ease forwards;
+}
+
+@keyframes settingsMenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ayarlar menü öğeleri */
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.settings-item:last-child {
+  margin-bottom: 0;
+}
+
+.settings-item:hover:not(.theme-dropdown-container) {
+  background: var(--hover-color);
+  box-shadow: var(--neu-pressed-shadow);
+}
+
+.settings-item span {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-color);
+  flex: 1;
+}
+
+/* Tema dropdown container */
+.theme-dropdown-container {
+  position: relative;
+  cursor: default;
+  padding: 0;
+  background: none;
+}
+
+.theme-dropdown-container:hover {
+  background: none;
+  box-shadow: none;
+}
+
+/* Tema seçici */
+.theme-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-selector:hover {
+  background: var(--hover-color);
+  box-shadow: var(--neu-pressed-shadow);
+}
+
+.dropdown-arrow {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  transition: transform 0.2s ease;
+  margin-left: auto;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Tema dropdown menüsü */
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--background-color);
+  border-radius: 10px;
+  box-shadow: var(--neu-raised-shadow);
+  padding: 8px;
+  z-index: 1001;
+  margin-top: 4px;
+  opacity: 0;
+  transform: translateY(-5px);
+  animation: themeDropdownSlideIn 0.2s ease forwards;
+}
+
+@keyframes themeDropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tema seçenekleri */
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.theme-option:last-child {
+  margin-bottom: 0;
+}
+
+.theme-option:hover {
+  background: var(--hover-color);
+  box-shadow: var(--neu-pressed-shadow);
+}
+
+.theme-option.active {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: var(--neu-pressed-shadow);
+}
+
+.theme-option.active .theme-option-icon {
+  color: white;
+}
+
+.theme-option-icon {
+  font-size: 1rem;
+  color: var(--primary-color);
+  transition: color 0.2s ease;
+}
+
+.theme-option span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Dil seçenekleri */
+.language-options {
+  display: flex;
+  gap: 6px;
+}
+
+.language-option {
+  background: var(--background-color);
+  border: none;
+  color: var(--text-color);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: var(--neu-raised-shadow);
+}
+
+.language-option:hover {
+  box-shadow: var(--neu-pressed-shadow);
+  transform: scale(0.95);
+}
+
+.language-option.active {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: var(--neu-pressed-shadow);
+}
+
+/* Tema ikonu stilleri */
+.theme-icon {
+  font-size: 1.2rem;
   transition: color var(--theme-transition-duration) var(--theme-transition-easing), 
               transform 0.3s ease;
 }
@@ -109,6 +297,16 @@
 
 [data-theme='dark'] .theme-icon {
   color: #FEFCD7;  /* ay rengi */
+}
+
+.language-icon {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+/* Rotasyon animasyonu - menü içindeki tema ikonu için */
+.theme-icon.rotating {
+  animation: rotate-theme-smooth 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Gelişmiş rotasyon animasyonu */
@@ -136,7 +334,7 @@
 }
 
 /* Tema değişimi sırasında ikon parlaklık efekti */
-.theme-toggle-button.transitioning .theme-icon {
+.theme-icon.transitioning {
   animation: iconGlow 0.8s ease-in-out;
 }
 
@@ -161,17 +359,55 @@
     padding: 6px 12px;
   }
   
-  .theme-toggle-button {
+  .settings-button {
     width: 45px;
     height: 45px;
   }
   
+  .settings-menu {
+    right: -10px;
+    min-width: 180px;
+    padding: 12px;
+  }
+  
+  .settings-item {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .settings-item span {
+    font-size: 0.9rem;
+  }
+  
+  .theme-selector {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .theme-dropdown {
+    padding: 6px;
+  }
+  
+  .theme-option {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .theme-option span {
+    font-size: 0.85rem;
+  }
+  
+  .language-option {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+  
   /* Mobilde daha hızlı animasyonlar */
-  .theme-toggle-button.rotating .theme-icon {
+  .theme-icon.rotating {
     animation-duration: 0.6s;
   }
   
-  .theme-toggle-button.transitioning {
+  .theme-icon.transitioning {
     animation-duration: 0.6s;
   }
 }
