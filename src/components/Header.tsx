@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
+import { faSun, faMoon, faGear, faLanguage, faDesktop, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import '../style/Header.css';
 
 const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
+
+type ThemeOption = 'light' | 'dark' | 'system';
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -12,64 +14,189 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = false }) => {
-  // const location = useLocation(); // Kaldırıldı
-  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(
+  // Sistem temasını algıla
+  const getSystemTheme = (): 'light' | 'dark' => {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+
+  const [themePreference, setThemePreference] = useState<ThemeOption>(
     () => {
-      // Önce localStorage'dan tema tercihini kontrol et
-      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as 'light' | 'dark';
-      if (savedTheme) {
-        return savedTheme;
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as ThemeOption;
+      if (!savedTheme) {
+        // İlk açılışta sistem temasını varsayılan olarak ayarla ve kaydet
+        localStorage.setItem(THEME_STORAGE_KEY, 'system');
+        return 'system';
       }
-      
-      // Eğer localStorage'da tema yoksa, HTML data-theme özelliğini kontrol et
-      const htmlTheme = document.documentElement.getAttribute('data-theme') as 'light' | 'dark';
-      if (htmlTheme) {
-        return htmlTheme;
-      }
-      
-      // Hiçbir tercih bulunamadıysa varsayılan olarak 'light' tema kullan
-      return 'light';
+      return savedTheme;
     }
   );
+  
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(
+    () => {
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as ThemeOption;
+      if (!savedTheme) {
+        // İlk açılışta sistem temasını uygula
+        return getSystemTheme();
+      }
+      if (savedTheme === 'system') {
+        return getSystemTheme();
+      }
+      return savedTheme as 'light' | 'dark';
+    }
+  );
+  
   const [isRotating, setIsRotating] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<'tr' | 'en'>('tr');
+  const settingsRef = useRef<HTMLDivElement>(null);
+  const themeRef = useRef<HTMLDivElement>(null);
 
-  // Tema değişikliklerini izle
+  // İlk yüklemede HTML'e tema uygula
   useEffect(() => {
-    const handleStorageChange = () => {
-      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as 'light' | 'dark';
-      if (savedTheme && savedTheme !== currentTheme) {
-        setCurrentTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  }, []);
+
+  // Sistem teması değişikliklerini izle
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleSystemThemeChange = () => {
+      if (themePreference === 'system') {
+        const newSystemTheme = getSystemTheme();
+        setCurrentTheme(newSystemTheme);
+        // HTML'e tema uygula
+        document.documentElement.setAttribute('data-theme', newSystemTheme);
       }
     };
 
-    // Storage event'ini dinle (farklı sekmelarda senkronizasyon için)
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
+    } else {
+      // Eski tarayıcılar için fallback
+      mediaQuery.addListener(handleSystemThemeChange);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleSystemThemeChange);
+      } else {
+        mediaQuery.removeListener(handleSystemThemeChange);
+      }
+    };
+  }, [themePreference]);
+
+  // Tema tercihini localStorage'dan izle
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as ThemeOption;
+      if (savedTheme && savedTheme !== themePreference) {
+        setThemePreference(savedTheme);
+        if (savedTheme === 'system') {
+          setCurrentTheme(getSystemTheme());
+        } else {
+          setCurrentTheme(savedTheme as 'light' | 'dark');
+        }
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
     
-    // Cleanup
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [currentTheme]);
+  }, [themePreference]);
 
-  const handleThemeToggle = () => {
-    // Tema geçişi devam ediyorsa tıklamayı engelle
+  // Menülerin dışarı tıklandığında kapanması
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+        setIsSettingsOpen(false);
+      }
+      if (themeRef.current && !themeRef.current.contains(event.target as Node)) {
+        setIsThemeMenuOpen(false);
+      }
+    };
+
+    if (isSettingsOpen || isThemeMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSettingsOpen, isThemeMenuOpen]);
+
+  const handleThemeChange = (selectedTheme: ThemeOption) => {
     if (isThemeTransitioning) return;
     
     setIsRotating(true);
+    setThemePreference(selectedTheme);
+    setIsThemeMenuOpen(false);
     
-    // Rotasyon animasyonunu başlat ve tema değişikliğini çağır
+    // Tema tercihini localStorage'a kaydet
+    localStorage.setItem(THEME_STORAGE_KEY, selectedTheme);
+    
+    // Yeni tema değerini belirle
+    let newTheme: 'light' | 'dark';
+    if (selectedTheme === 'system') {
+      newTheme = getSystemTheme();
+    } else {
+      newTheme = selectedTheme;
+    }
+    
+    // Animasyonlu tema değişimi
     setTimeout(() => {
+      setCurrentTheme(newTheme);
+      document.documentElement.setAttribute('data-theme', newTheme);
       toggleTheme();
-      setCurrentTheme(prevTheme => {
-        const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-        return newTheme;
-      });
       
       // Rotasyon animasyonunu bitir
       setTimeout(() => {
         setIsRotating(false);
       }, 400);
     }, 200);
+  };
+
+  const handleSettingsToggle = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+    setIsThemeMenuOpen(false);
+  };
+
+  const handleThemeMenuToggle = () => {
+    setIsThemeMenuOpen(!isThemeMenuOpen);
+  };
+
+  const handleLanguageChange = (language: 'tr' | 'en') => {
+    setCurrentLanguage(language);
+    // Dil değişikliği mantığı buraya eklenebilir
+    setIsSettingsOpen(false);
+  };
+
+  const getThemeIcon = (theme: ThemeOption) => {
+    switch (theme) {
+      case 'light':
+        return faSun;
+      case 'dark':
+        return faMoon;
+      case 'system':
+        return faDesktop;
+      default:
+        return faSun;
+    }
+  };
+
+  const getThemeLabel = (theme: ThemeOption) => {
+    switch (theme) {
+      case 'light':
+        return 'Aydınlık Tema';
+      case 'dark':
+        return 'Karanlık Tema';
+      case 'system':
+        return 'Sistem Teması';
+      default:
+        return 'Aydınlık Tema';
+    }
   };
 
   return (
@@ -79,17 +206,84 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
           <div className="logo">SYNCHDOC</div>
         </Link>
       </div>
-      <button 
-        onClick={handleThemeToggle} 
-        className={`theme-toggle-button ${isRotating ? 'rotating' : ''} ${isThemeTransitioning ? 'transitioning' : ''}`}
-        disabled={isThemeTransitioning}
-        aria-label={currentTheme === 'light' ? 'Karanlık temaya geç' : 'Aydınlık temaya geç'}
-      >
-        <FontAwesomeIcon 
-          icon={currentTheme === 'light' ? faSun : faMoon} 
-          className="theme-icon" 
-        />
-      </button>
+      <div className="settings-container" ref={settingsRef}>
+        <button 
+          onClick={handleSettingsToggle} 
+          className={`settings-button ${isSettingsOpen ? 'active' : ''}`}
+          aria-label="Ayarlar"
+        >
+          <FontAwesomeIcon 
+            icon={faGear} 
+            className="settings-icon" 
+          />
+        </button>
+        
+        {isSettingsOpen && (
+          <div className="settings-menu">
+            <div className="settings-item theme-dropdown-container" ref={themeRef}>
+              <div className="theme-selector" onClick={handleThemeMenuToggle}>
+                <FontAwesomeIcon 
+                  icon={getThemeIcon(themePreference)} 
+                  className={`theme-icon ${isRotating ? 'rotating' : ''} ${isThemeTransitioning ? 'transitioning' : ''}`}
+                />
+                <span>{getThemeLabel(themePreference)}</span>
+                <FontAwesomeIcon 
+                  icon={faChevronDown} 
+                  className={`dropdown-arrow ${isThemeMenuOpen ? 'open' : ''}`}
+                />
+              </div>
+              
+              {isThemeMenuOpen && (
+                <div className="theme-dropdown">
+                  <div 
+                    className={`theme-option ${themePreference === 'light' ? 'active' : ''}`}
+                    onClick={() => handleThemeChange('light')}
+                  >
+                    <FontAwesomeIcon icon={faSun} className="theme-option-icon" />
+                    <span>Aydınlık Tema</span>
+                  </div>
+                  <div 
+                    className={`theme-option ${themePreference === 'dark' ? 'active' : ''}`}
+                    onClick={() => handleThemeChange('dark')}
+                  >
+                    <FontAwesomeIcon icon={faMoon} className="theme-option-icon" />
+                    <span>Karanlık Tema</span>
+                  </div>
+                  <div 
+                    className={`theme-option ${themePreference === 'system' ? 'active' : ''}`}
+                    onClick={() => handleThemeChange('system')}
+                  >
+                    <FontAwesomeIcon icon={faDesktop} className="theme-option-icon" />
+                    <span>Sistem Teması</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="settings-item">
+              <FontAwesomeIcon 
+                icon={faLanguage} 
+                className="language-icon"
+              />
+              <span>Dil</span>
+              <div className="language-options">
+                <button 
+                  className={`language-option ${currentLanguage === 'tr' ? 'active' : ''}`}
+                  onClick={() => handleLanguageChange('tr')}
+                >
+                  TR
+                </button>
+                <button 
+                  className={`language-option ${currentLanguage === 'en' ? 'active' : ''}`}
+                  onClick={() => handleLanguageChange('en')}
+                >
+                  EN
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   );
 };
