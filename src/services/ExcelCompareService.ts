@@ -9,7 +9,7 @@ export class ExcelCompareService {
   /**
    * İki Excel dosyasını karşılaştırır
    */
-  public static async compareExcelFiles(file1: File, file2: File): Promise<ExcelCompareResult> {
+  public static async compareExcelFiles(file1: File, file2: File, matchColumns: boolean = false): Promise<ExcelCompareResult> {
     try {
       // Dosyaları yükle ve içeriğini çıkar
       const workbook1 = await this.readExcelFile(file1);
@@ -60,7 +60,7 @@ export class ExcelCompareService {
           }
           
           // Sayfaları karşılaştır
-          const differences = await this.compareSheets(json1, json2, sheetName);
+          const differences = await this.compareSheets(json1, json2, sheetName, matchColumns);
           
           // Farklılık yüzdesini hesapla
           const totalCells = this.countCells(json1) + this.countCells(json2);
@@ -106,7 +106,7 @@ export class ExcelCompareService {
   /**
    * ID ile IndexedDB'den Excel dosyası yükler ve karşılaştırır
    */
-  public static async compareExcelFilesFromDB(id1: string, id2: string): Promise<ExcelCompareResult | null> {
+  public static async compareExcelFilesFromDB(id1: string, id2: string, matchColumns: boolean = false): Promise<ExcelCompareResult | null> {
     try {
       // IndexedDB'den dosyaları al
       const fileData1 = await getExcelFile<any>(id1);
@@ -173,7 +173,7 @@ export class ExcelCompareService {
           }
           
           // Sayfaları karşılaştır
-          const differences = await this.compareSheets(json1, json2, sheetName);
+          const differences = await this.compareSheets(json1, json2, sheetName, matchColumns);
           
           // Farklılık yüzdesini hesapla
           const totalCells = this.countCells(json1) + this.countCells(json2);
@@ -273,8 +273,15 @@ export class ExcelCompareService {
   /**
    * İki Excel sayfasını karşılaştırır (Optimized Version)
    */
-  private static async compareSheets(sheet1: any[][], sheet2: any[][], sheetName: string): Promise<CellDiff[]> {
+  private static async compareSheets(sheet1: any[][], sheet2: any[][], sheetName: string, matchColumns: boolean = false): Promise<CellDiff[]> {
     const differences: CellDiff[] = [];
+    
+    if (matchColumns && sheet1.length > 0 && sheet2.length > 0) {
+      // Sütun eşleme modunda karşılaştır
+      return await this.compareSheetsWithColumnMapping(sheet1, sheet2, sheetName);
+    }
+    
+    // Normal mod - pozisyona göre karşılaştırma
     const maxRows = Math.max(sheet1.length, sheet2.length);
     const CHUNK_SIZE = 1000; // Her chunk'ta 1000 satır işle
     
@@ -345,6 +352,86 @@ export class ExcelCompareService {
       count += row.length;
     }
     return count;
+  }
+  
+  /**
+   * Sütun başlıklarına göre eşleyerek Excel sayfalarını karşılaştırır
+   */
+  private static async compareSheetsWithColumnMapping(sheet1: any[][], sheet2: any[][], sheetName: string): Promise<CellDiff[]> {
+    const differences: CellDiff[] = [];
+    
+    // İlk satırları başlık olarak al
+    const headers1 = sheet1[0] || [];
+    const headers2 = sheet2[0] || [];
+    
+    // Sütun eşleme tablosu oluştur (sheet1 sütun index -> sheet2 sütun index)
+    const columnMapping: Map<number, number> = new Map();
+    
+    for (let i = 0; i < headers1.length; i++) {
+      const header1 = String(headers1[i] || '').trim();
+      if (header1) {
+        // Aynı başlığı sheet2'de ara
+        for (let j = 0; j < headers2.length; j++) {
+          const header2 = String(headers2[j] || '').trim();
+          if (header1 === header2) {
+            columnMapping.set(i, j);
+            break;
+          }
+        }
+      }
+    }
+    
+    // Veri satırlarını karşılaştır (başlık satırından sonraki satırlar)
+    const maxRows = Math.max(sheet1.length, sheet2.length);
+    const CHUNK_SIZE = 1000;
+    
+    for (let startRow = 1; startRow < maxRows; startRow += CHUNK_SIZE) {
+      const endRow = Math.min(startRow + CHUNK_SIZE, maxRows);
+      
+      for (let r = startRow; r < endRow; r++) {
+        const row1 = r < sheet1.length ? sheet1[r] : [];
+        const row2 = r < sheet2.length ? sheet2[r] : [];
+        
+        // Eşleşen sütunları karşılaştır
+        for (const [col1Index, col2Index] of columnMapping.entries()) {
+          const value1 = col1Index < row1.length ? row1[col1Index] : null;
+          const value2 = col2Index < row2.length ? row2[col2Index] : null;
+          
+          if (this.cellValuesAreDifferent(value1, value2)) {
+            differences.push({
+              value1,
+              value2,
+              row: r + 1, // 1'den başlayan satır numaraları
+              col: col1Index + 1, // Dosya 1'deki sütun numarası
+              sheet: sheetName
+            });
+          }
+        }
+        
+        // Sheet1'de var olan ama sheet2'de eşleşmeyen sütunları kontrol et
+        for (let c = 0; c < row1.length; c++) {
+          if (!columnMapping.has(c)) {
+            const value1 = row1[c];
+            if (value1 !== null && value1 !== undefined && String(value1).trim() !== '') {
+              differences.push({
+                value1,
+                value2: null,
+                row: r + 1,
+                col: c + 1,
+                sheet: sheetName
+              });
+            }
+          }
+        }
+      }
+      
+      // Her chunk'tan sonra main thread'e nefes ver
+      if (startRow + CHUNK_SIZE < maxRows) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+    }
+    
+    return differences;
   }
   
   /**
