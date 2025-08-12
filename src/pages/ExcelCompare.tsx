@@ -14,6 +14,7 @@ import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../compo
 const ExcelCompare: React.FC = () => {
   const allowedExcelTypes = ['.xlsx', '.xls', '.xlsm', '.xlsb', '.csv'];
   const [compareResult, setCompareResult] = useState<ExcelCompareResultType | null>(null);
+  const [matchColumns, setMatchColumns] = useState<boolean>(false);
   
   const handleCompare = async (file1: File, file2: File) => {
     try {
@@ -54,7 +55,7 @@ const ExcelCompare: React.FC = () => {
       ]);
       
       // Excel dosyalarını karşılaştır
-      const result = await ExcelCompareService.compareExcelFiles(file1, file2);
+      const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns);
       console.log('Karşılaştırma sonucu:', result);
       
       // Sonuçları ayarla
@@ -672,6 +673,20 @@ const ExcelCompare: React.FC = () => {
         Excel Karşılaştırma aracı ile iki Excel dosyasının içeriğini kolayca karşılaştırın.
         Yüklediğiniz tablolardaki veri farklılıkları anında tespit edilir.
       </p>
+      
+      <div className="comparison-options">
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={matchColumns}
+            onChange={(e) => setMatchColumns(e.target.checked)}
+          />
+          <span>Sütunları Eşle</span>
+          <small className="option-description">
+            İşaretli olduğunda, sütunları pozisyonlarına değil başlık isimlerine göre eşleştirir
+          </small>
+        </label>
+      </div>
       
       <FileUpload 
         onCompare={handleCompare} 
