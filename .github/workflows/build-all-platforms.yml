@@ -34,7 +34,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: windows-build
-        path: src-tauri/target/release/SynchDoc.exe
+        path: src-tauri/target/release/bundle/SynchDoc.exe
 
   build-macos:
     runs-on: macos-latest
@@ -62,7 +62,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: macos-build
-        path: src-tauri/target/aarch64-apple-darwin/release/SynchDoc
+        path: src-tauri/target/aarch64-apple-darwin/release/bundle/SynchDoc.dmg
 
   build-linux:
     runs-on: ubuntu-latest
@@ -95,7 +95,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: linux-build
-        path: src-tauri/target/release/SynchDoc
+        path: src-tauri/target/release/bundle/SynchDoc.deb
 
   create-release:
     needs: [build-windows, build-macos, build-linux]
@@ -117,7 +117,7 @@ jobs:
       with:
         files: |
           artifacts/windows-build/SynchDoc.exe
-          artifacts/macos-build/SynchDoc
-          artifacts/linux-build/SynchDoc
+          artifacts/macos-build/SynchDoc.dmg
+          artifacts/linux-build/SynchDoc.deb
         draft: false
         prerelease: false
