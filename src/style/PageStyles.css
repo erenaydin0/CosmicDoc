@@ -8,10 +8,12 @@
 }
 
 .page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: var(--text-4xl);
+  font-weight: var(--font-extrabold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
   color: var(--text-color);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   background: var(--primary-color);
   -webkit-background-clip: text;
   background-clip: text;
@@ -20,69 +22,60 @@
 }
 
 .page-description {
-  font-size: 1.2rem;
-  color: var(--text-color);
-  opacity: 0.8;
-  margin-bottom: 2rem;
+  font-size: var(--text-xl);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-relaxed);
+  letter-spacing: var(--tracking-normal);
+  color: var(--secondary-color);
+  margin-bottom: 2.5rem;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .card {
   background-color: var(--background-color);
   color: var(--text-color);
-  padding: 2.5rem 2rem;
-  border-radius: 20px;
+  padding: 2rem;
+  border-radius: 12px;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--neu-raised-shadow);
+  transition: all 0.2s ease;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  border: none;
-  min-height: 220px;
+  min-height: 200px;
   cursor: pointer;
-  transform-style: preserve-3d;
-  transform-origin: center center;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Tıklanabilirlik için mikro animasyonlar */
+/* Minimal tıklama efekti */
 .card:active {
-  transform: scale(0.97) translateY(-5px);
-  box-shadow: var(--neu-pressed-shadow);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transform: scale(0.98);
+  box-shadow: var(--subtle-shadow);
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-/* Neumorphism için gradient overlay */
+/* Minimal hover border efekti */
 .card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-  z-index: 1;
-  border-radius: 20px 20px 0 0;
-}
-
-.card::after {
-  content: '';
-  position: absolute;
   bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, transparent, var(--subtle-bg-color));
-  z-index: 0;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: 12px;
+  padding: 1px;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
   opacity: 0;
-  transition: opacity 0.4s ease;
-  border-radius: 20px;
+  transition: opacity 0.2s ease;
+  z-index: 0;
 }
 
 /* Tıklama ripple efekti */
@@ -121,185 +114,129 @@
 }
 
 .card .icon-container {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
-  background-color: var(--background-color);
-  box-shadow: var(--neu-raised-shadow);
+  margin-bottom: 1.2rem;
+  background-color: var(--subtle-bg-color);
+  border: 1px solid var(--border-color);
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   overflow: hidden;
   z-index: 2;
 }
 
-/* Özel ikon stilleri */
-.excel-icon {
-  background-color: var(--background-color);
-}
-
+/* Minimal ikon stilleri */
 .excel-icon svg {
-  color: #217346; /* Excel yeşili */
-}
-
-.pdf-icon {
-  background-color: var(--background-color);
+  color: var(--accent-color); /* Modern yeşil */
 }
 
 .pdf-icon svg {
-  color: #E2231A; /* PDF kırmızısı */
-}
-
-.text-icon {
-  background-color: var(--background-color);
+  color: #EF4444; /* Modern kırmızı */
 }
 
 .text-icon svg {
-  color: #2969B0; /* Metin mavisi */
-}
-
-.convert-icon {
-  background-color: var(--background-color);
+  color: var(--primary-color); /* Modern mavi */
 }
 
 .convert-icon svg {
-  color: #FF9900; /* Dönüştürme turuncusu */
+  color: #F59E0B; /* Modern turuncu */
 }
 
 .card svg {
   margin-bottom: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   z-index: 2;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .card h2 {
   color: var(--text-color);
   margin-top: 0;
   margin-bottom: 0.75rem;
-  font-weight: 700;
-  font-size: 1.4rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+  transition: all 0.2s ease;
   text-align: center;
   position: relative;
   z-index: 2;
 }
 
 .card p {
-  color: var(--text-color);
-  opacity: 0.8;
+  color: var(--secondary-color);
   margin-bottom: 0;
-  font-size: 1rem;
+  font-size: var(--text-base);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-relaxed);
+  letter-spacing: var(--tracking-normal);
   text-align: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   position: relative;
   z-index: 2;
 }
 
 .card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 12px 12px 24px var(--neu-shadow-dark), -12px -12px 24px var(--neu-shadow-light);
-  background: linear-gradient(135deg, var(--background-color), var(--subtle-bg-color));
-}
-
-/* Tıklanma sonrası geri tepme animasyonu */
-.card:active:hover {
-  transform: translateY(-4px) scale(0.98);
-  box-shadow: var(--neu-pressed-shadow);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transform: translateY(-2px);
+  box-shadow: var(--elevated-shadow);
+  border-color: var(--primary-color);
+  background-color: var(--hover-bg-color);
 }
 
 .card:hover::before {
-  transform: scaleX(1);
-}
-
-.card:hover::after {
   opacity: 1;
 }
 
 /* Kart focus durumu (klavye navigasyonu için) */
 .card:focus {
   outline: none;
-  box-shadow: 0 0 0 3px var(--primary-color), var(--neu-raised-shadow);
+  box-shadow: 0 0 0 3px var(--primary-color), var(--card-shadow);
 }
 
 .card:focus:not(:focus-visible) {
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
 }
 
 .card:hover .icon-container {
-  transform: scale(1.05);
-  box-shadow: var(--neu-inset-shadow-light);
+  transform: scale(1.1);
+  background-color: var(--background-color);
+  border-color: var(--primary-color);
 }
 
 /* İkon basma efekti */
 .card:active .icon-container {
   transform: scale(0.95);
-  box-shadow: var(--neu-pressed-shadow);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.1s;
 }
 
-/* Hover durumunda özel ikon stilleri - neumorphism uyumlu */
-.card:hover .excel-icon {
-  box-shadow: var(--neu-inset-shadow-light);
-  background: linear-gradient(135deg, 
-              var(--background-color), 
-              rgba(33, 115, 70, 0.05));
-}
-
-.card:hover .pdf-icon {
-  box-shadow: var(--neu-inset-shadow-light);
-  background: linear-gradient(135deg, 
-              var(--background-color), 
-              rgba(226, 35, 26, 0.05));
-}
-
-.card:hover .text-icon {
-  box-shadow: var(--neu-inset-shadow-light);
-  background: linear-gradient(135deg, 
-              var(--background-color), 
-              rgba(41, 105, 176, 0.05));
-}
-
-.card:hover .convert-icon {
-  box-shadow: var(--neu-inset-shadow-light);
-  background: linear-gradient(135deg, 
-              var(--background-color), 
-              rgba(255, 153, 0, 0.05));
-}
-
-.card:hover svg {
+/* Hover durumunda minimal ikon stilleri */
+.card:hover .excel-icon svg {
+  color: var(--accent-color);
   transform: scale(1.1);
-  filter: drop-shadow(0 2px 8px rgba(var(--primary-color-rgb), 0.3));
+}
+
+.card:hover .pdf-icon svg {
+  color: #EF4444;
+  transform: scale(1.1);
+}
+
+.card:hover .text-icon svg {
+  color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.card:hover .convert-icon svg {
+  color: #F59E0B;
+  transform: scale(1.1);
 }
 
 /* Tıklama durumundaki ikon efekti */
 .card:active svg {
   transform: scale(0.95);
-  transition: transform 0.2s;
-}
-
-.card:hover .excel-icon svg {
-  color: #217346;
-  filter: drop-shadow(0 2px 8px rgba(33, 115, 70, 0.4));
-}
-
-.card:hover .pdf-icon svg {
-  color: #E2231A;
-  filter: drop-shadow(0 2px 8px rgba(226, 35, 26, 0.4));
-}
-
-.card:hover .text-icon svg {
-  color: #2969B0;
-  filter: drop-shadow(0 2px 8px rgba(41, 105, 176, 0.4));
-}
-
-.card:hover .convert-icon svg {
-  color: #FF9900;
-  filter: drop-shadow(0 2px 8px rgba(255, 153, 0, 0.4));
+  transition: transform 0.1s;
 }
 
 .card:hover h2 {
@@ -328,30 +265,33 @@
   }
   
   .page-title {
-    font-size: 1.8rem;
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
   }
   
   .page-description {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    margin-bottom: 2rem;
+    padding: 0 1rem;
   }
   
   /* Mobil cihazlarda neumorphism uyumlu basma efekti */
   .card:active {
     transform: scale(0.98) translateY(-2px);
-    box-shadow: var(--neu-pressed-shadow);
+    box-shadow: var(--subtle-shadow);
   }
   
   .card:active:hover {
     transform: scale(0.98) translateY(-2px);
-    box-shadow: var(--neu-pressed-shadow);
+    box-shadow: var(--subtle-shadow);
   }
   
   /* Mobil için hover efektleri (dokunmatik cihazlarda) */
   @media (hover: hover) {
     .card:hover {
       transform: translateY(-6px) scale(1.01);
-      box-shadow: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+      box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
     }
     
     .card:hover .icon-container {
@@ -371,13 +311,10 @@
 
 /* Karşılaştırma seçenekleri */
 .comparison-options {
-  width: 50%;
+  width: 100%;
   justify-content: center;
   margin: 1.5rem 0;
   padding: 1.5rem;
-  background-color: var(--background-color);
-  border-radius: 16px;
-  border: 1px solid var(--neu-shadow-light);
   display: flex;
   gap: 1rem;
 }
@@ -421,7 +358,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
 }
 
 .checkbox-label:hover .option-description {

@@ -44,6 +44,7 @@ interface ComparisonLayoutProps {
   noDifferenceMessage?: string;
   isLoading?: boolean;
   loadingMessage?: string;
+  loadingType?: 'spinner' | 'dots' | 'progress' | 'skeleton';
   error?: string;
   onRetry?: () => void;
 }
@@ -133,14 +134,36 @@ const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
   noDifferenceMessage = "Dosyalar arasında fark bulunamadı.",
   isLoading = false,
   loadingMessage = "Dosyalar karşılaştırılıyor",
+  loadingType = 'spinner',
   error,
   onRetry
 }) => {
+  
+  const renderLoader = () => {
+    switch (loadingType) {
+      case 'dots':
+        return <div className="loading-dots"></div>;
+      case 'progress':
+        return <div className="loading-progress"></div>;
+      case 'skeleton':
+        return (
+          <div className="skeleton-container">
+            <div className="skeleton skeleton-text large"></div>
+            <div className="skeleton skeleton-text"></div>
+            <div className="skeleton skeleton-text small"></div>
+            <div className="skeleton skeleton-card"></div>
+          </div>
+        );
+      default:
+        return <div className="loading-spinner"></div>;
+    }
+  };
+
   return (
     <div className="result-container">
       {isLoading ? (
         <div className="loading-container full-page">
-          <div className="loading-spinner"></div>
+          {renderLoader()}
           <p className="loading-message">{loadingMessage}</p>
         </div>
       ) : error ? (

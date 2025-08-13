@@ -12,11 +12,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
   border-top: 1px solid var(--border-color);
   border-radius: 0 0 16px 16px;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
   gap: 15px;
+  padding: 1rem 1rem;
 }
 
 .pagination-info {
@@ -25,7 +25,6 @@
   gap: 10px;
   font-size: 0.9rem;
   color: var(--text-color);
-  margin-left: 1rem;
 }
 
 .page-size-selector {
@@ -149,20 +148,20 @@
   border-radius: 12px 12px 0 0;
   cursor: pointer;
   background-color: var(--accent-color);
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
   position: relative;
   transition: all 0.3s ease;
   color: var(--white-color);
 }
 
 .sheet-tab:hover {
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
   transform: scale(0.98);
 }
 
 .sheet-tab.active {
   background-color: var(--background-color);
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
   color: var(--primary-color);
   font-size: 14px;
   font-weight: 600;
@@ -175,7 +174,7 @@
   padding: 4px 8px;
   font-size: 12px;
   margin-left: 8px;
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--subtle-shadow);
 }
 
 /* Fark tablosu */
@@ -196,7 +195,7 @@
 
 .differences-table-header th {
   background-color: var(--background-color);
-  box-shadow: 0 0 0 1px var(--neu-raised-shadow);
+  box-shadow: 0 0 0 1px var(--card-shadow);
   font-weight: 600;
   padding: 15px 20px;
   text-align: left;
@@ -208,7 +207,7 @@
 
 .differences-table-body-scroll {
   height: 1000px;
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--subtle-shadow);
   overflow-y: auto;
 }
 
@@ -228,7 +227,6 @@
 .differences-table-header th:nth-child(1),
 .differences-table td:nth-child(1) {
   width: 10%; /* Satır */
-  border-radius: 16px 0 0 0;
 }
 
 .differences-table-header th:nth-child(2),
@@ -244,7 +242,6 @@
 .differences-table-header th:nth-child(4),
 .differences-table td:nth-child(4) {
   width: 40%; /* Dosya 2 Değeri */
-  border-radius: 0 16px 0 0;
 }
 
 .differences-table th {
@@ -351,7 +348,7 @@
   color: var(--text-color);
   font-size: 0.9rem;
   border-radius: 16px;
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--subtle-shadow);
 }
 
 .filter-search-input:focus {
@@ -391,7 +388,7 @@
   padding: 6px 10px;
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
   background-color: var(--background-color);
   color: var(--text-color);
   font-size: 0.85rem;
@@ -401,7 +398,7 @@
 
 .filter-actions button:hover {
   background-color: var(--subtle-bg-color);
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
 }
 
 /* Filtre Loading Indicator */
@@ -438,7 +435,7 @@
 .filter-options input[type="checkbox"] {
   margin-right: 8px;
   border-radius: 16px;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
 }
 
 /* Responsive tasarım - Excel */
@@ -477,7 +474,7 @@
   border-radius: 16px;
   overflow: hidden;
   background-color: var(--background-color);
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
 }
 
 .text-file-header {
@@ -487,7 +484,7 @@
   background-color: var(--background-color);
   padding: 15px 20px;
   border-bottom: none;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
 }
 
 .text-file-header h3 {
@@ -503,7 +500,7 @@
 .text-content {
   padding-top: 10px;
   background-color: var(--background-color);
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--subtle-shadow);
   max-height: 500px;
   overflow-y: auto;
   font-family: 'Courier New', monospace;
@@ -550,7 +547,6 @@
 /* =============== PDF KARŞILAŞTIRMA STILLERI =============== */
 .pdf-previews {
   display: flex;
-  gap: 0.5rem;
   width: 100%;
 }
 
@@ -560,7 +556,7 @@
   overflow: hidden;
   background-color: var(--background-color);
   border-radius: 16px;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
 }
 
 .pdf-preview-header {
@@ -570,7 +566,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
   border-radius: 16px 16px 0 0;
 }
 
@@ -609,7 +605,7 @@
   height: auto;
   border: none;
   border-radius: 8px;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
   margin-bottom: 10px;
 }
 
@@ -632,7 +628,7 @@
 }
 
 .page-details:hover {
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--subtle-shadow);
 }
 
 .page-details h3 {
@@ -678,7 +674,7 @@
   border: 2px solid var(--primary-color);
   border-radius: 12px;
   background-color: var(--primary-color);
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--card-shadow);
   color: var(--white-color);
   font-size: 0.9rem;
   font-weight: 500;
@@ -688,7 +684,7 @@
 }
 
 .mode-button:hover {
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
   background-color: var(--background-color);
   color: var(--primary-color);
 }
@@ -696,7 +692,7 @@
 .mode-button.active {
   background-color: var(--background-color);
   color: var(--primary-color);
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
   cursor: default;
 }
 
@@ -711,12 +707,9 @@
   margin: 0 auto;
 }
 
-.single-preview .pdf-preview-pages {
-  max-height: 1000px;
-}
-
 /* Görsel karşılaştırma sonuçları */
 .visual-results {
+  width: 100%;
   max-height: 600px;
   overflow-y: auto;
   margin-top: 20px;
@@ -736,7 +729,7 @@
 
 .visual-page-result:hover {
   background-color: rgba(var(--warning-color-rgb), 0.1);
-  box-shadow: var(--neu-inset-shadow-light);
+  box-shadow: var(--subtle-shadow);
 }
 
 .visual-page-result h4 {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileExcel, faFilePdf, faFileAlt, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTable, faFile, faAlignLeft, faArrowRightArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import '../style/PageStyles.css';
 
@@ -68,7 +68,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container excel-icon">
-            <FontAwesomeIcon icon={faFileExcel} size="3x" />
+            <FontAwesomeIcon icon={faTable} size="2x" />
           </div>
           <h2>{t('home.features.excel.title')}</h2>
           <p>{t('home.features.excel.description')}</p>
@@ -83,7 +83,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container pdf-icon">
-            <FontAwesomeIcon icon={faFilePdf} size="3x" />
+            <FontAwesomeIcon icon={faFile} size="2x" />
           </div>
           <h2>{t('home.features.pdf.title')}</h2>
           <p>{t('home.features.pdf.description')}</p>
@@ -98,7 +98,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container text-icon">
-            <FontAwesomeIcon icon={faFileAlt} size="3x" />
+            <FontAwesomeIcon icon={faAlignLeft} size="2x" />
           </div>
           <h2>{t('home.features.text.title')}</h2>
           <p>{t('home.features.text.description')}</p>
@@ -113,7 +113,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container convert-icon">
-            <FontAwesomeIcon icon={faSyncAlt} size="3x" />
+            <FontAwesomeIcon icon={faArrowRightArrowLeft} size="2x" />
           </div>
           <h2>{t('home.features.convert.title')}</h2>
           <p>{t('home.features.convert.description')}</p>

@@ -1,92 +1,150 @@
 :root {
-  --white-color: #e0e5ec;
-  --black-color: #2c3e50;
+  --white-color: #FCFCFC;
+  --black-color: #0F172A;
   
-  /* RGB renk değerleri */
-  --white-color-rgb: 224, 229, 236;
-  --black-color-rgb: 44, 62, 80;
-  --primary-color-rgb: 242, 48, 5;
-  --secondary-color-rgb: 39, 62, 71;
-  --accent-color-rgb: 89, 30, 17;
-  --success-color-rgb: 76, 175, 80;
-  --warning-color-rgb: 255, 152, 0;
-  --error-color-rgb: 244, 67, 54;
+  /* RGB renk değerleri - Minimal */
+  --white-color-rgb: 252, 252, 252;
+  --black-color-rgb: 15, 23, 42;
+  --primary-color-rgb: 37, 99, 235;
+  --secondary-color-rgb: 100, 116, 139;
+  --accent-color-rgb: 16, 185, 129;
+  --success-color-rgb: 34, 197, 94;
+  --warning-color-rgb: 245, 158, 11;
+  --error-color-rgb: 239, 68, 68;
 
-  /* Ana renkler - Neumorphism uyumlu */
+  /* Ana renkler - Minimal flat design */
   --background-color: var(--white-color);
-  --primary-color: #F23005;
-  --secondary-color: #273E47;
-  --accent-color: #591E11;
+  --primary-color: #2563EB;
+  --secondary-color: #64748B;
+  --accent-color: #10B981;
   --text-color: var(--black-color);
   
-  /* Neumorphism gölge değişkenleri */
-  --neu-shadow-light: #ffffff;
-  --neu-shadow-dark: #a3b1c6;
-  --neu-inset-shadow-light: inset 6px 6px 12px #a3b1c6, inset -6px -6px 12px #ffffff;
-  --neu-raised-shadow: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
-  --neu-pressed-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff;
+  /* Minimal gölge değişkenleri */
+  --subtle-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-light: #E2E8F0;
+  --shadow-dark: #94A3B8;
   
-  /* Hata, Uyarı ve Başarı renkleri */
-  --success-color: #4CAF50;
-  --success-bg-color: rgba(76, 175, 80, 0.05);
-  --warning-color: #FF9800;
-  --warning-bg-color: rgba(255, 152, 0, 0.05);
-  --error-color: #F44336;
-  --error-bg-color: rgba(244, 67, 54, 0.05);
+  /* Durum renkleri - Minimal */
+  --success-color: #22C55E;
+  --success-bg-color: rgba(34, 197, 94, 0.1);
+  --warning-color: #F59E0B;
+  --warning-bg-color: rgba(245, 158, 11, 0.1);
+  --error-color: #EF4444;
+  --error-bg-color: rgba(239, 68, 68, 0.1);
   
-  /* Kart ve UI elementleri için ek renkler */
-  --card-shadow-color: rgba(163, 177, 198, 0.6);
-  --hover-shadow-color: rgba(163, 177, 198, 0.8);
-  --subtle-bg-color: rgba(163, 177, 198, 0.1);
-  --border-color: rgba(163, 177, 198, 0.3);
+  /* UI elementleri için minimal renkler */
+  --card-shadow-color: rgba(0, 0, 0, 0.1);
+  --hover-shadow-color: rgba(0, 0, 0, 0.15);
+  --subtle-bg-color: #F8FAFC;
+  --border-color: #E2E8F0;
+  --hover-bg-color: #F1F5F9;
+  --hover-color: #F1F5F9;
+  --secondary-bg-color: #64748B;
+  
+  /* Modern Typography Scale */
+  --font-family-base: 'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  
+  /* Font Sizes - Type Scale (1.125 - Major Second) */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+  
+  /* Line Heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+  
+  /* Letter Spacing */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+  
+  /* Font Weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
 }
 
 [data-theme='dark'] {
-  /* RGB renk değerleri - Koyu tema */
-  --primary-color-rgb: 242, 48, 5;
-  --secondary-color-rgb: 39, 62, 71;
-  --accent-color-rgb: 112, 41, 28;
-  --success-color-rgb: 102, 187, 106;
-  --warning-color-rgb: 255, 167, 38;
-  --error-color-rgb: 239, 83, 80;
+  /* RGB renk değerleri - Minimal koyu tema */
+  --white-color-rgb: 248, 250, 252;
+  --black-color-rgb: 15, 23, 42;
+  --primary-color-rgb: 59, 130, 246;
+  --secondary-color-rgb: 148, 163, 184;
+  --accent-color-rgb: 52, 211, 153;
+  --success-color-rgb: 74, 222, 128;
+  --warning-color-rgb: 251, 191, 36;
+  --error-color-rgb: 248, 113, 113;
   
-  /* Ana renkler - Koyu tema */
-  --background-color: #2c3e50;
-  --primary-color: #F23005;
-  --secondary-color: #273E47;
-  --accent-color: #702A1C;
-  --text-color: #e0e5ec;
+  /* Ana renkler - Minimal koyu tema */
+  --white-color: #F8FAFC;
+  --black-color: #0F172A;
+  --background-color: #0F172A;
+  --primary-color: #3B82F6;
+  --secondary-color: #94A3B8;
+  --accent-color: #34D399;
+  --text-color: #F8FAFC;
   
-  /* Neumorphism gölge değişkenleri - Koyu tema */
-  --neu-shadow-light: #3a4c63;
-  --neu-shadow-dark: #1e303d;
-  --neu-inset-shadow-light: inset 6px 6px 12px #1e303d, inset -6px -6px 12px #3a4c63;
-  --neu-raised-shadow: 6px 6px 12px #1e303d, -6px -6px 12px #3a4c63;
-  --neu-pressed-shadow: inset 3px 3px 6px #1e303d, inset -3px -3px 6px #3a4c63;
+  /* Minimal gölge değişkenleri - Koyu tema */
+  --subtle-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --shadow-light: #475569;
+  --shadow-dark: #1E293B;
   
-  /* Hata, Uyarı ve Başarı renkleri - Koyu tema */
-  --success-color: #66BB6A;
-  --success-bg-color: rgba(102, 187, 106, 0.1);
-  --warning-color: #FFA726;
-  --warning-bg-color: rgba(255, 167, 38, 0.1);
-  --error-color: #EF5350;
-  --error-bg-color: rgba(239, 83, 80, 0.1);
+  /* Durum renkleri - Minimal koyu tema */
+  --success-color: #4ADE80;
+  --success-bg-color: rgba(74, 222, 128, 0.1);
+  --warning-color: #FBBF24;
+  --warning-bg-color: rgba(251, 191, 36, 0.1);
+  --error-color: #F87171;
+  --error-bg-color: rgba(248, 113, 113, 0.1);
   
-  /* Kart ve UI elementleri için ek renkler - Koyu tema */
-  --card-shadow-color: rgba(30, 48, 61, 0.8);
-  --hover-shadow-color: rgba(30, 48, 61, 0.9);
-  --subtle-bg-color: rgba(58, 76, 99, 0.1);
-  --border-color: rgba(58, 76, 99, 0.3);
+  /* UI elementleri için minimal renkler - Koyu tema */
+  --card-shadow-color: rgba(0, 0, 0, 0.3);
+  --hover-shadow-color: rgba(0, 0, 0, 0.4);
+  --subtle-bg-color: #1E293B;
+  --border-color: #334155;
+  --hover-bg-color: #334155;
+  --hover-color: #334155;
+  --secondary-bg-color: #94A3B8;
 }
 
 body {
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-family-base);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  font-weight: var(--font-normal);
   margin: 0;
   padding: 0;
   overflow-x: hidden;
   position: relative;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -94,6 +152,38 @@ body {
   text-align: center;
   margin: 0 auto;
 }
+
+/* Typography Utility Classes */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+.text-3xl { font-size: var(--text-3xl); }
+.text-4xl { font-size: var(--text-4xl); }
+.text-5xl { font-size: var(--text-5xl); }
+
+.font-light { font-weight: var(--font-light); }
+.font-normal { font-weight: var(--font-normal); }
+.font-medium { font-weight: var(--font-medium); }
+.font-semibold { font-weight: var(--font-semibold); }
+.font-bold { font-weight: var(--font-bold); }
+.font-extrabold { font-weight: var(--font-extrabold); }
+
+.leading-none { line-height: var(--leading-none); }
+.leading-tight { line-height: var(--leading-tight); }
+.leading-snug { line-height: var(--leading-snug); }
+.leading-normal { line-height: var(--leading-normal); }
+.leading-relaxed { line-height: var(--leading-relaxed); }
+.leading-loose { line-height: var(--leading-loose); }
+
+.tracking-tighter { letter-spacing: var(--tracking-tighter); }
+.tracking-tight { letter-spacing: var(--tracking-tight); }
+.tracking-normal { letter-spacing: var(--tracking-normal); }
+.tracking-wide { letter-spacing: var(--tracking-wide); }
+.tracking-wider { letter-spacing: var(--tracking-wider); }
+.tracking-widest { letter-spacing: var(--tracking-widest); }
 
 /* Mobil düzenlemeler */
 @media (max-width: 768px) {

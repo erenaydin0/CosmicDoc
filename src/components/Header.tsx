@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSun, faMoon, faGear, faLanguage, faDesktop, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faSun, faMoon, faCog, faGlobe, faDisplay, faChevronDown, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import '../style/Header.css';
 
@@ -9,12 +9,9 @@ const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 
-interface HeaderProps {
-  toggleTheme: () => void;
-  isThemeTransitioning?: boolean;
-}
+interface HeaderProps {}
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = false }) => {
+const Header: React.FC<HeaderProps> = () => {
   const { t, i18n } = useTranslation();
   
   // Sistem temasını algıla
@@ -131,7 +128,6 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
   }, [isSettingsOpen, isThemeMenuOpen]);
 
   const handleThemeChange = (selectedTheme: ThemeOption) => {
-    if (isThemeTransitioning) return;
     
     setIsRotating(true);
     setThemePreference(selectedTheme);
@@ -152,7 +148,6 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
     setTimeout(() => {
       setCurrentTheme(newTheme);
       document.documentElement.setAttribute('data-theme', newTheme);
-      toggleTheme();
       
       // Rotasyon animasyonunu bitir
       setTimeout(() => {
@@ -183,7 +178,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
       case 'dark':
         return faMoon;
       case 'system':
-        return faDesktop;
+        return faDisplay;
       default:
         return faSun;
     }
@@ -216,7 +211,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
           aria-label={t('header.settings')}
         >
           <FontAwesomeIcon 
-            icon={faGear} 
+            icon={faCog} 
             className="settings-icon" 
           />
         </button>
@@ -227,7 +222,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
               <div className="theme-selector" onClick={handleThemeMenuToggle}>
                 <FontAwesomeIcon 
                   icon={getThemeIcon(themePreference)} 
-                  className={`theme-icon ${isRotating ? 'rotating' : ''} ${isThemeTransitioning ? 'transitioning' : ''}`}
+                  className={`theme-icon ${isRotating ? 'rotating' : ''}`}
                 />
                 <span>{getThemeLabel(themePreference)}</span>
                 <FontAwesomeIcon 
@@ -265,7 +260,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isThemeTransitioning = fal
             
             <div className="settings-item">
               <FontAwesomeIcon 
-                icon={faLanguage} 
+                icon={faGlobe} 
                 className="language-icon"
               />
               <span>{t('header.language')}</span>

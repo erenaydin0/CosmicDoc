@@ -29,24 +29,51 @@
   width: 100%;
 }
 
-/* Sayfa içerik stilleri */
+/* Sayfa içerik stilleri - Minimal */
 .page-content-wrapper {
   position: relative;
   animation-fill-mode: both;
   min-height: 70vh;
   width: 100%;
-  animation: fadeInScale 400ms ease-out;
+  animation: fadeInUp 300ms ease-out;
 }
 
-/* Animasyon keyframe tanımlamaları */
-@keyframes fadeInScale {
+/* Modern Minimal Animations */
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: scale(0.98);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -100,9 +127,43 @@
   }
 }
 
-/* Reduced motion desteği */
+/* Reduced Motion & Performance */
 @media (prefers-reduced-motion: reduce) {
+  .page-content-wrapper,
+  .loading-spinner,
+  .loading-dots,
+  .loading-progress::before,
+  .skeleton {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .page-transition-enter-active,
+  .page-transition-exit-active {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .loading-container {
+    padding: 2rem;
+  }
+  
+  .loading-message {
+    font-size: var(--text-xs);
+  }
+  
+  .skeleton-card {
+    height: 150px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .loading-container,
+  .error-container,
   .theme-transition-overlay {
-    animation-duration: 0.3s;
+    display: none !important;
   }
 }

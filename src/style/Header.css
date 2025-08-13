@@ -2,16 +2,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.2rem 1.5rem;
-  background-color: var(--background-color);
+  padding: 1rem 1.5rem;
   color: var(--text-color);
-  font-family: 'Montserrat', sans-serif;
-  transition: all var(--theme-transition-duration) var(--theme-transition-easing);
-  box-shadow: var(--neu-raised-shadow);
+  font-family: var(--font-family-base);
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
-  border-radius: 0 0 15px 15px;
+  backdrop-filter: blur(8px);
+  background-color: rgba(var(--white-color-rgb), 0.9);
+}
+
+[data-theme='dark'] .app-header {
+  background-color: rgba(var(--black-color-rgb), 0.9);
 }
 
 .logo-container {
@@ -24,19 +28,18 @@
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
   color: var(--text-color);
-  letter-spacing: 0.5px;
+  letter-spacing: var(--tracking-wide);
+  font-family: var(--font-family-base);
   padding: 8px;
   border-radius: 12px;
-  transition: all var(--theme-transition-duration) var(--theme-transition-easing);
+  transition: all 0.2s ease;
 }
 
 .logo:hover {
   color: var(--primary-color);
-  box-shadow: var(--neu-pressed-shadow);
-  transform: scale(0.98);
 }
 
 /* Ayarlar container */
@@ -46,43 +49,41 @@
 
 /* Ayarlar butonu */
 .settings-button {
-  background: var(--background-color);
-  border: none;
-  color: var(--primary-color);
-  font-size: 1.5rem;
+  background: var(--subtle-bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--secondary-color);
+  font-size: 1.3rem;
   cursor: pointer;
-  transition: all var(--theme-transition-duration) var(--theme-transition-easing);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  transition: all 0.2s ease;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   outline: none;
-  box-shadow: var(--neu-raised-shadow);
 }
 
 .settings-button:hover {
-  transform: scale(1.05);
-  color: var(--text-color);
-  box-shadow: var(--neu-pressed-shadow);
+  background: var(--hover-bg-color);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .settings-button:active {
   transform: scale(0.95);
-  box-shadow: var(--neu-pressed-shadow);
 }
 
 .settings-button.active {
-  color: var(--text-color);
-  box-shadow: var(--neu-pressed-shadow);
-  transform: scale(0.98);
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
 }
 
 .settings-icon {
-  font-size: 1.4rem;
-  transition: transform 0.3s ease, color var(--theme-transition-duration) var(--theme-transition-easing);
+  font-size: 1.1rem;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .settings-button.active .settings-icon {
@@ -92,17 +93,18 @@
 /* Ayarlar menüsü */
 .settings-menu {
   position: absolute;
-  top: 60px;
+  top: 56px;
   right: 0;
   background: var(--background-color);
-  border-radius: 15px;
-  box-shadow: var(--neu-raised-shadow);
-  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--elevated-shadow);
+  padding: 12px;
   min-width: 200px;
   z-index: 1000;
   opacity: 0;
   transform: translateY(-10px);
-  animation: settingsMenuSlideIn 0.3s ease forwards;
+  animation: settingsMenuSlideIn 0.2s ease forwards;
 }
 
 @keyframes settingsMenuSlideIn {
@@ -134,12 +136,13 @@
 
 .settings-item:hover:not(.theme-dropdown-container) {
   background: var(--hover-color);
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
 }
 
 .settings-item span {
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  line-height: var(--leading-normal);
   color: var(--text-color);
   flex: 1;
 }
@@ -170,7 +173,7 @@
 
 .theme-selector:hover {
   background: var(--hover-color);
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
 }
 
 .dropdown-arrow {
@@ -192,7 +195,7 @@
   right: 0;
   background: var(--background-color);
   border-radius: 10px;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--elevated-shadow);
   padding: 8px;
   z-index: 1001;
   margin-top: 4px;
@@ -230,23 +233,26 @@
 
 .theme-option:hover {
   background: var(--hover-color);
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
 }
 
 .theme-option.active {
   background: var(--primary-color);
-  color: white;
-  box-shadow: var(--neu-pressed-shadow);
+  color: var(--white-color);
+  box-shadow: var(--subtle-shadow);
 }
 
 .theme-option.active .theme-option-icon {
-  color: white;
+  color: var(--white-color);
 }
 
 .theme-option-icon {
   font-size: 1rem;
   color: var(--primary-color);
   transition: color 0.2s ease;
+}
+.theme-option.active span {
+  color: var(--white-color);
 }
 
 .theme-option span {
@@ -267,28 +273,29 @@
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  font-family: var(--font-family-base);
+  letter-spacing: var(--tracking-wide);
   transition: all 0.2s ease;
-  box-shadow: var(--neu-raised-shadow);
+  box-shadow: var(--elevated-shadow);
 }
 
 .language-option:hover {
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
   transform: scale(0.95);
 }
 
 .language-option.active {
   background: var(--primary-color);
   color: white;
-  box-shadow: var(--neu-pressed-shadow);
+  box-shadow: var(--subtle-shadow);
 }
 
 /* Tema ikonu stilleri */
 .theme-icon {
-  font-size: 1.2rem;
-  transition: color var(--theme-transition-duration) var(--theme-transition-easing), 
-              transform 0.3s ease;
+  font-size: 1rem;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 [data-theme='light'] .theme-icon {
@@ -300,8 +307,8 @@
 }
 
 .language-icon {
-  font-size: 1.2rem;
-  color: var(--primary-color);
+  font-size: 1rem;
+  color: var(--secondary-color);
 }
 
 /* Rotasyon animasyonu - menü içindeki tema ikonu için */
