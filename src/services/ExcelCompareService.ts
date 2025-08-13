@@ -497,6 +497,40 @@ export class ExcelCompareService {
       }
     }
     
+    // Başlık satırındaki eşleşmeyen sütunları da kontrol et
+    // Sheet1'deki eşleşmeyen başlıklar
+    for (let i = 0; i < headers1.length; i++) {
+      if (!columnMapping.has(i)) {
+        const header1 = headers1[i];
+        if (header1 !== null && header1 !== undefined && String(header1).trim() !== '') {
+          differences.push({
+            value1: header1,
+            value2: null,
+            row: 1, // Başlık satırı
+            col: i + 1,
+            sheet: sheetName
+          });
+        }
+      }
+    }
+    
+    // Sheet2'deki eşleşmeyen başlıklar
+    for (let j = 0; j < headers2.length; j++) {
+      const isMatched = Array.from(columnMapping.values()).includes(j);
+      if (!isMatched) {
+        const header2 = headers2[j];
+        if (header2 !== null && header2 !== undefined && String(header2).trim() !== '') {
+          differences.push({
+            value1: null,
+            value2: header2,
+            row: 1, // Başlık satırı
+            col: j + 1,
+            sheet: sheetName
+          });
+        }
+      }
+    }
+    
     // Veri satırlarını karşılaştır (başlık satırından sonraki satırlar)
     const maxRows = Math.max(sheet1.length, sheet2.length);
     const CHUNK_SIZE = 1000;
@@ -534,6 +568,24 @@ export class ExcelCompareService {
                 value2: null,
                 row: r + 1,
                 col: c + 1,
+                sheet: sheetName
+              });
+            }
+          }
+        }
+        
+        // Sheet2'de var olan ama sheet1'de eşleşmeyen sütunları kontrol et
+        for (let c = 0; c < row2.length; c++) {
+          // Sheet2'deki bu sütunun sheet1'de eşleşmesi var mı kontrol et
+          const isMatched = Array.from(columnMapping.values()).includes(c);
+          if (!isMatched) {
+            const value2 = row2[c];
+            if (value2 !== null && value2 !== undefined && String(value2).trim() !== '') {
+              differences.push({
+                value1: null,
+                value2,
+                row: r + 1,
+                col: c + 1, // Sheet2'deki sütun numarası
                 sheet: sheetName
               });
             }
