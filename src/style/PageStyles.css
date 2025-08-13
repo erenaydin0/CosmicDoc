@@ -12,9 +12,8 @@
   font-weight: var(--font-extrabold);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
-  color: var(--text-color);
   margin-bottom: 0.75rem;
-  background: var(--primary-color);
+  background: var(--text-color);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -26,7 +25,7 @@
   font-weight: var(--font-normal);
   line-height: var(--leading-relaxed);
   letter-spacing: var(--tracking-normal);
-  color: var(--secondary-color);
+  color: var(--primary-color);
   margin-bottom: 2.5rem;
   max-width: 42rem;
   margin-left: auto;
@@ -34,12 +33,12 @@
 }
 
 .card {
-  background-color: var(--background-color);
+  background-color: var(--card-bg-color);
   color: var(--text-color);
   padding: 2rem;
   border-radius: 12px;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: var(--card-shadow);
   border: 1px solid var(--border-color);
   display: flex;
@@ -131,11 +130,11 @@
 
 /* Minimal ikon stilleri */
 .excel-icon svg {
-  color: var(--accent-color); /* Modern yeşil */
+  color: var(--success-color); /* Modern yeşil */
 }
 
 .pdf-icon svg {
-  color: #EF4444; /* Modern kırmızı */
+  color: var(--error-color); /* Modern kırmızı */
 }
 
 .text-icon svg {
@@ -143,7 +142,7 @@
 }
 
 .convert-icon svg {
-  color: #F59E0B; /* Modern turuncu */
+  color: var(--warning-color); /* Modern turuncu */
 }
 
 .card svg {
@@ -167,7 +166,7 @@
 }
 
 .card p {
-  color: var(--secondary-color);
+  color: var(--primary-color);
   margin-bottom: 0;
   font-size: var(--text-base);
   font-weight: var(--font-normal);

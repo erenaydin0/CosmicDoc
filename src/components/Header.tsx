@@ -55,20 +55,34 @@ const Header: React.FC<HeaderProps> = () => {
   // İlk yüklemede HTML'e tema uygula
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', currentTheme);
-  }, []);
+  }, [currentTheme]);
 
-  // Sistem teması değişikliklerini izle
+  // Sistem teması değişikliklerini izle ve gelişmiş algılama
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
-    const handleSystemThemeChange = () => {
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
       if (themePreference === 'system') {
-        const newSystemTheme = getSystemTheme();
+        const newSystemTheme = e.matches ? 'dark' : 'light';
         setCurrentTheme(newSystemTheme);
-        // HTML'e tema uygula
+        // HTML'e tema uygula - smooth geçiş için
+        document.documentElement.style.transition = 'background-color 0.3s ease, color 0.3s ease';
         document.documentElement.setAttribute('data-theme', newSystemTheme);
+        
+        // Transition'ı temizle
+        setTimeout(() => {
+          document.documentElement.style.transition = '';
+        }, 300);
       }
     };
+
+    // İlk yüklemede sistem temasını kontrol et
+    if (themePreference === 'system') {
+      const currentSystemTheme = getSystemTheme();
+      if (currentTheme !== currentSystemTheme) {
+        setCurrentTheme(currentSystemTheme);
+      }
+    }
 
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleSystemThemeChange);
@@ -84,7 +98,7 @@ const Header: React.FC<HeaderProps> = () => {
         mediaQuery.removeListener(handleSystemThemeChange);
       }
     };
-  }, [themePreference]);
+  }, [themePreference, currentTheme]);
 
   // Tema tercihini localStorage'dan izle
   useEffect(() => {

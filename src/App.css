@@ -1,23 +1,57 @@
 :root {
-  --white-color: #FCFCFC;
-  --black-color: #0F172A;
+  --white-color: #FFFFFF;
+  --black-color: #000000;
   
-  /* RGB renk değerleri - Minimal */
-  --white-color-rgb: 252, 252, 252;
-  --black-color-rgb: 15, 23, 42;
-  --primary-color-rgb: 37, 99, 235;
-  --secondary-color-rgb: 100, 116, 139;
-  --accent-color-rgb: 16, 185, 129;
-  --success-color-rgb: 34, 197, 94;
-  --warning-color-rgb: 245, 158, 11;
-  --error-color-rgb: 239, 68, 68;
-
-  /* Ana renkler - Minimal flat design */
+  /* Gri Tonları Paleti */
+  --gray-50: #FAFAFA;
+  --gray-100: #F5F5F5;
+  --gray-200: #E5E5E5;
+  --gray-300: #D4D4D4;
+  --gray-400: #A3A3A3;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #404040;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  
+  /* RGB renk değerleri - Gri tonları */
+  --white-color-rgb: 255, 255, 255;
+  --black-color-rgb: 0, 0, 0;
+  --gray-50-rgb: 250, 250, 250;
+  --gray-100-rgb: 245, 245, 245;
+  --gray-200-rgb: 229, 229, 229;
+  --gray-800-rgb: 38, 38, 38;
+  --gray-900-rgb: 23, 23, 23;
+  
+  /* Turuncu Aksan Renkleri */
+  --orange-50: #FFF7ED;
+  --orange-100: #FFEDD5;
+  --orange-200: #FED7AA;
+  --orange-300: #FDBA74;
+  --orange-400: #FB923C;
+  --orange-500: #F97316;
+  --orange-600: #EA580C;
+  --orange-700: #C2410C;
+  --orange-800: #9A3412;
+  --orange-900: #7C2D12;
+  
+  /* RGB turuncu değerleri */
+  --orange-400-rgb: 251, 146, 60;
+  --orange-500-rgb: 249, 115, 22;
+  --orange-600-rgb: 234, 88, 12;
+  
+  /* Ana renkler - Gri tonları teması */
   --background-color: var(--white-color);
-  --primary-color: #2563EB;
-  --secondary-color: #64748B;
-  --accent-color: #10B981;
-  --text-color: var(--black-color);
+  --primary-color: var(--gray-900);
+  --secondary-color: var(--gray-600);
+  --accent-color: var(--orange-500);
+  --text-color: var(--gray-900);
+  --text-secondary-color: var(--gray-100);
+  
+  /* Durum renkleri */
+  --success-color-rgb: 34, 197, 94;
+  --warning-color-rgb: 249, 115, 22;
+  --error-color-rgb: 239, 68, 68;
   
   /* Minimal gölge değişkenleri */
   --subtle-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -27,22 +61,30 @@
   --shadow-light: #E2E8F0;
   --shadow-dark: #94A3B8;
   
-  /* Durum renkleri - Minimal */
+  /* Durum renkleri - Gri tonları teması */
   --success-color: #22C55E;
   --success-bg-color: rgba(34, 197, 94, 0.1);
-  --warning-color: #F59E0B;
-  --warning-bg-color: rgba(245, 158, 11, 0.1);
+  --warning-color: var(--orange-500);
+  --warning-bg-color: rgba(249, 115, 22, 0.1);
   --error-color: #EF4444;
   --error-bg-color: rgba(239, 68, 68, 0.1);
   
-  /* UI elementleri için minimal renkler */
+  /* UI elementleri - Gri tonları */
   --card-shadow-color: rgba(0, 0, 0, 0.1);
   --hover-shadow-color: rgba(0, 0, 0, 0.15);
-  --subtle-bg-color: #F8FAFC;
-  --border-color: #E2E8F0;
-  --hover-bg-color: #F1F5F9;
-  --hover-color: #F1F5F9;
-  --secondary-bg-color: #64748B;
+  --subtle-bg-color: var(--gray-50);
+  --card-bg-color: var(--white-color);
+  --input-bg-color: var(--white-color);
+  --border-color: var(--gray-200);
+  --hover-bg-color: var(--gray-100);
+  --hover-color: var(--gray-100);
+  --secondary-bg-color: var(--gray-600);
+  
+  /* Ekstra light mode değişkenleri */
+  --overlay-bg-color: rgba(255, 255, 255, 0.8);
+  --modal-bg-color: var(--white-color);
+  --divider-color: var(--gray-200);
+  --focus-ring-color: rgba(249, 115, 22, 0.3);
   
   /* Modern Typography Scale */
   --font-family-base: 'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -84,50 +126,59 @@
   --font-extrabold: 800;
 }
 
-[data-theme='dark'] {
-  /* RGB renk değerleri - Minimal koyu tema */
-  --white-color-rgb: 248, 250, 252;
-  --black-color-rgb: 15, 23, 42;
-  --primary-color-rgb: 59, 130, 246;
-  --secondary-color-rgb: 148, 163, 184;
-  --accent-color-rgb: 52, 211, 153;
-  --success-color-rgb: 74, 222, 128;
-  --warning-color-rgb: 251, 191, 36;
-  --error-color-rgb: 248, 113, 113;
+[data-theme='dark'] {  
+  /* RGB renk değerleri - Dark mode */
+  --white-color-rgb: 255, 255, 255;
+  --black-color-rgb: 0, 0, 0;
+  --gray-900-rgb: 23, 23, 23;
+  --gray-800-rgb: 38, 38, 38;
+  --gray-700-rgb: 64, 64, 64;
   
-  /* Ana renkler - Minimal koyu tema */
-  --white-color: #F8FAFC;
-  --black-color: #0F172A;
-  --background-color: #0F172A;
-  --primary-color: #3B82F6;
-  --secondary-color: #94A3B8;
-  --accent-color: #34D399;
-  --text-color: #F8FAFC;
+  /* Turuncu aksan dark mode */
+  --orange-400-rgb: 251, 146, 60;
+  --orange-500-rgb: 249, 115, 22;
+  --orange-600-rgb: 234, 88, 12;
   
-  /* Minimal gölge değişkenleri - Koyu tema */
-  --subtle-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  /* Ana renkler - Dark gri tema */
+  --background-color: var(--gray-900);
+  --primary-color: var(--gray-300);
+  --secondary-color: var(--gray-600);
+  --accent-color: var(--orange-400);
+  --text-color: var(--gray-100);
+  --text-secondary-color: var(--gray-800);
+  
+  /* Minimal gölge değişkenleri - Gelişmiş koyu tema */
+  --subtle-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
   --shadow-light: #475569;
   --shadow-dark: #1E293B;
   
-  /* Durum renkleri - Minimal koyu tema */
-  --success-color: #4ADE80;
-  --success-bg-color: rgba(74, 222, 128, 0.1);
-  --warning-color: #FBBF24;
-  --warning-bg-color: rgba(251, 191, 36, 0.1);
+  /* Durum renkleri - Dark gri tema */
+  --success-color: #22C55E;
+  --success-bg-color: rgba(34, 197, 94, 0.15);
+  --warning-color: var(--orange-400);
+  --warning-bg-color: rgba(251, 146, 60, 0.15);
   --error-color: #F87171;
-  --error-bg-color: rgba(248, 113, 113, 0.1);
+  --error-bg-color: rgba(248, 113, 113, 0.15);
   
-  /* UI elementleri için minimal renkler - Koyu tema */
-  --card-shadow-color: rgba(0, 0, 0, 0.3);
-  --hover-shadow-color: rgba(0, 0, 0, 0.4);
-  --subtle-bg-color: #1E293B;
-  --border-color: #334155;
-  --hover-bg-color: #334155;
-  --hover-color: #334155;
-  --secondary-bg-color: #94A3B8;
+  /* UI elementleri - Dark gri tema */
+  --card-shadow-color: rgba(0, 0, 0, 0.4);
+  --hover-shadow-color: rgba(0, 0, 0, 0.5);
+  --subtle-bg-color: var(--gray-800);
+  --card-bg-color: var(--gray-800);
+  --input-bg-color: var(--gray-700);
+  --border-color: var(--gray-600);
+  --hover-bg-color: var(--gray-700);
+  --hover-color: var(--gray-700);
+  --secondary-bg-color: var(--gray-400);
+  
+  /* Ekstra dark mode değişkenleri */
+  --overlay-bg-color: rgba(23, 23, 23, 0.8);
+  --modal-bg-color: var(--gray-800);
+  --divider-color: var(--gray-600);
+  --focus-ring-color: rgba(251, 146, 60, 0.3);
 }
 
 body {
@@ -145,6 +196,8 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .container {

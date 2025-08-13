@@ -64,7 +64,7 @@
 
 .pagination-button.active {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--text-secondary-color);
   border-color: var(--primary-color);
 }
 
@@ -145,13 +145,14 @@
 .sheet-tab {
   padding: 10px 18px;
   border: none;
-  border-radius: 12px 12px 0 0;
+  border-radius: 14px 14px 0 0;
   cursor: pointer;
-  background-color: var(--accent-color);
+  background-color: var(--background-color);
   box-shadow: var(--card-shadow);
   position: relative;
   transition: all 0.3s ease;
-  color: var(--white-color);
+  color: var(--text-color);
+  font-size: 14px;
 }
 
 .sheet-tab:hover {
@@ -160,21 +161,16 @@
 }
 
 .sheet-tab.active {
-  background-color: var(--background-color);
+  background-color: var(--secondary-color);
   box-shadow: var(--subtle-shadow);
-  color: var(--primary-color);
-  font-size: 14px;
+  color: var(--text-color);
   font-weight: 600;
 }
 
 .diff-badge {
-  background-color: var(--background-color);
   color: var(--error-color);
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 12px;
-  margin-left: 8px;
-  box-shadow: var(--subtle-shadow);
+  font-weight: 600;
+  margin-left: 10px;
 }
 
 /* Fark tablosu */
@@ -646,8 +642,6 @@
 
 .text-comparison {
   margin-top: 10px;
-  max-height: 150px;
-  overflow-y: auto;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background-color: var(--background-color);
@@ -675,7 +669,7 @@
   border-radius: 12px;
   background-color: var(--primary-color);
   box-shadow: var(--card-shadow);
-  color: var(--white-color);
+  color: var(--text-secondary-color);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;

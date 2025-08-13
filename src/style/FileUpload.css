@@ -223,7 +223,7 @@
 
 .compare-button {
   background-color: var(--primary-color);
-  color: var(--white-color);
+  color: var(--text-secondary-color);
   border: none;
   padding: 1rem 2rem;
   border-radius: 15px;
@@ -303,8 +303,8 @@
 }
 
 .compare-button:hover:not(:disabled) {
-  background: var(--background-color);
-  color: var(--primary-color);
+  background: var(--accent-color);
+  color: var(--text-color);
   transform: translateY(-2px);
   box-shadow: var(--subtle-shadow);
 }
@@ -359,11 +359,36 @@
   }
 }
 
-/* Tema uyumlu buton renkleri */
+/* Dark mode iyileştirmeleri */
+[data-theme='dark'] .drop-zone {
+  background-color: var(--card-bg-color);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme='dark'] .drop-zone:hover:not(.file-uploaded) {
+  background-color: var(--hover-bg-color);
+  border-color: var(--primary-color);
+}
+
 [data-theme='dark'] .compare-button:disabled {
   background-color: var(--subtle-bg-color);
   color: var(--text-color);
   opacity: 0.5;
+}
+
+[data-theme='dark'] .clear-file-button {
+  background: var(--error-color);
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme='dark'] .drop-zone.file-uploaded {
+  background-color: rgba(var(--success-color-rgb), 0.1);
+  border-color: var(--success-color);
+}
+
+[data-theme='dark'] .drop-zone.file-error {
+  background-color: rgba(var(--error-color-rgb), 0.1);
+  border-color: var(--error-color);
 }
 
 .drop-hint {
