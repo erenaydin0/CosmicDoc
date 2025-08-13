@@ -5,6 +5,9 @@
   margin-top: 3rem;
   padding: 1rem 0.5rem;
   perspective: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
 }
 
 .page-title {
@@ -47,7 +50,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  min-height: 200px;
+  min-height: fit-content;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -113,19 +116,18 @@
 }
 
 .card .icon-container {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+  width: 100px;
+  height: 100px;
+  font-size: var(--text-xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.2rem;
-  background-color: var(--subtle-bg-color);
-  border: 1px solid var(--border-color);
+  margin-bottom: 1rem;
   position: relative;
   transition: all 0.2s ease;
   overflow: hidden;
   z-index: 2;
+  flex: 1;
 }
 
 /* Minimal ikon stilleri */
@@ -146,36 +148,36 @@
 }
 
 .card svg {
-  margin-bottom: 0;
   transition: all 0.2s ease;
   z-index: 2;
 }
 
 .card h2 {
   color: var(--text-color);
-  margin-top: 0;
-  margin-bottom: 0.75rem;
   font-weight: var(--font-semibold);
   font-size: var(--text-xl);
   line-height: var(--leading-snug);
   letter-spacing: var(--tracking-normal);
+  margin-bottom: 0;
   transition: all 0.2s ease;
   text-align: center;
   position: relative;
   z-index: 2;
+  flex: 1;
 }
 
 .card p {
   color: var(--primary-color);
-  margin-bottom: 0;
   font-size: var(--text-base);
   font-weight: var(--font-normal);
   line-height: var(--leading-relaxed);
   letter-spacing: var(--tracking-normal);
+  margin-top: 0;
   text-align: center;
   transition: all 0.2s ease;
   position: relative;
   z-index: 2;
+  flex: 1;
 }
 
 .card:hover {
@@ -199,37 +201,11 @@
   box-shadow: var(--card-shadow);
 }
 
-.card:hover .icon-container {
-  transform: scale(1.1);
-  background-color: var(--background-color);
-  border-color: var(--primary-color);
-}
 
 /* İkon basma efekti */
 .card:active .icon-container {
-  transform: scale(0.95);
+  transform: scale(1);
   transition: transform 0.1s;
-}
-
-/* Hover durumunda minimal ikon stilleri */
-.card:hover .excel-icon svg {
-  color: var(--accent-color);
-  transform: scale(1.1);
-}
-
-.card:hover .pdf-icon svg {
-  color: #EF4444;
-  transform: scale(1.1);
-}
-
-.card:hover .text-icon svg {
-  color: var(--primary-color);
-  transform: scale(1.1);
-}
-
-.card:hover .convert-icon svg {
-  color: #F59E0B;
-  transform: scale(1.1);
 }
 
 /* Tıklama durumundaki ikon efekti */
@@ -300,11 +276,6 @@
     .card:hover svg {
       transform: scale(1.08);
     }
-  }
-  
-  .card .icon-container {
-    width: 70px;
-    height: 70px;
   }
 }
 
