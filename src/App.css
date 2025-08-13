@@ -24,21 +24,13 @@
   --gray-900-rgb: 23, 23, 23;
   
   /* Turuncu Aksan Renkleri */
-  --orange-50: #FFF7ED;
-  --orange-100: #FFEDD5;
-  --orange-200: #FED7AA;
   --orange-300: #FDBA74;
   --orange-400: #FB923C;
   --orange-500: #F97316;
-  --orange-600: #EA580C;
-  --orange-700: #C2410C;
-  --orange-800: #9A3412;
-  --orange-900: #7C2D12;
   
   /* RGB turuncu değerleri */
   --orange-400-rgb: 251, 146, 60;
   --orange-500-rgb: 249, 115, 22;
-  --orange-600-rgb: 234, 88, 12;
   
   /* Ana renkler - Gri tonları teması */
   --background-color: var(--white-color);
@@ -73,8 +65,8 @@
   --card-shadow-color: rgba(0, 0, 0, 0.1);
   --hover-shadow-color: rgba(0, 0, 0, 0.15);
   --subtle-bg-color: var(--gray-50);
-  --card-bg-color: var(--white-color);
-  --input-bg-color: var(--white-color);
+  --card-bg-color: var(--gray-100);
+  --input-bg-color: var(--gray-100);
   --border-color: var(--gray-200);
   --hover-bg-color: var(--gray-100);
   --hover-color: var(--gray-100);
@@ -137,7 +129,6 @@
   /* Turuncu aksan dark mode */
   --orange-400-rgb: 251, 146, 60;
   --orange-500-rgb: 249, 115, 22;
-  --orange-600-rgb: 234, 88, 12;
   
   /* Ana renkler - Dark gri tema */
   --background-color: var(--gray-900);
