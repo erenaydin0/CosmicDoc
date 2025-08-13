@@ -116,8 +116,8 @@
 }
 
 .card .icon-container {
-  width: 100px;
-  height: 100px;
+  min-width: 64px;
+  min-height: 64px;
   font-size: var(--text-xl);
   display: flex;
   align-items: center;
