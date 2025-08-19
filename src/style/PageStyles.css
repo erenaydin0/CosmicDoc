@@ -1,48 +1,30 @@
+.page-title {
+  font-size: var(--text-4xl);
+  color: var(--text-color);
+}
+
+.page-description {
+  color: var(--primary-color);
+}
+
+
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
-  margin-top: 3rem;
   padding: 1rem 0.5rem;
   perspective: 1000px;
   margin-left: auto;
   margin-right: auto;
   width: 80%;
 }
-
-.page-title {
-  font-size: var(--text-4xl);
-  font-weight: var(--font-extrabold);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  margin-bottom: 0.75rem;
-  background: var(--text-color);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: inline-block;
-}
-
-.page-description {
-  font-size: var(--text-xl);
-  font-weight: var(--font-normal);
-  line-height: var(--leading-relaxed);
-  letter-spacing: var(--tracking-normal);
-  color: var(--primary-color);
-  margin-bottom: 2.5rem;
-  max-width: 42rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .card {
   background-color: var(--card-bg-color);
   color: var(--text-color);
-  padding: 2rem;
-  border-radius: 12px;
+  padding: 1.5rem;
+  border-radius: 16px;
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: var(--card-shadow);
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
@@ -70,10 +52,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  border-radius: 12px;
   padding: 1px;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -122,7 +101,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
   position: relative;
   transition: all 0.2s ease;
   overflow: hidden;

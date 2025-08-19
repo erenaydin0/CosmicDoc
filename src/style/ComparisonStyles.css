@@ -138,21 +138,22 @@
 .sheet-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
   border-bottom: none;
 }
 
 .sheet-tab {
   padding: 10px 18px;
   border: none;
-  border-radius: 14px 14px 0 0;
   cursor: pointer;
   background-color: var(--background-color);
-  box-shadow: var(--card-shadow);
   position: relative;
   transition: all 0.3s ease;
   color: var(--text-color);
   font-size: 14px;
+}
+
+.sheet-tab:first-child {
+  border-radius: 32px 0 0 0;
 }
 
 .sheet-tab:hover {
@@ -161,9 +162,9 @@
 }
 
 .sheet-tab.active {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   box-shadow: var(--subtle-shadow);
-  color: var(--text-color);
+  color: var(--text-secondary-color);
   font-weight: 600;
 }
 
