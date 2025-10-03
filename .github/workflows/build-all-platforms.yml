@@ -35,16 +35,14 @@ jobs:
         echo "Listing target directory:"
         if (Test-Path "src-tauri/target/release/bundle/") { Get-ChildItem -Recurse "src-tauri/target/release/bundle/" } else { echo "Bundle directory not found" }
         echo "Finding Windows executables:"
-        Get-ChildItem -Recurse "src-tauri/target" -Include "*.exe", "*.msi" -ErrorAction SilentlyContinue
+        Get-ChildItem -Recurse "src-tauri/target" -Include "*.exe" -ErrorAction SilentlyContinue
       shell: pwsh
     
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
       with:
         name: windows-build
-        path: |
-          src-tauri/target/release/bundle/msi/*.msi
-          src-tauri/target/release/bundle/nsis/*.exe
+        path: src-tauri/target/release/bundle/nsis/*.exe
 
   build-macos:
     runs-on: macos-latest
@@ -72,15 +70,13 @@ jobs:
       run: |
         echo "Listing target directory:"
         ls -la src-tauri/target/aarch64-apple-darwin/release/bundle/ || echo "Bundle directory not found"
-        find src-tauri/target -name "*.dmg" -o -name "*.app" || echo "No macOS bundles found"
+        find src-tauri/target -name "*.dmg" || echo "No macOS DMG found"
     
     - name: Upload macOS artifacts
       uses: actions/upload-artifact@v4
       with:
         name: macos-build
-        path: |
-          src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-          src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
+        path: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
 
   build-linux:
     runs-on: ubuntu-latest
@@ -113,15 +109,13 @@ jobs:
       run: |
         echo "Listing target directory:"
         ls -la src-tauri/target/release/bundle/ || echo "Bundle directory not found"
-        find src-tauri/target -name "*.deb" -o -name "*.AppImage" || echo "No Linux packages found"
+        find src-tauri/target -name "*.deb" || echo "No Linux DEB found"
     
     - name: Upload Linux artifacts
       uses: actions/upload-artifact@v4
       with:
         name: linux-build
-        path: |
-          src-tauri/target/release/bundle/deb/*.deb
-          src-tauri/target/release/bundle/appimage/*.AppImage
+        path: src-tauri/target/release/bundle/deb/*.deb
 
   create-release:
     needs: [build-windows, build-macos, build-linux]
@@ -142,11 +136,8 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          artifacts/windows-build/*.msi
           artifacts/windows-build/*.exe
           artifacts/macos-build/*.dmg
-          artifacts/macos-build/*.app
           artifacts/linux-build/*.deb
-          artifacts/linux-build/*.AppImage
         draft: false
         prerelease: false
