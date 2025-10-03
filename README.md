@@ -1,4 +1,4 @@
-# SynchDoc
+# CosmicDoc
 
 Modern ve kullanıcı dostu masaüstü belge karşılaştırma ve dönüştürme uygulaması.
 
@@ -28,8 +28,8 @@ Modern ve kullanıcı dostu masaüstü belge karşılaştırma ve dönüştürme
 
 ### 1. Depoyu klonlayın
 ```bash
-git clone https://github.com/erenaydin0/SynchDoc.git
-cd SynchDoc
+git clone https://github.com/erenaydin0/CosmicDoc.git
+cd CosmicDoc
 ```
 
 ### 2. Bağımlılıkları yükleyin

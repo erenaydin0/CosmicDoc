@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFile, faArrowRightArrowLeft, faFilePdf, faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import { faFile, faFilePdf, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import '../style/PageStyles.css';
 
@@ -17,8 +17,7 @@ const Home: React.FC = () => {
   const [ripples, setRipples] = useState<Record<string, RippleStyles[]>>({
     excel: [],
     pdf: [],
-    text: [],
-    convert: []
+    text: []
   });
 
   // Ripple efekti için yardımcı fonksiyon
@@ -104,20 +103,6 @@ const Home: React.FC = () => {
           <p>{t('home.features.text.description')}</p>
         </Link>
         
-        <Link 
-          to="/file-convert" 
-          className="card"
-          onClick={e => createRipple(e, 'convert')}
-        >
-          {ripples.convert.map((style, i) => (
-            <span key={i} className="ripple" style={style}></span>
-          ))}
-          <div className="icon-container convert-icon">
-            <FontAwesomeIcon icon={faArrowRightArrowLeft} size="2x" />
-          </div>
-          <h2>{t('home.features.convert.title')}</h2>
-          <p>{t('home.features.convert.description')}</p>
-        </Link>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { faSun, faMoon, faCog, faGlobe, faDisplay, faChevronDown, faDesktop } fr
 import { useTranslation } from 'react-i18next';
 import '../style/Header.css';
 
-const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
+const THEME_STORAGE_KEY = 'CosmicDoc-theme-preference';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 
@@ -215,7 +215,7 @@ const Header: React.FC<HeaderProps> = () => {
     <header className="app-header">
       <div className="logo-container">
         <Link to="/" className="logo-link">
-          <div className="logo">SYNCHDOC</div>
+          <div className="logo">CosmicDoc</div>
         </Link>
       </div>
       <div className="settings-container" ref={settingsRef}>

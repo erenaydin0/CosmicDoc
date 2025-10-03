@@ -30,7 +30,7 @@ i18n
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
-      lookupLocalStorage: 'synchdoc-language'
+      lookupLocalStorage: 'CosmicDoc-language'
     },
 
     interpolation: {
