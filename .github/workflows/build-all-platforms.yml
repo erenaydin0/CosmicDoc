@@ -66,6 +66,10 @@ jobs:
     - name: Build Tauri app (Apple Silicon)
       run: npm run tauri build -- --target aarch64-apple-darwin
     
+    - name: Sign macOS app (ad-hoc)
+      run: |
+        find src-tauri/target/aarch64-apple-darwin/release/bundle -name "*.app" -exec codesign --force --deep --sign - {} \;
+    
     - name: List build artifacts (debug)
       run: |
         echo "Listing target directory:"
