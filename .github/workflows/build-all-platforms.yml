@@ -33,8 +33,10 @@ jobs:
     - name: List build artifacts (debug)
       run: |
         echo "Listing target directory:"
-        ls -la src-tauri/target/release/bundle/ || echo "Bundle directory not found"
-        find src-tauri/target -name "*.exe" -o -name "*.msi" || echo "No Windows executables found"
+        if (Test-Path "src-tauri/target/release/bundle/") { Get-ChildItem -Recurse "src-tauri/target/release/bundle/" } else { echo "Bundle directory not found" }
+        echo "Finding Windows executables:"
+        Get-ChildItem -Recurse "src-tauri/target" -Include "*.exe", "*.msi" -ErrorAction SilentlyContinue
+      shell: pwsh
     
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
