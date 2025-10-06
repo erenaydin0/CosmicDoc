@@ -24,10 +24,6 @@
       "text": {
         "title": "Metin Karşılaştırma",
         "description": "Metin dosyalarını karşılaştırın"
-      },
-      "convert": {
-        "title": "Dosya Dönüştürme",
-        "description": "Dosyaları farklı formatlara dönüştürün"
       }
     }
   },
@@ -102,10 +98,6 @@
     "error": {
       "compareError": "Dosyalar karşılaştırılırken bir hata oluştu."
     }
-  },
-  "convert": {
-    "title": "Dosya Dönüştürme",
-    "description": "Dosyalarınızı farklı formatlara dönüştürün."
   },
   "fileUpload": {
     "selectFile": "Dosya Seç",

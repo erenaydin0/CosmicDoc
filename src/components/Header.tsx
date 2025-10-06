@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon, faCog, faGlobe, faDisplay, faChevronDown, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import CosmicLogo from './CosmicLogo';
 import '../style/Header.css';
 
 const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
@@ -55,6 +56,11 @@ const Header: React.FC<HeaderProps> = () => {
   // İlk yüklemede HTML'e tema uygula
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', currentTheme);
+    if (currentTheme === 'dark') {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
   }, [currentTheme]);
 
   // Sistem teması değişikliklerini izle ve gelişmiş algılama
@@ -68,6 +74,11 @@ const Header: React.FC<HeaderProps> = () => {
         // HTML'e tema uygula - smooth geçiş için
         document.documentElement.style.transition = 'background-color 0.3s ease, color 0.3s ease';
         document.documentElement.setAttribute('data-theme', newSystemTheme);
+        if (newSystemTheme === 'dark') {
+          document.body.classList.add('dark');
+        } else {
+          document.body.classList.remove('dark');
+        }
         
         // Transition'ı temizle
         setTimeout(() => {
@@ -162,6 +173,11 @@ const Header: React.FC<HeaderProps> = () => {
     setTimeout(() => {
       setCurrentTheme(newTheme);
       document.documentElement.setAttribute('data-theme', newTheme);
+      if (newTheme === 'dark') {
+        document.body.classList.add('dark');
+      } else {
+        document.body.classList.remove('dark');
+      }
       
       // Rotasyon animasyonunu bitir
       setTimeout(() => {
@@ -215,7 +231,8 @@ const Header: React.FC<HeaderProps> = () => {
     <header className="app-header">
       <div className="logo-container">
         <Link to="/" className="logo-link">
-          <div className="logo">SYNCHDOC</div>
+          <CosmicLogo size={40} animated={true} />
+          <div className="logo">CosmicDoc</div>
         </Link>
       </div>
       <div className="settings-container" ref={settingsRef}>

@@ -24,10 +24,6 @@
       "text": {
         "title": "Text Comparison", 
         "description": "Compare text files"
-      },
-      "convert": {
-        "title": "File Conversion",
-        "description": "Convert files to different formats"
       }
     }
   },
@@ -102,10 +98,6 @@
     "error": {
       "compareError": "An error occurred while comparing files."
     }
-  },
-  "convert": {
-    "title": "File Conversion", 
-    "description": "Convert your files to different formats."
   },
   "fileUpload": {
     "selectFile": "Select File",

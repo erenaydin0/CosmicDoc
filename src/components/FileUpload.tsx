@@ -30,8 +30,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onCompare, pageType = 'text', a
         return ['.pdf'];
       case 'text':
         return ['.txt', '.md', '.json', '.xml', '.html', '.css', '.js', '.ts'];
-      case 'convert':
-        return [];
       default:
         return [];
     }

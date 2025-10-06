@@ -4,7 +4,6 @@ import Home from './pages/Home';
 import ExcelCompare from './pages/ExcelCompare';
 import PdfCompare from './pages/PdfCompare';
 import TextCompare from './pages/TextCompare';
-import FileConvert from './pages/FileConvert';
 import { PageTransition } from './components/TransitionEffects';
 import "./App.css";
 import "./style/PageStyles.css";
@@ -24,7 +23,6 @@ const AppRoutes = () => {
           <Route path="/excel-compare" element={<ExcelCompare />} />
           <Route path="/pdf-compare" element={<PdfCompare />} />
           <Route path="/text-compare" element={<TextCompare />} />
-          <Route path="/file-convert" element={<FileConvert />} />
         </Routes>
       </div>
     </PageTransition>
