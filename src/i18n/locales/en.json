@@ -1,6 +1,6 @@
 {
   "header": {
-    "logo": "SYNCHDOC",
+    "logo": "CosmicDoc",
     "settings": "Settings",
     "theme": {
       "light": "Light Theme",
@@ -10,8 +10,8 @@
     "language": "Language"
   },
   "home": {
-    "title": "File Comparison & Conversion",
-    "subtitle": "Easily compare and convert your files",
+    "title": "File Comparison",
+    "subtitle": "Easily compare your files",
     "features": {
       "excel": {
         "title": "Excel Comparison",

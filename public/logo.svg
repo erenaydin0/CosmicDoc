@@ -1,0 +1,89 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer ring - cosmic orbit -->
+  <circle
+    cx="50"
+    cy="50"
+    r="45"
+    stroke="url(#gradient1)"
+    stroke-width="2"
+    fill="none"
+    opacity="0.6"
+  />
+  
+  <!-- Middle ring -->
+  <circle
+    cx="50"
+    cy="50"
+    r="35"
+    stroke="url(#gradient2)"
+    stroke-width="1.5"
+    fill="none"
+    opacity="0.4"
+  />
+  
+  <!-- Inner core - planet/star -->
+  <circle
+    cx="50"
+    cy="50"
+    r="20"
+    fill="url(#gradientCore)"
+  />
+  
+  <!-- Central Diamond Shape -->
+  <g>
+    <path
+      d="M 50 30 L 70 50 L 50 70 L 30 50 Z"
+      fill="url(#gradientDiamond)"
+      stroke="#ffffff"
+      stroke-width="2"
+    />
+    <!-- Inner diamond for depth -->
+    <path
+      d="M 50 38 L 62 50 L 50 62 L 38 50 Z"
+      fill="#ffffff"
+      opacity="0.3"
+    />
+  </g>
+  
+  <!-- Small orbiting dots - satellites -->
+  <circle
+    cx="50"
+    cy="5"
+    r="3"
+    fill="#e89558"
+    opacity="0.8"
+  />
+  
+  <circle
+    cx="95"
+    cy="50"
+    r="2.5"
+    fill="#a66794"
+    opacity="0.7"
+  />
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D07E47" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#e89558" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#a66794" stop-opacity="0.8" />
+    </linearGradient>
+    
+    <linearGradient id="gradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a66794" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#D07E47" stop-opacity="0.6" />
+    </linearGradient>
+    
+    <radialGradient id="gradientCore">
+      <stop offset="0%" stop-color="#e89558" />
+      <stop offset="100%" stop-color="#D07E47" />
+    </radialGradient>
+    
+    <linearGradient id="gradientDiamond" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e89558" />
+      <stop offset="50%" stop-color="#D07E47" />
+      <stop offset="100%" stop-color="#a66794" />
+    </linearGradient>
+  </defs>
+</svg>

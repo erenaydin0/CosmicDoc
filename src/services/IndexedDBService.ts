@@ -3,7 +3,7 @@
  */
 
 // Veritabanı adı ve sürümü
-const DB_NAME = 'SynchDocDB';
+const DB_NAME = 'CosmicDocDB';
 const DB_VERSION = 1;
 
 // Nesne depoları (object stores)

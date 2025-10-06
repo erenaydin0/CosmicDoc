@@ -3,7 +3,7 @@
 version = 4
 
 [[package]]
-name = "SynchDoc"
+name = "CosmicDoc"
 version = "0.1.5"
 dependencies = [
  "serde",

@@ -1,6 +1,6 @@
 {
   "header": {
-    "logo": "SYNCHDOC",
+    "logo": "CosmicDoc",
     "settings": "Ayarlar",
     "theme": {
       "light": "Aydınlık Tema",
@@ -10,8 +10,8 @@
     "language": "Dil"
   },
   "home": {
-    "title": "Dosya Karşılaştırma & Dönüştürme",
-    "subtitle": "Dosyalarınızı kolayca karşılaştırın ve dönüştürün",
+    "title": "Dosya Karşılaştırma",
+    "subtitle": "Dosyalarınızı kolayca karşılaştırın",
     "features": {
       "excel": {
         "title": "Excel Karşılaştırma",

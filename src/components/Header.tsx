@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import CosmicLogo from './CosmicLogo';
 import '../style/Header.css';
 
-const THEME_STORAGE_KEY = 'synchdoc-theme-preference';
+const THEME_STORAGE_KEY = 'cosmicdoc-theme-preference';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 

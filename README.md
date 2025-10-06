@@ -1,13 +1,12 @@
-# SynchDoc
+# CosmicDoc
 
-Modern ve kullanıcı dostu masaüstü belge karşılaştırma ve dönüştürme uygulaması.
+Modern ve kullanıcı dostu masaüstü belge karşılaştırma uygulaması.
 
 ## 🚀 Özellikler
 
 - **PDF Karşılaştırma**: İki PDF dosyasını karşılaştırın ve farklılıkları görsel olarak inceleyin
 - **Excel Karşılaştırma**: Excel dosyalarındaki değişiklikleri detaylı olarak analiz edin
 - **Metin Karşılaştırma**: Metin dosyalarını karşılaştırın ve farklılıkları satır bazında görün
-- **Dosya Dönüştürme(Geliştirme aşamasında)**: Farklı belge formatları arasında dönüştürme yapın
 
 ## 🛠️ Teknolojiler
 
@@ -28,8 +27,8 @@ Modern ve kullanıcı dostu masaüstü belge karşılaştırma ve dönüştürme
 
 ### 1. Depoyu klonlayın
 ```bash
-git clone https://github.com/erenaydin0/SynchDoc.git
-cd SynchDoc
+git clone https://github.com/erenaydin0/CosmicDoc.git
+cd CosmicDoc
 ```
 
 ### 2. Bağımlılıkları yükleyin
