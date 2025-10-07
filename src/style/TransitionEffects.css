@@ -1,24 +1,5 @@
 /* ===== SAYFA GEÇİŞ ANIMASYONLARI ===== */
 
-/* Basit sayfa geçiş animasyonu */
-.page-transition-enter {
-  opacity: 0;
-}
-
-.page-transition-enter-active {
-  opacity: 1;
-  transition: opacity 300ms ease-out;
-}
-
-.page-transition-exit {
-  opacity: 1;
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-  transition: opacity 200ms ease-in;
-}
-
 /* Genel konteyner stilleri */
 .page-transition-wrapper {
   position: relative;
@@ -145,10 +126,6 @@
     transition-duration: 0.01ms !important;
   }
   
-  .page-transition-enter-active,
-  .page-transition-exit-active {
-    transition-duration: 0.01ms !important;
-  }
 }
 
 /* Mobile Optimizations */
