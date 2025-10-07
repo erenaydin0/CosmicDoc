@@ -1,3 +1,115 @@
+/* Scrollbar stilleri - Tema uyumlu */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--status-primary);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--status-primary-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg-tertiary);
+}
+
+/* Dark theme scrollbar */
+[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: var(--status-primary);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: var(--status-primary-hover);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-corner {
+  background: var(--bg-tertiary);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--status-primary);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--status-primary-hover);
+}
+
+.dark ::-webkit-scrollbar-corner {
+  background: var(--bg-tertiary);
+}
+
+/* Firefox scrollbar stilleri */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--status-primary) var(--bg-tertiary);
+}
+
+[data-theme='dark'] * {
+  scrollbar-color: var(--status-primary) var(--bg-tertiary);
+}
+
+.dark * {
+  scrollbar-color: var(--status-primary) var(--bg-tertiary);
+}
+
+/* Özel scrollbar stilleri - Tablolar için */
+.table-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--status-warning);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--status-primary);
+}
+
+/* Text area scrollbar */
+textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: var(--status-primary);
+  border-radius: 3px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--status-primary-hover);
+}
+
 /* Karşılaştırma sonuçları için standart layout */
 .compare-layout {
   display: flex;
@@ -23,8 +135,106 @@
   align-items: center;
 }
 
-/* Mobil görünüm için düzenleme */
-@media (max-width: 1024px) {
+/* Summary Layout - Dosya bilgileri ve tablo yan yana */
+.summary-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-top: 1rem;
+  max-width: 100%;
+}
+
+.file-info-section {
+  flex: 0 0 40%;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.structure-diff-table {
+  flex: 0 0 60%;
+  min-width: 400px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--background-color);
+  margin: 0 auto; /* Tabloyu ortala */
+}
+
+/* Dosya bilgileri stilleri */
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item span:first-child {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.summary-item span:last-child {
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-all;
+}
+
+.diff-high {
+  color: var(--error-color) !important;
+  font-weight: 600;
+}
+
+.diff-none {
+  color: var(--success-color) !important;
+  font-weight: 600;
+}
+
+/* Yapı karşılaştırma tablosu stilleri */
+.structure-diff-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  background-color: var(--bg-tertiary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.structure-diff-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.structure-diff-row:last-child {
+  border-bottom: none;
+}
+
+.structure-diff-cell {
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.structure-diff-cell:last-child {
+  border-right: none;
+}
+
+.structure-diff-cell.header-cell {
+  background-color: var(--bg-tertiary);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Tablet görünüm için düzenleme */
+@media (max-width: 1200px) {
   .compare-layout {
     flex-direction: column;
   }
@@ -36,6 +246,44 @@
   
   .summary-section {
     margin-top: 20px;
+    order: -1; /* Özet alanını üste taşı */
+  }
+  
+  .summary-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .file-info-section {
+    flex: none;
+    width: 100%;
+    max-width: none;
+  }
+  
+  .structure-diff-table {
+    flex: none;
+    width: 100%;
+    min-width: auto;
+    margin: 0 auto;
+  }
+}
+
+/* Mobil görünüm için düzenleme */
+@media (max-width: 768px) {
+  .compare-layout {
+    gap: 15px;
+  }
+  
+  .summary-section {
+    margin-top: 15px;
+  }
+  
+  .summary-layout {
+    gap: 1rem;
+  }
+  
+  .structure-diff-table {
+    margin: 0 auto;
   }
 }
 
@@ -116,7 +364,6 @@
   border: 1px solid var(--border-color);
   border-radius: 32px;
   box-shadow: var(--subtle-shadow);
-  width: 90%;
 }
 
 .result-header h2 {

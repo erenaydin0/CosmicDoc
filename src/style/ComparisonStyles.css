@@ -5,6 +5,9 @@
 /* =============== ORTAK STILLER =============== */
 .result-container {
   width: 100%;
+  padding: 0 2rem;
+  max-width: 1750px;
+  margin: 0 auto;
 }
 
 /* Pagination Controls - Ortak */
@@ -744,5 +747,23 @@
 @media (max-width: 768px) {
   .pdf-previews {
     flex-direction: column;
+  }
+}
+
+/* Responsive tasarım - Genel */
+@media (max-width: 1200px) {
+  .result-container {
+    max-width: 95%;
+  }
+}
+@media (max-width: 768px) {
+  .result-container {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-container {
+    padding: 0 0.5rem;
   }
 }
