@@ -1,23 +1,24 @@
-'use client';
-
 import React from 'react';
+import '../style/Components.css';
 
 interface CosmicSpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   message?: string;
+  className?: string;
 }
 
-export default function CosmicSpinner({ size = 'md', message }: CosmicSpinnerProps) {
+export default function CosmicSpinner({ size = 'lg', message, className = '' }: CosmicSpinnerProps) {
   const sizeMap = {
     sm: { spinner: 24, orbit: 32, dot: 3 },
     md: { spinner: 40, orbit: 56, dot: 4 },
-    lg: { spinner: 60, orbit: 80, dot: 6 }
+    lg: { spinner: 60, orbit: 80, dot: 6 },
+    xl: { spinner: 96, orbit: 120, dot: 8 }
   };
 
   const dimensions = sizeMap[size];
 
   return (
-    <div style={{ 
+    <div className={`cosmic-spinner-container ${className}`} style={{ 
       display: 'flex', 
       flexDirection: 'column',
       alignItems: 'center', 
@@ -122,54 +123,6 @@ export default function CosmicSpinner({ size = 'md', message }: CosmicSpinnerPro
         </div>
       )}
 
-      <style jsx>{`
-        @keyframes spin-cosmic {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes spin-cosmic-reverse {
-          from {
-            transform: rotate(360deg);
-          }
-          to {
-            transform: rotate(0deg);
-          }
-        }
-
-        @keyframes pulse-cosmic {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-          50% {
-            transform: scale(1.1);
-            opacity: 0.8;
-          }
-        }
-
-        @keyframes orbit-cosmic {
-          from {
-            transform: rotate(0deg) translateX(${dimensions.orbit / 2}px) rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg) translateX(${dimensions.orbit / 2}px) rotate(-360deg);
-          }
-        }
-
-        @keyframes fade-pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-      `}</style>
     </div>
   );
 }

@@ -284,14 +284,109 @@
   animation: spin 0.8s linear infinite;
 }
 
-/* Cosmic Loader */
-.cosmic-loader {
-  width: 96px;
-  height: 96px;
-  position: relative;
+/* Cosmic Spinner Container */
+.cosmic-spinner-container {
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
+}
+
+/* Fullscreen Cosmic Spinner */
+.fullscreen-cosmic-spinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  gap: 2rem;
+}
+
+.fullscreen-cosmic-spinner .cosmic-spinner-container {
+  width: auto;
+  height: auto;
+}
+
+.fullscreen-cosmic-spinner .loading-message {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: center;
+  animation: fade-pulse 2s ease-in-out infinite;
+}
+
+/* Cosmic Spinner Animations */
+@keyframes spin-cosmic {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-cosmic-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulse-cosmic {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes orbit-cosmic {
+  from {
+    transform: rotate(0deg) translateX(60px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(60px) rotate(-360deg);
+  }
+}
+
+@keyframes fade-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Cosmic Spinner Elements */
+.cosmic-spinner-ring {
+  animation: spin-cosmic 1.5s linear infinite;
+}
+
+.cosmic-spinner-ring-middle {
+  animation: spin-cosmic-reverse 2s linear infinite;
+}
+
+.cosmic-particle-orbit {
+  animation: orbit-cosmic 1.5s linear infinite;
+}
+
+.cosmic-particle-orbit-2 {
+  animation: orbit-cosmic 1.5s linear infinite 0.75s;
 }
 
 /* Pulsing Dots Loader */

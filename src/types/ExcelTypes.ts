@@ -28,4 +28,5 @@ export interface ExcelCompareResult {
   file2MaxRows: number;
   file1MaxCols: number;
   file2MaxCols: number;
+  isLoading?: boolean;
 } 

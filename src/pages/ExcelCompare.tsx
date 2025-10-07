@@ -10,6 +10,7 @@ import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
 import { calculateExcelDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
+import CosmicSpinner from '../components/CosmicSpinner';
 import { useTranslation } from 'react-i18next';
 
 const ExcelCompare: React.FC = () => {
@@ -23,6 +24,26 @@ const ExcelCompare: React.FC = () => {
     try {
       setCompareResult(null); // Yeni karşılaştırma başlamadan önce önceki sonucu temizle
       console.log('Excel dosyaları karşılaştırılıyor:', file1.name, file2.name);
+      
+      // Yükleme durumunu göster
+      setCompareResult({
+        file1Name: file1.name,
+        file2Name: file2.name,
+        file1Size: file1.size,
+        file2Size: file2.size,
+        sheetCount1: 0,
+        sheetCount2: 0,
+        sheetCountDiffers: false,
+        sheetResults: [],
+        overallDiffPercentage: 0,
+        missingSheets1: [],
+        missingSheets2: [],
+        file1MaxRows: 0,
+        file2MaxRows: 0,
+        file1MaxCols: 0,
+        file2MaxCols: 0,
+        isLoading: true
+      } as any);
       
       // Excel dosyalarını IndexedDB'ye kaydet
       const saveFileToIndexedDB = async (file: File, key: string) => {
@@ -61,8 +82,11 @@ const ExcelCompare: React.FC = () => {
       const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns, true);
       console.log('Karşılaştırma sonucu:', result);
       
-      // Sonuçları ayarla
-      setCompareResult(result);
+      // Sonuçları ayarla (isLoading: false ile)
+      setCompareResult({
+        ...result,
+        isLoading: false
+      } as ExcelCompareResultType);
     } catch (err) {
       console.error('Excel karşılaştırma hatası:', err);
       setCompareResult(null);
@@ -76,7 +100,17 @@ const ExcelCompare: React.FC = () => {
     const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'ascending' | 'descending' | null }>({ key: null, direction: null });
     const [showFilterDropdown, setShowFilterDropdown] = useState<string | null>(null); // Hangi kolonun filtresi açık
     const [filterSearchTerms, setFilterSearchTerms] = useState<{ [key: string]: string }>({}); // Her filtre için arama terimi
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    
+    // Eğer result yükleme durumundaysa cosmic spinner göster
+    if ((result as any).isLoading) {
+      return (
+        <div className="fullscreen-cosmic-spinner">
+          <CosmicSpinner size="xl" />
+          <div className="loading-message">Excel dosyaları karşılaştırılıyor...</div>
+        </div>
+      );
+    }
     
     // Pagination state'leri
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -658,8 +692,8 @@ const ExcelCompare: React.FC = () => {
      return (
        <ComparisonLayout
          isLoading={isLoading}
-         loadingType="cosmic"
-         loadingMessage="Excel dosyaları karşılaştırılıyor..."
+         componentIsLoading={isLoading}
+         componentLoadingMessage="Excel sonuçları hazırlanıyor..."
          noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <>

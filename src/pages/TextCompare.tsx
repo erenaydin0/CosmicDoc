@@ -6,6 +6,7 @@ import { formatFileSize } from '../utils/formatters';
 import { exportTextCompareResults } from '../utils/exportUtils';
 import { calculateTextDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
+import CosmicSpinner from '../components/CosmicSpinner';
 import { useTranslation } from 'react-i18next';
 
 const TextCompare: React.FC = () => {
@@ -23,8 +24,23 @@ const TextCompare: React.FC = () => {
       
       console.log('Metin dosyaları karşılaştırılıyor:', file1.name, file2.name);
       
+      // Yükleme durumunu göster
+      setCompareResult({
+        file1Name: file1.name,
+        file2Name: file2.name,
+        file1Size: file1.size,
+        file2Size: file2.size,
+        file1Lines: 0,
+        file2Lines: 0,
+        differences: [],
+        isLoading: true
+      } as any);
+      
       const result = await compareTextFiles(file1, file2);
-      setCompareResult(result);
+      setCompareResult({
+        ...result,
+        isLoading: false
+      } as TextCompareResultType);
     } catch (error) {
       console.error('Karşılaştırma hatası:', error);
       setError(t('text.error.compareError'));
@@ -35,7 +51,17 @@ const TextCompare: React.FC = () => {
 
   // Metin karşılaştırma sonuçlarını gösteren bileşen
   const TextCompareResult: React.FC<{result: TextCompareResultType}> = ({ result }) => {
-    const [componentIsLoading, setComponentIsLoading] = useState<boolean>(true);
+    const [componentIsLoading, setComponentIsLoading] = useState<boolean>(false);
+
+    // Eğer result yükleme durumundaysa cosmic spinner göster
+    if ((result as any).isLoading) {
+      return (
+        <div className="fullscreen-cosmic-spinner">
+          <CosmicSpinner size="xl" />
+          <div className="loading-message">Metin dosyaları karşılaştırılıyor...</div>
+        </div>
+      );
+    }
 
     // Bileşen yüklendiğinde
     useEffect(() => {
@@ -87,8 +113,8 @@ const TextCompare: React.FC = () => {
     return (
       <ComparisonLayout
         isLoading={componentIsLoading}
-        loadingType="cosmic"
-        loadingMessage="Metin dosyaları karşılaştırılıyor..."
+        componentIsLoading={componentIsLoading}
+        componentLoadingMessage="Metin sonuçları hazırlanıyor..."
         noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <div className="text-files-previews">

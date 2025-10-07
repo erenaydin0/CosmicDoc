@@ -1,6 +1,5 @@
 import React from 'react';
 import '../style/Components.css';
-import CosmicLogo from './CosmicLogo';
 
 // Export düğmesi için prop tipleri
 interface ExportButtonProps {
@@ -45,9 +44,12 @@ interface ComparisonLayoutProps {
   noDifferenceMessage?: string;
   isLoading?: boolean;
   loadingMessage?: string;
-  loadingType?: 'spinner' | 'dots' | 'progress' | 'skeleton' | 'cosmic';
+  loadingType?: 'spinner' | 'dots' | 'progress' | 'skeleton';
   error?: string;
   onRetry?: () => void;
+  // Component loading state'i için
+  componentIsLoading?: boolean;
+  componentLoadingMessage?: string;
 }
 
 // Sonuç düzeni için prop tipleri
@@ -137,7 +139,9 @@ const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
   loadingMessage = "Dosyalar karşılaştırılıyor",
   loadingType = 'spinner',
   error,
-  onRetry
+  onRetry,
+  componentIsLoading = false,
+  componentLoadingMessage = "Sonuçlar yükleniyor..."
 }) => {
   
   const renderLoader = () => {
@@ -153,12 +157,6 @@ const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
             <div className="skeleton skeleton-text"></div>
             <div className="skeleton skeleton-text small"></div>
             <div className="skeleton skeleton-card"></div>
-          </div>
-        );
-      case 'cosmic':
-        return (
-          <div className="cosmic-loader">
-            <CosmicLogo size={96} animated={true} />
           </div>
         );
       default:
@@ -179,6 +177,11 @@ const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
           {onRetry && (
             <button onClick={onRetry} className="retry-button">Tekrar Dene</button>
           )}
+        </div>
+      ) : componentIsLoading ? (
+        <div className="loading-container full-page">
+          <div className="loading-spinner"></div>
+          <p className="loading-message">{componentLoadingMessage}</p>
         </div>
       ) : (
         <div className="compare-layout">

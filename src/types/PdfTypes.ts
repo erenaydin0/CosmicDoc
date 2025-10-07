@@ -44,4 +44,5 @@ export interface PdfCompareResult {
   timestamp?: number;
   pdf1Key?: string;
   pdf2Key?: string;
+  isLoading?: boolean;
 } 

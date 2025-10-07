@@ -7,6 +7,7 @@ export interface TextCompareResult {
   file2Size: number;
   differences: diff.Change[];
   timestamp: number;
+  isLoading?: boolean;
 }
 
 export const compareTextFiles = async (file1: File, file2: File): Promise<TextCompareResult> => {

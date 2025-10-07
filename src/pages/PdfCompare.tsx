@@ -10,6 +10,7 @@ import { formatFileSize } from '../utils/formatters';
 import { exportPdfCompareResults } from '../utils/exportUtils';
 import { calculatePdfDiffCount, calculatePageDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
+import CosmicSpinner from '../components/CosmicSpinner';
 import { useTranslation } from 'react-i18next';
 
 // Worker yolunu doğru şekilde ayarlayalım
@@ -33,6 +34,26 @@ const PdfCompare: React.FC = () => {
   
   const handleCompare = async (file1: File, file2: File) => {
     setCompareResult(null);
+    
+    // Yükleme durumunu göster
+    setCompareResult({
+      file1Name: file1.name,
+      file2Name: file2.name,
+      file1Size: file1.size,
+      file2Size: file2.size,
+      pageCount1: 0,
+      pageCount2: 0,
+      pageCountDiffers: false,
+      pageResults: [],
+      overallDiffPercentage: 0,
+      missingPages1: [],
+      missingPages2: [],
+      file1MaxWidth: 0,
+      file2MaxWidth: 0,
+      file1MaxHeight: 0,
+      file2MaxHeight: 0,
+      isLoading: true
+    } as any);
     
     try {
       // Yeni bir timestamp oluştur
@@ -87,7 +108,10 @@ const PdfCompare: React.FC = () => {
         pdf1Key,
         pdf2Key
       };
-      setCompareResult(resultWithTimestamp);
+      setCompareResult({
+        ...resultWithTimestamp,
+        isLoading: false
+      } as PdfCompareResultType);
     } catch (error) {
       console.error('PDF karşılaştırma hatası:', error);
     }
@@ -105,8 +129,18 @@ const PdfCompare: React.FC = () => {
     const [pdf1Pages, setPdf1Pages] = useState<HTMLCanvasElement[]>([]);
     const [pdf2Pages, setPdf2Pages] = useState<HTMLCanvasElement[]>([]);
     const [overlayPages, setOverlayPages] = useState<HTMLCanvasElement[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [compareMode, setCompareMode] = useState<CompareMode>(CompareMode.TEXT);
+    
+    // Eğer result yükleme durumundaysa cosmic spinner göster
+    if ((result as any).isLoading) {
+      return (
+        <div className="fullscreen-cosmic-spinner">
+          <CosmicSpinner size="xl" />
+          <div className="loading-message">PDF dosyaları karşılaştırılıyor...</div>
+        </div>
+      );
+    }
     const [visualResults, setVisualResults] = useState<VisualCompareResult[]>([]);
     const [isComparingVisually, setIsComparingVisually] = useState<boolean>(false);
     
@@ -611,8 +645,8 @@ const PdfCompare: React.FC = () => {
       <ComparisonLayout
         noDifference={noDifference && !isLoading && !isComparingVisually}
         isLoading={isLoading || isComparingVisually}
-        loadingType="cosmic"
-        loadingMessage="PDF dosyaları karşılaştırılıyor..."
+        componentIsLoading={isLoading}
+        componentLoadingMessage="PDF sonuçları hazırlanıyor..."
         previewContent={previewContent}
         summaryContent={summaryContent}
       />
