@@ -47,9 +47,6 @@ interface ComparisonLayoutProps {
   loadingType?: 'spinner' | 'dots' | 'progress' | 'skeleton';
   error?: string;
   onRetry?: () => void;
-  // Component loading state'i için
-  componentIsLoading?: boolean;
-  componentLoadingMessage?: string;
 }
 
 // Sonuç düzeni için prop tipleri
@@ -139,9 +136,7 @@ const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
   loadingMessage = "Dosyalar karşılaştırılıyor",
   loadingType = 'spinner',
   error,
-  onRetry,
-  componentIsLoading = false,
-  componentLoadingMessage = "Sonuçlar yükleniyor..."
+  onRetry
 }) => {
   
   const renderLoader = () => {
@@ -177,11 +172,6 @@ const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
           {onRetry && (
             <button onClick={onRetry} className="retry-button">Tekrar Dene</button>
           )}
-        </div>
-      ) : componentIsLoading ? (
-        <div className="loading-container full-page">
-          <div className="loading-spinner"></div>
-          <p className="loading-message">{componentLoadingMessage}</p>
         </div>
       ) : (
         <div className="compare-layout">

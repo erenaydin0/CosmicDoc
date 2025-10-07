@@ -6,46 +6,37 @@ import { formatFileSize } from '../utils/formatters';
 import { exportTextCompareResults } from '../utils/exportUtils';
 import { calculateTextDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
-import CosmicSpinner from '../components/CosmicSpinner';
+import FullscreenSpinner from '../components/FullscreenSpinner';
+import { useComparisonLoading } from '../hooks/useComparisonLoading';
 import { useTranslation } from 'react-i18next';
 
 const TextCompare: React.FC = () => {
   const { t } = useTranslation();
   const [compareResult, setCompareResult] = useState<TextCompareResultType | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { startComparison, finishComparison, createLoadingResult } = useComparisonLoading();
   
   const allowedTextTypes = ['.txt', '.md', '.json', '.xml', '.html', '.css', '.js', '.jsx', '.ts', '.tsx', '.yaml', '.yml', '.ini', '.conf', '.csv'];
   
   const handleCompare = async (file1: File, file2: File) => {
     try {
-      setIsLoading(true);
       setError(null);
+      startComparison(file1, file2);
       
       console.log('Metin dosyaları karşılaştırılıyor:', file1.name, file2.name);
       
       // Yükleme durumunu göster
-      setCompareResult({
-        file1Name: file1.name,
-        file2Name: file2.name,
-        file1Size: file1.size,
-        file2Size: file2.size,
+      setCompareResult(createLoadingResult(file1, file2, {
         file1Lines: 0,
         file2Lines: 0,
-        differences: [],
-        isLoading: true
-      } as any);
+        differences: []
+      }));
       
       const result = await compareTextFiles(file1, file2);
-      setCompareResult({
-        ...result,
-        isLoading: false
-      } as TextCompareResultType);
+      setCompareResult(finishComparison(result));
     } catch (error) {
       console.error('Karşılaştırma hatası:', error);
       setError(t('text.error.compareError'));
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -55,12 +46,7 @@ const TextCompare: React.FC = () => {
 
     // Eğer result yükleme durumundaysa cosmic spinner göster
     if ((result as any).isLoading) {
-      return (
-        <div className="fullscreen-cosmic-spinner">
-          <CosmicSpinner size="xl" />
-          <div className="loading-message">Metin dosyaları karşılaştırılıyor...</div>
-        </div>
-      );
+      return <FullscreenSpinner message="Metin dosyaları karşılaştırılıyor..." />;
     }
 
     // Bileşen yüklendiğinde
@@ -113,8 +99,6 @@ const TextCompare: React.FC = () => {
     return (
       <ComparisonLayout
         isLoading={componentIsLoading}
-        componentIsLoading={componentIsLoading}
-        componentLoadingMessage="Metin sonuçları hazırlanıyor..."
         noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <div className="text-files-previews">
@@ -222,7 +206,7 @@ const TextCompare: React.FC = () => {
         pageType="text" 
         allowedFileTypes={allowedTextTypes}
       />
-      {compareResult && !isLoading && !error && (
+      {compareResult && !error && (
         <TextCompareResult result={compareResult} />
       )}
     </div>

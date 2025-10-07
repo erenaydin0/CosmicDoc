@@ -10,7 +10,8 @@ import { formatFileSize } from '../utils/formatters';
 import { exportPdfCompareResults } from '../utils/exportUtils';
 import { calculatePdfDiffCount, calculatePageDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
-import CosmicSpinner from '../components/CosmicSpinner';
+import FullscreenSpinner from '../components/FullscreenSpinner';
+import { useComparisonLoading } from '../hooks/useComparisonLoading';
 import { useTranslation } from 'react-i18next';
 
 // Worker yolunu doğru şekilde ayarlayalım
@@ -21,6 +22,7 @@ const PdfCompare: React.FC = () => {
   const { t } = useTranslation();
   const allowedPdfTypes = ['.pdf'];
   const [compareResult, setCompareResult] = useState<PdfCompareResultType | null>(null);
+  const { startComparison, finishComparison, createLoadingResult } = useComparisonLoading();
   
   // Component ilk yüklendiğinde verileri temizle
   useEffect(() => {
@@ -34,13 +36,10 @@ const PdfCompare: React.FC = () => {
   
   const handleCompare = async (file1: File, file2: File) => {
     setCompareResult(null);
+    startComparison(file1, file2);
     
     // Yükleme durumunu göster
-    setCompareResult({
-      file1Name: file1.name,
-      file2Name: file2.name,
-      file1Size: file1.size,
-      file2Size: file2.size,
+    setCompareResult(createLoadingResult(file1, file2, {
       pageCount1: 0,
       pageCount2: 0,
       pageCountDiffers: false,
@@ -51,9 +50,8 @@ const PdfCompare: React.FC = () => {
       file1MaxWidth: 0,
       file2MaxWidth: 0,
       file1MaxHeight: 0,
-      file2MaxHeight: 0,
-      isLoading: true
-    } as any);
+      file2MaxHeight: 0
+    }));
     
     try {
       // Yeni bir timestamp oluştur
@@ -108,10 +106,7 @@ const PdfCompare: React.FC = () => {
         pdf1Key,
         pdf2Key
       };
-      setCompareResult({
-        ...resultWithTimestamp,
-        isLoading: false
-      } as PdfCompareResultType);
+      setCompareResult(finishComparison(resultWithTimestamp));
     } catch (error) {
       console.error('PDF karşılaştırma hatası:', error);
     }
@@ -134,12 +129,7 @@ const PdfCompare: React.FC = () => {
     
     // Eğer result yükleme durumundaysa cosmic spinner göster
     if ((result as any).isLoading) {
-      return (
-        <div className="fullscreen-cosmic-spinner">
-          <CosmicSpinner size="xl" />
-          <div className="loading-message">PDF dosyaları karşılaştırılıyor...</div>
-        </div>
-      );
+      return <FullscreenSpinner message="PDF dosyaları karşılaştırılıyor..." />;
     }
     const [visualResults, setVisualResults] = useState<VisualCompareResult[]>([]);
     const [isComparingVisually, setIsComparingVisually] = useState<boolean>(false);
@@ -645,8 +635,6 @@ const PdfCompare: React.FC = () => {
       <ComparisonLayout
         noDifference={noDifference && !isLoading && !isComparingVisually}
         isLoading={isLoading || isComparingVisually}
-        componentIsLoading={isLoading}
-        componentLoadingMessage="PDF sonuçları hazırlanıyor..."
         previewContent={previewContent}
         summaryContent={summaryContent}
       />

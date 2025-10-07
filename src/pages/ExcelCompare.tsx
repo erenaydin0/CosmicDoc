@@ -10,7 +10,8 @@ import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
 import { calculateExcelDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
-import CosmicSpinner from '../components/CosmicSpinner';
+import FullscreenSpinner from '../components/FullscreenSpinner';
+import { useComparisonLoading } from '../hooks/useComparisonLoading';
 import { useTranslation } from 'react-i18next';
 
 const ExcelCompare: React.FC = () => {
@@ -18,19 +19,18 @@ const ExcelCompare: React.FC = () => {
   const allowedExcelTypes = ['.xlsx', '.xls', '.xlsm', '.xlsb', '.csv'];
   const [compareResult, setCompareResult] = useState<ExcelCompareResultType | null>(null);
   const [matchColumns, setMatchColumns] = useState<boolean>(false);
+  const { startComparison, finishComparison, createLoadingResult } = useComparisonLoading();
 
   
   const handleCompare = async (file1: File, file2: File) => {
     try {
-      setCompareResult(null); // Yeni karşılaştırma başlamadan önce önceki sonucu temizle
+      setCompareResult(null);
+      startComparison(file1, file2);
+      
       console.log('Excel dosyaları karşılaştırılıyor:', file1.name, file2.name);
       
       // Yükleme durumunu göster
-      setCompareResult({
-        file1Name: file1.name,
-        file2Name: file2.name,
-        file1Size: file1.size,
-        file2Size: file2.size,
+      setCompareResult(createLoadingResult(file1, file2, {
         sheetCount1: 0,
         sheetCount2: 0,
         sheetCountDiffers: false,
@@ -41,9 +41,8 @@ const ExcelCompare: React.FC = () => {
         file1MaxRows: 0,
         file2MaxRows: 0,
         file1MaxCols: 0,
-        file2MaxCols: 0,
-        isLoading: true
-      } as any);
+        file2MaxCols: 0
+      }));
       
       // Excel dosyalarını IndexedDB'ye kaydet
       const saveFileToIndexedDB = async (file: File, key: string) => {
@@ -82,11 +81,8 @@ const ExcelCompare: React.FC = () => {
       const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns, true);
       console.log('Karşılaştırma sonucu:', result);
       
-      // Sonuçları ayarla (isLoading: false ile)
-      setCompareResult({
-        ...result,
-        isLoading: false
-      } as ExcelCompareResultType);
+      // Sonuçları ayarla
+      setCompareResult(finishComparison(result));
     } catch (err) {
       console.error('Excel karşılaştırma hatası:', err);
       setCompareResult(null);
@@ -100,16 +96,10 @@ const ExcelCompare: React.FC = () => {
     const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'ascending' | 'descending' | null }>({ key: null, direction: null });
     const [showFilterDropdown, setShowFilterDropdown] = useState<string | null>(null); // Hangi kolonun filtresi açık
     const [filterSearchTerms, setFilterSearchTerms] = useState<{ [key: string]: string }>({}); // Her filtre için arama terimi
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     
     // Eğer result yükleme durumundaysa cosmic spinner göster
     if ((result as any).isLoading) {
-      return (
-        <div className="fullscreen-cosmic-spinner">
-          <CosmicSpinner size="xl" />
-          <div className="loading-message">Excel dosyaları karşılaştırılıyor...</div>
-        </div>
-      );
+      return <FullscreenSpinner message="Excel dosyaları karşılaştırılıyor..." />;
     }
     
     // Pagination state'leri
@@ -150,7 +140,7 @@ const ExcelCompare: React.FC = () => {
     useEffect(() => {
       // Veri hazırlama işlemi için kısa bir gecikme ekleyelim
       const timer = setTimeout(() => {
-        setIsLoading(false);
+        // Component loading tamamlandı
       }, 500);
       
       return () => clearTimeout(timer);
@@ -691,9 +681,6 @@ const ExcelCompare: React.FC = () => {
   
      return (
        <ComparisonLayout
-         isLoading={isLoading}
-         componentIsLoading={isLoading}
-         componentLoadingMessage="Excel sonuçları hazırlanıyor..."
          noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <>
