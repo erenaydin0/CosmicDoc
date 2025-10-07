@@ -17,7 +17,6 @@ const ExcelCompare: React.FC = () => {
   const allowedExcelTypes = ['.xlsx', '.xls', '.xlsm', '.xlsb', '.csv'];
   const [compareResult, setCompareResult] = useState<ExcelCompareResultType | null>(null);
   const [matchColumns, setMatchColumns] = useState<boolean>(false);
-  const [ignoreSheetNames, setIgnoreSheetNames] = useState<boolean>(false);
 
   
   const handleCompare = async (file1: File, file2: File) => {
@@ -59,7 +58,7 @@ const ExcelCompare: React.FC = () => {
       ]);
       
       // Excel dosyalarını karşılaştır
-      const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns, ignoreSheetNames);
+      const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns, true);
       console.log('Karşılaştırma sonucu:', result);
       
       // Sonuçları ayarla
@@ -77,7 +76,6 @@ const ExcelCompare: React.FC = () => {
     const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'ascending' | 'descending' | null }>({ key: null, direction: null });
     const [showFilterDropdown, setShowFilterDropdown] = useState<string | null>(null); // Hangi kolonun filtresi açık
     const [filterSearchTerms, setFilterSearchTerms] = useState<{ [key: string]: string }>({}); // Her filtre için arama terimi
-    const [cachedFilterValues, setCachedFilterValues] = useState<{ [key: string]: any[] }>({}); // Önbelleğe alınmış filtre değerleri
     const [isLoading, setIsLoading] = useState<boolean>(true);
     
     // Pagination state'leri
@@ -124,35 +122,6 @@ const ExcelCompare: React.FC = () => {
       return () => clearTimeout(timer);
     }, []);
   
-    // Aktif sayfa değiştiğinde filtre değerlerini önbelleğe al
-    useEffect(() => {
-      if (result.sheetResults.length > 0) {
-        const activeSheet = result.sheetResults[activeSheetIndex];
-        const newCachedValues: { [key: string]: any[] } = {};
-        
-        const columnKeys = ['row', 'col', 'value1', 'value2'];
-        
-        columnKeys.forEach(columnKey => {
-          const uniqueValues = Array.from(new Set(activeSheet.differences.map((diff: any) => diff[columnKey])));
-          newCachedValues[columnKey] = uniqueValues.sort((a, b) => {
-            // Null değerleri sona koy
-            if (a === null && b !== null) return 1;
-            if (a !== null && b === null) return -1;
-            if (a === null && b === null) return 0;
-            
-            // Sayısal değerleri sayısal olarak sırala
-            if (typeof a === 'number' && typeof b === 'number') {
-              return a - b;
-            }
-            
-            // String olarak sırala
-            return String(a).localeCompare(String(b));
-          });
-        });
-        
-        setCachedFilterValues(newCachedValues);
-      }
-    }, [result.sheetResults, activeSheetIndex]);
   
     // Toplam fark sayısını hesapla
     const calculateTotalDiffCount = () => {
@@ -199,7 +168,6 @@ const ExcelCompare: React.FC = () => {
                 setShowFilterDropdown(null);
                 setCurrentPage(1); // Sayfa değişince pagination'ı sıfırla
                 setFilterSearchTerms({}); // Sayfa değişince arama terimlerini sıfırla
-                setCachedFilterValues({}); // Cache'i temizle, yeni sayfa için yeniden hesaplanacak
               }}
             >
               {sheet.sheetName} 
@@ -225,7 +193,7 @@ const ExcelCompare: React.FC = () => {
       setSortConfig({ key, direction });
     };
   
-    // Filtre durumunu değiştir
+    // Filtre durumunu değiştir - Akıllı filtreleme ile
     const handleFilterChange = (columnKey: string, value: any, isChecked: boolean) => {
       setFilters(prevFilters => {
         const newFilters = { ...prevFilters };
@@ -237,6 +205,32 @@ const ExcelCompare: React.FC = () => {
         } else {
           newFilters[columnKey].delete(value);
         }
+        
+        // Eğer bu filtrede hiç seçili değer kalmadıysa, diğer filtrelerdeki geçersiz seçimleri temizle
+        if (newFilters[columnKey].size === 0) {
+          // Diğer kolonlardaki filtreleri kontrol et ve geçersiz olanları temizle
+          Object.keys(newFilters).forEach(otherColumnKey => {
+            if (otherColumnKey === columnKey) return;
+            
+            const otherSelectedValues = newFilters[otherColumnKey];
+            if (otherSelectedValues && otherSelectedValues.size > 0) {
+              // Bu kolonun mevcut filtrelenmiş değerlerini al
+              const validValues = getSmartFilterValues(otherColumnKey);
+              const validValuesSet = new Set(validValues);
+              
+              // Geçersiz seçimleri temizle
+              const cleanedValues = new Set();
+              otherSelectedValues.forEach(selectedValue => {
+                if (validValuesSet.has(selectedValue)) {
+                  cleanedValues.add(selectedValue);
+                }
+              });
+              
+              newFilters[otherColumnKey] = cleanedValues;
+            }
+          });
+        }
+        
         return newFilters;
       });
     };
@@ -270,14 +264,76 @@ const ExcelCompare: React.FC = () => {
       }));
     };
   
-    // Filtre için gerekli değerleri cache'den al
-    const getFilterValues = (columnKey: string) => {
-      return cachedFilterValues[columnKey] || [];
+
+    // Akıllı filtreleme: Diğer filtrelerin etkisini hesaba katarak mevcut değerleri hesapla
+    const getSmartFilterValues = (columnKey: string) => {
+      if (result.sheetResults.length === 0) return [];
+      
+      let currentDifferences = [...result.sheetResults[activeSheetIndex].differences];
+      
+      // Mevcut filtrelenmiş verileri al (sadece diğer kolonların filtrelerini uygula)
+      Object.keys(filters).forEach(otherColumnKey => {
+        if (otherColumnKey === columnKey) return; // Kendi kolonunu atla
+        
+        const selectedValues = filters[otherColumnKey];
+        const searchTerm = filterSearchTerms[otherColumnKey]?.toLowerCase() || '';
+        
+        if (selectedValues.size > 0 || searchTerm) {
+          currentDifferences = currentDifferences.filter(diff => {
+            let valueToCompare: any;
+            let displayValue: string;
+            
+            switch (otherColumnKey) {
+              case 'row':
+                valueToCompare = diff.row;
+                displayValue = String(valueToCompare);
+                break;
+              case 'col':
+                valueToCompare = diff.col;
+                displayValue = convertColumnIndexToLetter(valueToCompare);
+                break;
+              case 'value1':
+                valueToCompare = diff.value1;
+                displayValue = String(valueToCompare === null ? '(boş)' : valueToCompare);
+                break;
+              case 'value2':
+                valueToCompare = diff.value2;
+                displayValue = String(valueToCompare === null ? '(boş)' : valueToCompare);
+                break;
+              default:
+                return true;
+            }
+            
+            const matchesSearch = !searchTerm || displayValue.toLowerCase().includes(searchTerm);
+            const matchesSelection = selectedValues.size === 0 || selectedValues.has(valueToCompare);
+            
+            return matchesSearch && matchesSelection;
+          });
+        }
+      });
+      
+      // Şimdi bu filtrelenmiş verilerden hedef kolonun değerlerini çıkar
+      const uniqueValues = Array.from(new Set(currentDifferences.map((diff: any) => diff[columnKey])));
+      
+      return uniqueValues.sort((a, b) => {
+        // Null değerleri sona koy
+        if (a === null && b !== null) return 1;
+        if (a !== null && b === null) return -1;
+        if (a === null && b === null) return 0;
+        
+        // Sayısal değerleri sayısal olarak sırala
+        if (typeof a === 'number' && typeof b === 'number') {
+          return a - b;
+        }
+        
+        // String olarak sırala
+        return String(a).localeCompare(String(b));
+      });
     };
   
-    // Filtrelenmiş değerleri hesapla (arama terimi ile)
+    // Filtrelenmiş değerleri hesapla (arama terimi ile) - Akıllı filtreleme kullan
     const getFilteredValues = (columnKey: string) => {
-      const allValues = getFilterValues(columnKey);
+      const allValues = getSmartFilterValues(columnKey);
       const searchTerm = filterSearchTerms[columnKey]?.toLowerCase() || '';
       
       if (!searchTerm) return allValues;
@@ -513,7 +569,7 @@ const ExcelCompare: React.FC = () => {
                             </div>
                             <div className="filter-actions">
                               <button onClick={() => {
-                                const allValues = getFilterValues(col.key);
+                                const allValues = getSmartFilterValues(col.key);
                                 const searchTerm = filterSearchTerms[col.key]?.toLowerCase() || '';
                                 const filteredValues = searchTerm 
                                   ? allValues.filter(value => {
@@ -545,21 +601,19 @@ const ExcelCompare: React.FC = () => {
                               </button>
                             </div>
                             <div className="filter-options">
-                              {cachedFilterValues[col.key] ? (
-                                getFilteredValues(col.key).map((value, idx) => (
-                                  <label key={idx}>
-                                    <input 
-                                      type="checkbox" 
-                                      checked={filters[col.key]?.has(value) || false}
-                                      onChange={(e) => handleFilterChange(col.key, value, e.target.checked)}
-                                    />
-                                    {col.key === 'col' ? convertColumnIndexToLetter(value) : String(value === null ? '(boş)' : value)}
-                                  </label>
-                                ))
-                              ) : (
-                                <div className="filter-loading">
-                                  <div className="loading-spinner"></div>
-                                  <span>Yükleniyor...</span>
+                              {getFilteredValues(col.key).map((value, idx) => (
+                                <label key={idx}>
+                                  <input 
+                                    type="checkbox" 
+                                    checked={filters[col.key]?.has(value) || false}
+                                    onChange={(e) => handleFilterChange(col.key, value, e.target.checked)}
+                                  />
+                                  {col.key === 'col' ? convertColumnIndexToLetter(value) : String(value === null ? '(boş)' : value)}
+                                </label>
+                              ))}
+                              {getFilteredValues(col.key).length === 0 && (
+                                <div className="no-filter-options">
+                                  <span>Bu filtre için mevcut seçenek yok</span>
                                 </div>
                               )}
                             </div>
@@ -694,17 +748,6 @@ const ExcelCompare: React.FC = () => {
           <span>{t('excel.options.matchColumns')}</span>
           <small className="option-description">
             {t('excel.options.matchColumnsDesc')}
-          </small>
-        </label>
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={ignoreSheetNames}
-            onChange={(e) => setIgnoreSheetNames(e.target.checked)}
-          />
-          <span>{t('excel.options.ignoreSheetNames')}</span>
-          <small className="option-description">
-            {t('excel.options.ignoreSheetNamesDesc')}
           </small>
         </label>
       </div>
