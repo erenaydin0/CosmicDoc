@@ -51,30 +51,15 @@ export default function CosmicLogo({ size = 32, animated = true }: CosmicLogoPro
           className={animated ? 'cosmic-logo-rotate-reverse' : ''}
         />
         
-        {/* Inner core - planet/star */}
-        <circle
-          cx="50"
-          cy="50"
-          r="20"
-          fill="url(#gradientCore)"
+        {/* Central Logo Image */}
+        <image
+          href="/logo.svg"
+          x="-25"
+          y="-25"
+          width="150"
+          height="150"
           className={animated ? 'cosmic-logo-pulse' : ''}
         />
-        
-        {/* Central Diamond Shape */}
-        <g className={animated ? 'cosmic-logo-pulse' : ''}>
-          <path
-            d="M 50 30 L 70 50 L 50 70 L 30 50 Z"
-            fill="url(#gradientDiamond)"
-            stroke="var(--bg-primary)"
-            strokeWidth="2"
-          />
-          {/* Inner diamond for depth */}
-          <path
-            d="M 50 38 L 62 50 L 50 62 L 38 50 Z"
-            fill="var(--bg-primary)"
-            opacity="0.3"
-          />
-        </g>
         
         {/* Small orbiting dots - satellites */}
         <circle
