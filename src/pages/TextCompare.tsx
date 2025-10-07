@@ -87,6 +87,8 @@ const TextCompare: React.FC = () => {
     return (
       <ComparisonLayout
         isLoading={componentIsLoading}
+        loadingType="cosmic"
+        loadingMessage="Metin dosyaları karşılaştırılıyor..."
         noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <div className="text-files-previews">

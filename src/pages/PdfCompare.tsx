@@ -611,6 +611,8 @@ const PdfCompare: React.FC = () => {
       <ComparisonLayout
         noDifference={noDifference && !isLoading && !isComparingVisually}
         isLoading={isLoading || isComparingVisually}
+        loadingType="cosmic"
+        loadingMessage="PDF dosyaları karşılaştırılıyor..."
         previewContent={previewContent}
         summaryContent={summaryContent}
       />

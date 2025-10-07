@@ -655,10 +655,12 @@ const ExcelCompare: React.FC = () => {
       );
     };
   
-    return (
-      <ComparisonLayout
-        isLoading={isLoading}
-        noDifference={calculateTotalDiffCount() === 0}
+     return (
+       <ComparisonLayout
+         isLoading={isLoading}
+         loadingType="cosmic"
+         loadingMessage="Excel dosyaları karşılaştırılıyor..."
+         noDifference={calculateTotalDiffCount() === 0}
         previewContent={
           <>
             {renderSheetTabs()}

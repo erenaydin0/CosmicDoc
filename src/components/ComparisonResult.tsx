@@ -1,5 +1,6 @@
 import React from 'react';
 import '../style/Components.css';
+import CosmicLogo from './CosmicLogo';
 
 // Export düğmesi için prop tipleri
 interface ExportButtonProps {
@@ -44,7 +45,7 @@ interface ComparisonLayoutProps {
   noDifferenceMessage?: string;
   isLoading?: boolean;
   loadingMessage?: string;
-  loadingType?: 'spinner' | 'dots' | 'progress' | 'skeleton';
+  loadingType?: 'spinner' | 'dots' | 'progress' | 'skeleton' | 'cosmic';
   error?: string;
   onRetry?: () => void;
 }
@@ -152,6 +153,12 @@ const ComparisonLayout: React.FC<ComparisonLayoutProps> = ({
             <div className="skeleton skeleton-text"></div>
             <div className="skeleton skeleton-text small"></div>
             <div className="skeleton skeleton-card"></div>
+          </div>
+        );
+      case 'cosmic':
+        return (
+          <div className="cosmic-loader">
+            <CosmicLogo size={96} animated={true} />
           </div>
         );
       default:
