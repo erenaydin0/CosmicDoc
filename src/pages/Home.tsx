@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFile, faFilePdf, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import ExcelIcon from '../icons/ExcelIcon';
+import PdfIcon from '../icons/PdfIcon';
+import TextIcon from '../icons/TextIcon';
 import '../style/PageStyles.css';
 
 interface RippleStyles {
@@ -67,7 +68,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container excel-icon">
-            <FontAwesomeIcon icon={faFileExcel} size="2x" />
+            <ExcelIcon className="custom-icon" />
           </div>
           <h2>{t('home.features.excel.title')}</h2>
           <p>{t('home.features.excel.description')}</p>
@@ -82,7 +83,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container pdf-icon">
-            <FontAwesomeIcon icon={faFilePdf} size="2x" />
+            <PdfIcon className="custom-icon" />
           </div>
           <h2>{t('home.features.pdf.title')}</h2>
           <p>{t('home.features.pdf.description')}</p>
@@ -97,7 +98,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container text-icon">
-            <FontAwesomeIcon icon={faFile} size="2x" />
+            <TextIcon className="custom-icon" />
           </div>
           <h2>{t('home.features.text.title')}</h2>
           <p>{t('home.features.text.description')}</p>

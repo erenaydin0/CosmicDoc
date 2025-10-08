@@ -20,23 +20,27 @@
   max-width: 1200px;
 }
 .card {
-  background-color: var(--bg-primary);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(255, 255, 255, 0.05) 100%);
   color: var(--text-primary);
-  padding: 1.5rem;
-  border-radius: 16px;
+  padding: 2rem;
+  border-radius: 20px;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border: 1px solid var(--border-primary);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  min-height: fit-content;
+  min-height: 280px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  box-shadow: var(--shadow);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 /* Minimal tıklama efekti */
@@ -94,30 +98,44 @@
 
 
 .card .icon-container {
-  min-width: 64px;
-  min-height: 64px;
+  min-width: 80px;
+  min-height: 80px;
   font-size: var(--text-xl);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   overflow: hidden;
   z-index: 2;
   flex: 1;
+  margin-bottom: 1rem;
 }
 
-/* Minimal ikon stilleri */
-.excel-icon svg {
-  color: var(--success-color); /* Modern yeşil */
+/* Özel SVG ikon stilleri */
+.custom-icon {
+  width: 64px;
+  height: 64px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
 }
 
-.pdf-icon svg {
-  color: var(--error-color); /* Modern kırmızı */
+/* SVG ikon hover efektleri */
+.card:hover .custom-icon {
+  transform: scale(1.1) rotate(5deg);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
 }
 
-.text-icon svg {
-  color: var(--primary-color); /* Modern mavi */
+.card:hover .excel-icon .custom-icon {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+.card:hover .pdf-icon .custom-icon {
+  transform: scale(1.1) rotate(3deg);
+}
+
+.card:hover .text-icon .custom-icon {
+  transform: scale(1.1) rotate(-2deg);
 }
 
 
@@ -132,12 +150,13 @@
   font-size: var(--text-xl);
   line-height: var(--leading-snug);
   letter-spacing: var(--tracking-normal);
-  margin-bottom: 0;
-  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-align: center;
   position: relative;
   z-index: 2;
   flex: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .card p {
@@ -148,17 +167,21 @@
   letter-spacing: var(--tracking-normal);
   margin-top: 0;
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   position: relative;
   z-index: 2;
   flex: 1;
+  opacity: 0.8;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--status-primary);
-  background-color: var(--bg-hover);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, var(--bg-hover) 0%, rgba(255, 255, 255, 0.1) 100%);
 }
 
 .card:hover::before {
@@ -190,12 +213,14 @@
 
 .card:hover h2 {
   color: var(--status-primary);
-  text-shadow: 0 1px 3px rgba(208, 126, 71, 0.3);
+  text-shadow: 0 2px 4px rgba(208, 126, 71, 0.3);
+  transform: translateY(-2px);
 }
 
 .card:hover p {
   opacity: 1;
   transform: translateY(-2px);
+  color: var(--text-primary);
 }
 
 /* Tablet düzenlemeler */
