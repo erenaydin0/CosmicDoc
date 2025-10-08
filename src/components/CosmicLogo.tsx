@@ -53,12 +53,11 @@ export default function CosmicLogo({ size = 32, animated = true }: CosmicLogoPro
         
         {/* Central Logo Image */}
         <image
-          href="/logo.svg"
-          x="-25"
-          y="-25"
-          width="150"
-          height="150"
-          className={animated ? 'cosmic-logo-pulse' : ''}
+          href="/icon.svg"
+          x="0"
+          y="0"
+          width="100"
+          height="100"
         />
         
         {/* Small orbiting dots - satellites */}
