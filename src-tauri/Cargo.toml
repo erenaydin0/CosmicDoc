@@ -1,6 +1,6 @@
 [package]
 name = "CosmicDoc"
-version = "0.1.5"
+version = "1.0.0"
 description = "Document Tool"
 authors = ["you"]
 edition = "2021"
