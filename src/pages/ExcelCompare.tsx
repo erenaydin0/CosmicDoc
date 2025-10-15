@@ -10,7 +10,7 @@ import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
 import { calculateExcelDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
-import FullscreenSpinner from '../components/FullscreenSpinner';
+import CosmicSpinner from '../components/CosmicSpinner';
 import { useComparisonLoading } from '../hooks/useLoadingState';
 import { useTranslation } from 'react-i18next';
 import { ALLOWED_FILE_TYPES } from '../constants/fileTypes';
@@ -81,7 +81,7 @@ const ExcelCompare: React.FC = () => {
     
     // Eğer result yükleme durumundaysa cosmic spinner göster
     if ((result as any).isLoading) {
-      return <FullscreenSpinner message="Excel dosyaları karşılaştırılıyor..." />;
+      return <CosmicSpinner fullscreen size="xl" message="Excel dosyaları karşılaştırılıyor..." />;
     }
   
     const filterDropdownRef = useRef<HTMLDivElement>(null); // Filtre dropdown'ı için referans

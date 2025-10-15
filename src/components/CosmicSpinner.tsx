@@ -4,9 +4,10 @@ interface CosmicSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   message?: string;
   className?: string;
+  fullscreen?: boolean;
 }
 
-export default function CosmicSpinner({ size = 'lg', message, className = '' }: CosmicSpinnerProps) {
+export default function CosmicSpinner({ size = 'lg', message, className = '', fullscreen = false }: CosmicSpinnerProps) {
   const sizeMap = {
     sm: { spinner: 24, orbit: 32, dot: 3 },
     md: { spinner: 40, orbit: 56, dot: 4 },
@@ -16,7 +17,7 @@ export default function CosmicSpinner({ size = 'lg', message, className = '' }: 
 
   const dimensions = sizeMap[size];
 
-  return (
+  const spinnerContent = (
     <div className={`cosmic-spinner-container ${className}`} style={{ 
       display: 'flex', 
       flexDirection: 'column',
@@ -124,4 +125,14 @@ export default function CosmicSpinner({ size = 'lg', message, className = '' }: 
 
     </div>
   );
+
+  if (fullscreen) {
+    return (
+      <div className="fullscreen-cosmic-spinner">
+        {spinnerContent}
+      </div>
+    );
+  }
+
+  return spinnerContent;
 }

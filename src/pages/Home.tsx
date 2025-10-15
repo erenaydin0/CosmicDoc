@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import ExcelIcon from '../icons/ExcelIcon';
-import PdfIcon from '../icons/PdfIcon';
-import TextIcon from '../icons/TextIcon';
+import FileIcon from '../components/FileIcon';
 import '../style/PageStyles.css';
 
 interface RippleStyles {
@@ -68,7 +66,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container excel-icon">
-            <ExcelIcon className="custom-icon" />
+            <FileIcon type="excel" className="custom-icon" />
           </div>
           <h2>{t('home.features.excel.title')}</h2>
           <p>{t('home.features.excel.description')}</p>
@@ -83,7 +81,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container pdf-icon">
-            <PdfIcon className="custom-icon" />
+            <FileIcon type="pdf" className="custom-icon" />
           </div>
           <h2>{t('home.features.pdf.title')}</h2>
           <p>{t('home.features.pdf.description')}</p>
@@ -98,7 +96,7 @@ const Home: React.FC = () => {
             <span key={i} className="ripple" style={style}></span>
           ))}
           <div className="icon-container text-icon">
-            <TextIcon className="custom-icon" />
+            <FileIcon type="text" className="custom-icon" />
           </div>
           <h2>{t('home.features.text.title')}</h2>
           <p>{t('home.features.text.description')}</p>

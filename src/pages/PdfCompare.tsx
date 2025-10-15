@@ -10,7 +10,7 @@ import { formatFileSize } from '../utils/formatters';
 import { exportPdfCompareResults } from '../utils/exportUtils';
 import { calculatePdfDiffCount, calculatePageDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
-import FullscreenSpinner from '../components/FullscreenSpinner';
+import CosmicSpinner from '../components/CosmicSpinner';
 import { useTranslation } from 'react-i18next';
 import { ALLOWED_FILE_TYPES } from '../constants/fileTypes';
 import { saveFilesParallel, generateFileKey } from '../utils/fileUtils';
@@ -654,7 +654,7 @@ const PdfCompare: React.FC = () => {
   
     // Loading durumunda cosmic spinner göster
     if (isLoading) {
-      return <FullscreenSpinner message="PDF dosyaları karşılaştırılıyor..." />;
+      return <CosmicSpinner fullscreen size="xl" message="PDF dosyaları karşılaştırılıyor..." />;
     }
     
     return (
