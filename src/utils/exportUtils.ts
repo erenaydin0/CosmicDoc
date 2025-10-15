@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile as tauriWriteFile } from '@tauri-apps/plugin-fs';
+import { extractCleanLines } from './lineCountUtils';
 
 /**
  * Excel'e aktarma işlevi için ortak yardımcı fonksiyonlar
@@ -116,8 +117,7 @@ export const exportTextCompareResults = async (differences: any[]): Promise<void
   let currentFile2Line = 1;
 
   differences.forEach(diff => {
-    const lines = diff.value.split('\n');
-    const actualLines = lines.length > 0 && lines[lines.length - 1] === '' ? lines.slice(0, -1) : lines;
+    const actualLines = extractCleanLines(diff.value);
 
     for (let i = 0; i < actualLines.length; i++) {
       if (!diff.added) { // Bu satır Dosya 1'de mevcut (ortak veya silinmiş)
@@ -134,10 +134,9 @@ export const exportTextCompareResults = async (differences: any[]): Promise<void
   let exportFile2Index = 0;
 
   differences.forEach(diff => {
-    const lines = diff.value.split('\n');
-    const actualLines = lines.length > 0 && lines[lines.length - 1] === '' ? lines.slice(0, -1) : lines;
+    const actualLines = extractCleanLines(diff.value);
     
-            actualLines.forEach((line: string) => {
+    actualLines.forEach((line: string) => {
       if (diff.added) { // Line added to File 2
         allRows.push({
           'Dosya': 'Dosya 2',

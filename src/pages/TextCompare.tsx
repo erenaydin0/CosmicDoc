@@ -7,8 +7,10 @@ import { exportTextCompareResults } from '../utils/exportUtils';
 import { calculateTextDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
 import FullscreenSpinner from '../components/FullscreenSpinner';
-import { useComparisonLoading } from '../hooks/useComparisonLoading';
+import { useComparisonLoading } from '../hooks/useLoadingState';
 import { useTranslation } from 'react-i18next';
+import { ALLOWED_FILE_TYPES } from '../constants/fileTypes';
+import { calculateLineCountsFromDiff, extractCleanLines } from '../utils/lineCountUtils';
 
 const TextCompare: React.FC = () => {
   const { t } = useTranslation();
@@ -16,7 +18,7 @@ const TextCompare: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { startComparison, finishComparison, createLoadingResult } = useComparisonLoading();
   
-  const allowedTextTypes = ['.txt', '.md', '.json', '.xml', '.html', '.css', '.js', '.jsx', '.ts', '.tsx', '.yaml', '.yml', '.ini', '.conf', '.csv'];
+  const allowedTextTypes = [...ALLOWED_FILE_TYPES.TEXT] as string[];
   
   const handleCompare = async (file1: File, file2: File) => {
     try {
@@ -66,25 +68,7 @@ const TextCompare: React.FC = () => {
 
     // Toplam satır sayılarını hesapla
     const { file1LineCount, file2LineCount } = useMemo(() => {
-      let file1Lines = 0;
-      let file2Lines = 0;
-
-      result.differences.forEach(diff => {
-        const lines = diff.value.split('\n');
-        const actualLines = lines.length > 0 && lines[lines.length - 1] === '' ? lines.slice(0, -1) : lines;
-
-        if (!diff.added) {
-          // Dosya 1'e ait (normal veya silinen)
-          file1Lines += actualLines.length;
-        }
-        
-        if (!diff.removed) {
-          // Dosya 2'ye ait (normal veya eklenen)
-          file2Lines += actualLines.length;
-        }
-      });
-
-      return { file1LineCount: file1Lines, file2LineCount: file2Lines };
+      return calculateLineCountsFromDiff(result.differences);
     }, [result.differences]);
 
     // Excel'e aktarma işlevi
@@ -109,9 +93,7 @@ const TextCompare: React.FC = () => {
               </div>
               <div className="text-content">
                 {result.differences.map((diff, index) => {
-                  const lines = diff.value.split('\n');
-                  // Son boş satırı atla (eğer varsa)
-                  const actualLines = lines.length > 0 && lines[lines.length - 1] === '' ? lines.slice(0, -1) : lines;
+                  const actualLines = extractCleanLines(diff.value);
 
                   // Eğer dosya 1'den kaldırılmamışsa veya common ise göster
                   if (!diff.added) {
@@ -140,9 +122,7 @@ const TextCompare: React.FC = () => {
               </div>
               <div className="text-content">
                 {result.differences.map((diff, index) => {
-                  const lines = diff.value.split('\n');
-                  // Son boş satırı atla (eğer varsa)
-                  const actualLines = lines.length > 0 && lines[lines.length - 1] === '' ? lines.slice(0, -1) : lines;
+                  const actualLines = extractCleanLines(diff.value);
 
                   // Eğer dosya 2'ye eklenmemişse veya common ise göster
                   if (!diff.removed) {

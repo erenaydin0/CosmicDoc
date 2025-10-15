@@ -5,18 +5,23 @@ import { ExcelCompareResult as ExcelCompareResultType } from '../types/ExcelType
 import { saveExcelFile } from '../services/IndexedDBService';
 import '../style/PageStyles.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faFilter, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { formatFileSize } from '../utils/formatters';
 import { exportExcelCompareResults } from '../utils/exportUtils';
 import { calculateExcelDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
 import FullscreenSpinner from '../components/FullscreenSpinner';
-import { useComparisonLoading } from '../hooks/useComparisonLoading';
+import { useComparisonLoading } from '../hooks/useLoadingState';
 import { useTranslation } from 'react-i18next';
+import { ALLOWED_FILE_TYPES } from '../constants/fileTypes';
+import { convertColumnIndexToLetter } from '../utils/columnUtils';
+import { saveFilesParallel } from '../utils/fileUtils';
+import { usePagination } from '../hooks/usePagination';
+import { PaginationControls } from '../components/PaginationControls';
 
 const ExcelCompare: React.FC = () => {
   const { t } = useTranslation();
-  const allowedExcelTypes = ['.xlsx', '.xls', '.xlsm', '.xlsb', '.csv'];
+  const allowedExcelTypes = [...ALLOWED_FILE_TYPES.EXCEL] as string[];
   const [compareResult, setCompareResult] = useState<ExcelCompareResultType | null>(null);
   const [matchColumns, setMatchColumns] = useState<boolean>(false);
   const [showHeaders, setShowHeaders] = useState<boolean>(true);
@@ -45,38 +50,14 @@ const ExcelCompare: React.FC = () => {
         file2MaxCols: 0
       }));
       
-      // Excel dosyalarını IndexedDB'ye kaydet
-      const saveFileToIndexedDB = async (file: File, key: string) => {
-        return new Promise<void>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            try {
-              const dataUrl = e.target?.result;
-              if (dataUrl) {
-                // Dosyayı IndexedDB'ye kaydet
-                await saveExcelFile(key, dataUrl, {
-                  fileName: file.name,
-                  fileType: file.type,
-                  lastModified: file.lastModified
-                });
-                resolve();
-              } else {
-                reject(new Error('Dosya okunamadı'));
-              }
-            } catch (err) {
-              reject(err);
-            }
-          };
-          reader.onerror = (e) => reject(e);
-          reader.readAsDataURL(file);
-        });
-      };
-
-      // Excel dosyalarını paralel olarak kaydet
-      await Promise.all([
-        saveFileToIndexedDB(file1, 'excel1DataUrl'),
-        saveFileToIndexedDB(file2, 'excel2DataUrl')
-      ]);
+      // Excel dosyalarını paralel olarak IndexedDB'ye kaydet
+      await saveFilesParallel(
+        [
+          { file: file1, key: 'excel1DataUrl' },
+          { file: file2, key: 'excel2DataUrl' }
+        ],
+        saveExcelFile
+      );
       
       // Excel dosyalarını karşılaştır
       const result = await ExcelCompareService.compareExcelFiles(file1, file2, matchColumns, true);
@@ -102,10 +83,6 @@ const ExcelCompare: React.FC = () => {
     if ((result as any).isLoading) {
       return <FullscreenSpinner message="Excel dosyaları karşılaştırılıyor..." />;
     }
-    
-    // Pagination state'leri
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(100); // Sayfa başına gösterilecek satır sayısı
   
     const filterDropdownRef = useRef<HTMLDivElement>(null); // Filtre dropdown'ı için referans
   
@@ -152,19 +129,6 @@ const ExcelCompare: React.FC = () => {
     const calculateTotalDiffCount = () => {
       return calculateExcelDiffCount(result);
     };
-  
-  
-    // Sütun indeksini Excel harfine dönüştür (1 -> A, 2 -> B, ...)
-    const convertColumnIndexToLetter = (colIndex: number): string => {
-      let letter = '';
-      let tempColIndex = colIndex;
-      while (tempColIndex > 0) {
-        const remainder = (tempColIndex - 1) % 26;
-        letter = String.fromCharCode(65 + remainder) + letter;
-        tempColIndex = Math.floor((tempColIndex - 1) / 26);
-      }
-      return letter;
-    };
     
     // Excel'e aktarma işlevi
     const handleExportToExcel = async () => {
@@ -191,7 +155,7 @@ const ExcelCompare: React.FC = () => {
                 setFilters({}); // Sayfa değişince filtreleri sıfırla
                 setSortConfig({ key: null, direction: null }); // Sayfa değişince sıralamayı sıfırla
                 setShowFilterDropdown(null);
-                setCurrentPage(1); // Sayfa değişince pagination'ı sıfırla
+                pagination.resetPagination(); // Sayfa değişince pagination'ı sıfırla
                 setFilterSearchTerms({}); // Sayfa değişince arama terimlerini sıfırla
               }}
             >
@@ -384,7 +348,7 @@ const ExcelCompare: React.FC = () => {
       });
     };
   
-    // Gösterilecek farkları filtrele ve sırala (Pagination ile)
+    // Gösterilecek farkları filtrele ve sırala
     const filteredAndSortedDifferences = useMemo(() => {
       if (result.sheetResults.length === 0) return [];
   
@@ -459,99 +423,9 @@ const ExcelCompare: React.FC = () => {
       return currentDifferences;
     }, [result.sheetResults, activeSheetIndex, filters, sortConfig, filterSearchTerms]);
   
-    // Pagination hesaplamaları
-    const totalItems = filteredAndSortedDifferences.length;
-    const totalPages = Math.ceil(totalItems / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, totalItems);
-    const currentPageData = filteredAndSortedDifferences.slice(startIndex, endIndex);
-  
-    // Sayfa numarası değiştiğinde
-    const handlePageChange = (newPage: number) => {
-      if (newPage >= 1 && newPage <= totalPages) {
-        setCurrentPage(newPage);
-      }
-    };
-  
-    // Sayfa boyutu değiştiğinde
-    const handlePageSizeChange = (newPageSize: number) => {
-      setPageSize(newPageSize);
-      setCurrentPage(1); // İlk sayfaya dön
-    };
-  
-    // Pagination kontrollerini render et
-    const renderPaginationControls = () => {
-      if (totalItems === 0) return null;
-  
-      const maxVisiblePages = 5;
-      const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-  
-      return (
-        <div className="pagination-controls">
-          <div className="pagination-info">
-            <span>
-              {startIndex + 1}-{endIndex} / {totalItems} sonuç gösteriliyor
-            </span>
-            <select 
-              value={pageSize} 
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="page-size-selector"
-            >
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={250}>250</option>
-              <option value={500}>500</option>
-            </select>
-            <span>satır</span>
-          </div>
-          
-          <div className="pagination-buttons">
-            <button 
-              onClick={() => handlePageChange(1)} 
-              disabled={currentPage === 1}
-              className="pagination-button"
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
-            <button 
-              onClick={() => handlePageChange(currentPage - 1)} 
-              disabled={currentPage === 1}
-              className="pagination-button"
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
-            
-            {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(pageNum => (
-              <button
-                key={pageNum}
-                onClick={() => handlePageChange(pageNum)}
-                className={`pagination-button ${currentPage === pageNum ? 'active' : ''}`}
-              >
-                {pageNum}
-              </button>
-            ))}
-            
-            <button 
-              onClick={() => handlePageChange(currentPage + 1)} 
-              disabled={currentPage === totalPages}
-              className="pagination-button"
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-            <button 
-              onClick={() => handlePageChange(totalPages)} 
-              disabled={currentPage === totalPages}
-              className="pagination-button"
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </div>
-        </div>
-      );
-    };
+    // Pagination hook kullan
+    const pagination = usePagination(filteredAndSortedDifferences);
+    const { currentPageData } = pagination;
   
     // Aktif sayfanın farklarını göster
     const renderActiveDifferences = () => {
@@ -693,9 +567,9 @@ const ExcelCompare: React.FC = () => {
             <table className="differences-table">
               <tbody>
                 {currentPageData.map((diff, index) => (
-                  <tr key={startIndex + index}>
+                  <tr key={pagination.startIndex + index}>
                     {columnHeaders.map(col => (
-                      <td key={`${startIndex + index}-${col.key}`}
+                      <td key={`${pagination.startIndex + index}-${col.key}`}
                         className={
                           col.key === 'value1' ? 'diff-value diff-high' :
                           col.key === 'value2' ? 'diff-value diff-none' :
@@ -715,7 +589,15 @@ const ExcelCompare: React.FC = () => {
               </tbody>
             </table>
           </div>
-          {renderPaginationControls()}
+          <PaginationControls
+            {...pagination}
+            onPageChange={pagination.setPage}
+            onPageSizeChange={pagination.setPageSize}
+            onFirstPage={pagination.firstPage}
+            onLastPage={pagination.lastPage}
+            onNextPage={pagination.nextPage}
+            onPreviousPage={pagination.previousPage}
+          />
         </div>
       );
     };

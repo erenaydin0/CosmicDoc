@@ -1,6 +1,8 @@
 import * as XLSX from 'xlsx';
 import { ExcelCompareResult, SheetDiff, CellDiff } from '../types/ExcelTypes';
 import { getExcelFile } from './IndexedDBService';
+import { CHUNK_SIZE, NUMERIC_COMPARISON } from '../constants/comparison';
+import { safeEquals } from '../utils/formatters';
 
 /**
  * Excel dosyalarını karşılaştırmak için servis
@@ -402,7 +404,6 @@ export class ExcelCompareService {
     
     // Normal mod - pozisyona göre karşılaştırma
     const maxRows = Math.max(sheet1.length, sheet2.length);
-    const CHUNK_SIZE = 1000; // Her chunk'ta 1000 satır işle
     
     // Büyük veri setleri için chunk-based processing
     for (let startRow = 0; startRow < maxRows; startRow += CHUNK_SIZE) {
@@ -457,21 +458,7 @@ export class ExcelCompareService {
    * İki hücre değerinin farklı olup olmadığını kontrol eder
    */
   private static cellValuesAreDifferent(value1: any, value2: any): boolean {
-    const isEmpty = (v: any) => v == null || (typeof v === 'string' && v.trim() === '');
-
-    // İki değer de boşsa farklı değiller
-    if (isEmpty(value1) && isEmpty(value2)) return false;
-
-    // Biri boş diğeri değilse farklılar
-    if (isEmpty(value1) !== isEmpty(value2)) return true;
-
-    // Sayısal değerleri karşılaştır
-    if (typeof value1 === 'number' && typeof value2 === 'number') {
-      return Math.abs(value1 - value2) > 0.0001; // Küçük farkları yok say
-    }
-
-    // Diğer değerleri string'e çevirerek karşılaştır
-    return String(value1) !== String(value2);
+    return !safeEquals(value1, value2, NUMERIC_COMPARISON.EPSILON);
   }
   
   /**
@@ -559,7 +546,6 @@ export class ExcelCompareService {
     
     // Veri satırlarını karşılaştır (başlık satırından sonraki satırlar)
     const maxRows = Math.max(sheet1.length, sheet2.length);
-    const CHUNK_SIZE = 1000;
     
     for (let startRow = 1; startRow < maxRows; startRow += CHUNK_SIZE) {
       const endRow = Math.min(startRow + CHUNK_SIZE, maxRows);

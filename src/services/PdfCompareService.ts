@@ -2,6 +2,8 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { DiffResult, PdfPageCompareResult, PdfCompareResult, VisualCompareResult } from '../types/PdfTypes';
 import { diffWords } from 'diff';
 import { getPdfFile } from './IndexedDBService';
+import { VISUAL_COMPARISON } from '../constants/comparison';
+import { createOverlayCanvas } from '../utils/canvasUtils';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
@@ -280,7 +282,7 @@ export class PdfCompareService {
    * PDF sayfasını canvas'e render eder
    */
   private static async renderPageToCanvas(page: any): Promise<HTMLCanvasElement> {
-    const scale = 1.5;
+    const scale = VISUAL_COMPARISON.SCALE;
     const viewport = page.getViewport({ scale });
     
     const canvas = document.createElement('canvas');
@@ -318,76 +320,13 @@ export class PdfCompareService {
       };
     }
     
-    // Canvas boyutlarını eşitle
-    const maxWidth = Math.max(canvas1.width, canvas2.width);
-    const maxHeight = Math.max(canvas1.height, canvas2.height);
-    
-    // Overlay canvas oluştur
-    const overlayCanvas = document.createElement('canvas');
-    overlayCanvas.width = maxWidth;
-    overlayCanvas.height = maxHeight;
-    const overlayCtx = overlayCanvas.getContext('2d')!;
-    
-    // Beyaz arka plan ekle
-    overlayCtx.fillStyle = '#ffffff';
-    overlayCtx.fillRect(0, 0, maxWidth, maxHeight);
-    
-    // İlk canvas'ı tam opak çiz
-    overlayCtx.globalAlpha = 1.0;
-    overlayCtx.globalCompositeOperation = 'source-over';
-    overlayCtx.drawImage(canvas1, 0, 0);
-    
-    // Farkları hesapla ve turuncu ile işaretle
-    const imageData1 = canvas1.getContext('2d')!.getImageData(0, 0, Math.min(canvas1.width, maxWidth), Math.min(canvas1.height, maxHeight));
-    const imageData2 = canvas2.getContext('2d')!.getImageData(0, 0, Math.min(canvas2.width, maxWidth), Math.min(canvas2.height, maxHeight));
-    
-    const overlayImageData = overlayCtx.getImageData(0, 0, maxWidth, maxHeight);
-    
-    let differentPixels = 0;
-    const threshold = 30; // Piksel farklılık eşiği
-    
-    const minWidth = Math.min(canvas1.width, canvas2.width, maxWidth);
-    const minHeight = Math.min(canvas1.height, canvas2.height, maxHeight);
-    
-    for (let y = 0; y < minHeight; y++) {
-      for (let x = 0; x < minWidth; x++) {
-        const index1 = (y * canvas1.width + x) * 4;
-        const index2 = (y * canvas2.width + x) * 4;
-        const overlayIndex = (y * maxWidth + x) * 4;
-        
-        if (index1 < imageData1.data.length && index2 < imageData2.data.length) {
-          const r1 = imageData1.data[index1];
-          const g1 = imageData1.data[index1 + 1];
-          const b1 = imageData1.data[index1 + 2];
-          
-          const r2 = imageData2.data[index2];
-          const g2 = imageData2.data[index2 + 1];
-          const b2 = imageData2.data[index2 + 2];
-          
-          const diff = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
-          
-          if (diff > threshold) {
-            differentPixels++;
-            // Farkı canlı turuncu/kırmızı renkte işaretle
-            overlayImageData.data[overlayIndex] = 255; // R
-            overlayImageData.data[overlayIndex + 1] = 69;  // G
-            overlayImageData.data[overlayIndex + 2] = 0;   // B
-            overlayImageData.data[overlayIndex + 3] = 255; // A (tam opaklık)
-          }
-        }
-      }
-    }
-    
-    // Güncellenmiş image data'yı canvas'a uygula
-    overlayCtx.putImageData(overlayImageData, 0, 0);
-    
-    const totalPixels = minWidth * minHeight;
-    const differencePercentage = totalPixels > 0 ? (differentPixels / totalPixels) * 100 : 0;
+    // Overlay canvas oluştur ve farkları hesapla
+    const { overlayCanvas, differencePercentage } = createOverlayCanvas(canvas1, canvas2);
     
     return {
       pageNumber,
       differencePercentage,
-      hasVisualDifferences: differencePercentage > 0.1, // %0.1'den fazla fark varsa
+      hasVisualDifferences: differencePercentage > VISUAL_COMPARISON.DIFFERENCE_THRESHOLD,
       overlayCanvas: overlayCanvas
     };
   }

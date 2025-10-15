@@ -12,6 +12,9 @@ import { calculatePdfDiffCount, calculatePageDiffCount } from '../utils/diffUtil
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
 import FullscreenSpinner from '../components/FullscreenSpinner';
 import { useTranslation } from 'react-i18next';
+import { ALLOWED_FILE_TYPES } from '../constants/fileTypes';
+import { saveFilesParallel, generateFileKey } from '../utils/fileUtils';
+import { createDiffOverlay } from '../utils/canvasUtils';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
@@ -19,7 +22,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worke
 
 const PdfCompare: React.FC = () => {
   const { t } = useTranslation();
-  const allowedPdfTypes = ['.pdf'];
+  const allowedPdfTypes = [...ALLOWED_FILE_TYPES.PDF] as string[];
   const [compareResult, setCompareResult] = useState<PdfCompareResultType | null>(null);
   
   // Component ilk yüklendiğinde verileri temizle
@@ -43,42 +46,17 @@ const PdfCompare: React.FC = () => {
       await clearPdfStore();
       
       // Her yeni PDF karşılaştırması için benzersiz anahtarlar oluştur
-      const pdf1Key = `pdf1_${timestamp}`;
-      const pdf2Key = `pdf2_${timestamp}`;
+      const pdf1Key = generateFileKey('pdf1', timestamp);
+      const pdf2Key = generateFileKey('pdf2', timestamp);
       
-      // PDF dosyalarını IndexedDB'ye kaydet
-      const saveFileToIndexedDB = async (file: File, key: string) => {
-        return new Promise<void>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            try {
-              const dataUrl = e.target?.result;
-              if (dataUrl) {
-                // Dosyayı IndexedDB'ye kaydet
-                await savePdfFile(key, dataUrl, {
-                  fileName: file.name,
-                  fileType: file.type,
-                  lastModified: file.lastModified,
-                  timestamp: timestamp
-                });
-                resolve();
-              } else {
-                reject(new Error('Dosya okunamadı'));
-              }
-            } catch (err) {
-              reject(err);
-            }
-          };
-          reader.onerror = (e) => reject(e);
-          reader.readAsDataURL(file);
-        });
-      };
-
-      // PDF dosyalarını paralel olarak kaydet
-      await Promise.all([
-        saveFileToIndexedDB(file1, pdf1Key),
-        saveFileToIndexedDB(file2, pdf2Key)
-      ]);
+      // PDF dosyalarını paralel olarak IndexedDB'ye kaydet
+      await saveFilesParallel(
+        [
+          { file: file1, key: pdf1Key, metadata: { timestamp } },
+          { file: file2, key: pdf2Key, metadata: { timestamp } }
+        ],
+        savePdfFile
+      );
       
       const result = await PdfCompareService.comparePdfFiles(file1, file2);
       // Karşılaştırma sonucuna timestamp ekle
@@ -151,81 +129,21 @@ const PdfCompare: React.FC = () => {
           
           // PDF1 için diff ekle
           if (i < pdf1Canvases.length) {
-            const combinedCanvas1 = document.createElement('canvas');
-            combinedCanvas1.width = pdf1Canvases[i].width;
-            combinedCanvas1.height = pdf1Canvases[i].height;
-            combinedCanvas1.className = 'pdf-preview-page';
-            const ctx1 = combinedCanvas1.getContext('2d')!;
-            
-            // Orijinal PDF'i çiz
-            ctx1.drawImage(pdf1Canvases[i], 0, 0);
-            
-            // Diff varsa kırmızı işaretleri ekle
-            if (visualResult && visualResult.hasVisualDifferences && overlayCanvases[i]) {
-              // Overlay'den sadece kırmızı pikselleri çıkar ve yarı saydam sarıya çevir
-              const overlayData = overlayCanvases[i].getContext('2d')!.getImageData(0, 0, overlayCanvases[i].width, overlayCanvases[i].height);
-              
-              // Mevcut canvas'ı al
-              const currentData = ctx1.getImageData(0, 0, combinedCanvas1.width, combinedCanvas1.height);
-              
-              for (let j = 0; j < overlayData.data.length; j += 4) {
-                const r = overlayData.data[j];
-                const g = overlayData.data[j + 1];
-                const b = overlayData.data[j + 2];
-                
-                // Kırmızı piksel mi kontrol et (overlay'deki kırmızı işaretler)
-                if (r > 200 && g < 100 && b < 100) {
-                  // Sarı highlight ekle (alpha blending)
-                  const alpha = 0.4; // Highlight opaklığı
-                  currentData.data[j] = currentData.data[j] * (1 - alpha) + 255 * alpha;     // R
-                  currentData.data[j + 1] = currentData.data[j + 1] * (1 - alpha) + 255 * alpha; // G
-                  currentData.data[j + 2] = currentData.data[j + 2] * (1 - alpha) + 0 * alpha;   // B
-                }
-              }
-              
-              ctx1.putImageData(currentData, 0, 0);
-            }
-            
+            const combinedCanvas1 = createDiffOverlay(
+              pdf1Canvases[i],
+              overlayCanvases[i],
+              visualResult && visualResult.hasVisualDifferences
+            );
             pdf1WithDiff.push(combinedCanvas1);
           }
           
           // PDF2 için diff ekle
           if (i < pdf2Canvases.length) {
-            const combinedCanvas2 = document.createElement('canvas');
-            combinedCanvas2.width = pdf2Canvases[i].width;
-            combinedCanvas2.height = pdf2Canvases[i].height;
-            combinedCanvas2.className = 'pdf-preview-page';
-            const ctx2 = combinedCanvas2.getContext('2d')!;
-            
-            // Orijinal PDF'i çiz
-            ctx2.drawImage(pdf2Canvases[i], 0, 0);
-            
-            // Diff varsa kırmızı işaretleri ekle
-            if (visualResult && visualResult.hasVisualDifferences && overlayCanvases[i]) {
-              // Overlay'den sadece kırmızı pikselleri çıkar ve yarı saydam sarıya çevir
-              const overlayData = overlayCanvases[i].getContext('2d')!.getImageData(0, 0, overlayCanvases[i].width, overlayCanvases[i].height);
-              
-              // Mevcut canvas'ı al
-              const currentData = ctx2.getImageData(0, 0, combinedCanvas2.width, combinedCanvas2.height);
-              
-              for (let j = 0; j < overlayData.data.length; j += 4) {
-                const r = overlayData.data[j];
-                const g = overlayData.data[j + 1];
-                const b = overlayData.data[j + 2];
-                
-                // Kırmızı piksel mi kontrol et (overlay'deki kırmızı işaretler)
-                if (r > 200 && g < 100 && b < 100) {
-                  // Sarı highlight ekle (alpha blending)
-                  const alpha = 0.4; // Highlight opaklığı
-                  currentData.data[j] = currentData.data[j] * (1 - alpha) + 255 * alpha;     // R
-                  currentData.data[j + 1] = currentData.data[j + 1] * (1 - alpha) + 255 * alpha; // G
-                  currentData.data[j + 2] = currentData.data[j + 2] * (1 - alpha) + 0 * alpha;   // B
-                }
-              }
-              
-              ctx2.putImageData(currentData, 0, 0);
-            }
-            
+            const combinedCanvas2 = createDiffOverlay(
+              pdf2Canvases[i],
+              overlayCanvases[i],
+              visualResult && visualResult.hasVisualDifferences
+            );
             pdf2WithDiff.push(combinedCanvas2);
           }
         }
