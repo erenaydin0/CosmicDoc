@@ -11,7 +11,6 @@ import { exportPdfCompareResults } from '../utils/exportUtils';
 import { calculatePdfDiffCount, calculatePageDiffCount } from '../utils/diffUtils';
 import ComparisonLayout, { ComparisonResultLayout, ExportButton } from '../components/ComparisonResult';
 import FullscreenSpinner from '../components/FullscreenSpinner';
-import { useComparisonLoading } from '../hooks/useComparisonLoading';
 import { useTranslation } from 'react-i18next';
 
 // Worker yolunu doğru şekilde ayarlayalım
@@ -22,7 +21,6 @@ const PdfCompare: React.FC = () => {
   const { t } = useTranslation();
   const allowedPdfTypes = ['.pdf'];
   const [compareResult, setCompareResult] = useState<PdfCompareResultType | null>(null);
-  const { startComparison, finishComparison, createLoadingResult } = useComparisonLoading();
   
   // Component ilk yüklendiğinde verileri temizle
   useEffect(() => {
@@ -36,22 +34,6 @@ const PdfCompare: React.FC = () => {
   
   const handleCompare = async (file1: File, file2: File) => {
     setCompareResult(null);
-    startComparison(file1, file2);
-    
-    // Yükleme durumunu göster
-    setCompareResult(createLoadingResult(file1, file2, {
-      pageCount1: 0,
-      pageCount2: 0,
-      pageCountDiffers: false,
-      pageResults: [],
-      overallDiffPercentage: 0,
-      missingPages1: [],
-      missingPages2: [],
-      file1MaxWidth: 0,
-      file2MaxWidth: 0,
-      file1MaxHeight: 0,
-      file2MaxHeight: 0
-    }));
     
     try {
       // Yeni bir timestamp oluştur
@@ -106,7 +88,7 @@ const PdfCompare: React.FC = () => {
         pdf1Key,
         pdf2Key
       };
-      setCompareResult(finishComparison(resultWithTimestamp));
+      setCompareResult(resultWithTimestamp);
     } catch (error) {
       console.error('PDF karşılaştırma hatası:', error);
     }
@@ -123,16 +105,12 @@ const PdfCompare: React.FC = () => {
   const PdfCompareResult: React.FC<PdfCompareResultProps> = ({ result }) => {
     const [pdf1Pages, setPdf1Pages] = useState<HTMLCanvasElement[]>([]);
     const [pdf2Pages, setPdf2Pages] = useState<HTMLCanvasElement[]>([]);
+    const [pdf1WithDiffPages, setPdf1WithDiffPages] = useState<HTMLCanvasElement[]>([]);
+    const [pdf2WithDiffPages, setPdf2WithDiffPages] = useState<HTMLCanvasElement[]>([]);
     const [overlayPages, setOverlayPages] = useState<HTMLCanvasElement[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [compareMode, setCompareMode] = useState<CompareMode>(CompareMode.TEXT);
-    
-    // Eğer result yükleme durumundaysa cosmic spinner göster
-    if ((result as any).isLoading) {
-      return <FullscreenSpinner message="PDF dosyaları karşılaştırılıyor..." />;
-    }
     const [visualResults, setVisualResults] = useState<VisualCompareResult[]>([]);
-    const [isComparingVisually, setIsComparingVisually] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     
     const pdf1ContainerRef = useRef<HTMLDivElement>(null);
     const pdf2ContainerRef = useRef<HTMLDivElement>(null);
@@ -147,10 +125,133 @@ const PdfCompare: React.FC = () => {
     const calculateTotalDiffCount = () => {
       return calculatePdfDiffCount(result.pageResults);
     };
+    
+    // Görsel karşılaştırma ve diff overlay oluşturma
+    const performVisualComparison = async (
+      pdf1Key: string, 
+      pdf2Key: string, 
+      pdf1Canvases: HTMLCanvasElement[], 
+      pdf2Canvases: HTMLCanvasElement[]
+    ) => {
+      try {
+        // Görsel karşılaştırma yap
+        const visualResults = await PdfCompareService.compareVisually(pdf1Key, pdf2Key);
+        
+        // Overlay canvas'ları ayıkla
+        const overlayCanvases = visualResults.map(vr => vr.overlayCanvas).filter(Boolean) as HTMLCanvasElement[];
+        
+        // Diff canvas'ları oluştur ve PDF canvas'larına ekle
+        const pdf1WithDiff: HTMLCanvasElement[] = [];
+        const pdf2WithDiff: HTMLCanvasElement[] = [];
+        
+        const maxPages = Math.max(pdf1Canvases.length, pdf2Canvases.length);
+        
+        for (let i = 0; i < maxPages; i++) {
+          const visualResult = visualResults[i];
+          
+          // PDF1 için diff ekle
+          if (i < pdf1Canvases.length) {
+            const combinedCanvas1 = document.createElement('canvas');
+            combinedCanvas1.width = pdf1Canvases[i].width;
+            combinedCanvas1.height = pdf1Canvases[i].height;
+            combinedCanvas1.className = 'pdf-preview-page';
+            const ctx1 = combinedCanvas1.getContext('2d')!;
+            
+            // Orijinal PDF'i çiz
+            ctx1.drawImage(pdf1Canvases[i], 0, 0);
+            
+            // Diff varsa kırmızı işaretleri ekle
+            if (visualResult && visualResult.hasVisualDifferences && overlayCanvases[i]) {
+              // Overlay'den sadece kırmızı pikselleri çıkar ve yarı saydam sarıya çevir
+              const overlayData = overlayCanvases[i].getContext('2d')!.getImageData(0, 0, overlayCanvases[i].width, overlayCanvases[i].height);
+              
+              // Mevcut canvas'ı al
+              const currentData = ctx1.getImageData(0, 0, combinedCanvas1.width, combinedCanvas1.height);
+              
+              for (let j = 0; j < overlayData.data.length; j += 4) {
+                const r = overlayData.data[j];
+                const g = overlayData.data[j + 1];
+                const b = overlayData.data[j + 2];
+                
+                // Kırmızı piksel mi kontrol et (overlay'deki kırmızı işaretler)
+                if (r > 200 && g < 100 && b < 100) {
+                  // Sarı highlight ekle (alpha blending)
+                  const alpha = 0.4; // Highlight opaklığı
+                  currentData.data[j] = currentData.data[j] * (1 - alpha) + 255 * alpha;     // R
+                  currentData.data[j + 1] = currentData.data[j + 1] * (1 - alpha) + 255 * alpha; // G
+                  currentData.data[j + 2] = currentData.data[j + 2] * (1 - alpha) + 0 * alpha;   // B
+                }
+              }
+              
+              ctx1.putImageData(currentData, 0, 0);
+            }
+            
+            pdf1WithDiff.push(combinedCanvas1);
+          }
+          
+          // PDF2 için diff ekle
+          if (i < pdf2Canvases.length) {
+            const combinedCanvas2 = document.createElement('canvas');
+            combinedCanvas2.width = pdf2Canvases[i].width;
+            combinedCanvas2.height = pdf2Canvases[i].height;
+            combinedCanvas2.className = 'pdf-preview-page';
+            const ctx2 = combinedCanvas2.getContext('2d')!;
+            
+            // Orijinal PDF'i çiz
+            ctx2.drawImage(pdf2Canvases[i], 0, 0);
+            
+            // Diff varsa kırmızı işaretleri ekle
+            if (visualResult && visualResult.hasVisualDifferences && overlayCanvases[i]) {
+              // Overlay'den sadece kırmızı pikselleri çıkar ve yarı saydam sarıya çevir
+              const overlayData = overlayCanvases[i].getContext('2d')!.getImageData(0, 0, overlayCanvases[i].width, overlayCanvases[i].height);
+              
+              // Mevcut canvas'ı al
+              const currentData = ctx2.getImageData(0, 0, combinedCanvas2.width, combinedCanvas2.height);
+              
+              for (let j = 0; j < overlayData.data.length; j += 4) {
+                const r = overlayData.data[j];
+                const g = overlayData.data[j + 1];
+                const b = overlayData.data[j + 2];
+                
+                // Kırmızı piksel mi kontrol et (overlay'deki kırmızı işaretler)
+                if (r > 200 && g < 100 && b < 100) {
+                  // Sarı highlight ekle (alpha blending)
+                  const alpha = 0.4; // Highlight opaklığı
+                  currentData.data[j] = currentData.data[j] * (1 - alpha) + 255 * alpha;     // R
+                  currentData.data[j + 1] = currentData.data[j + 1] * (1 - alpha) + 255 * alpha; // G
+                  currentData.data[j + 2] = currentData.data[j + 2] * (1 - alpha) + 0 * alpha;   // B
+                }
+              }
+              
+              ctx2.putImageData(currentData, 0, 0);
+            }
+            
+            pdf2WithDiff.push(combinedCanvas2);
+          }
+        }
+        
+        // Tüm sonuçları return et
+        return {
+          visualResults,
+          overlayCanvases,
+          pdf1WithDiff,
+          pdf2WithDiff
+        };
+      } catch (error) {
+        console.error('Görsel karşılaştırma hatası:', error);
+        return null;
+      }
+    };
   
-    // PDF sayfalarını oluştur
+    // PDF sayfalarını oluştur - sadece timestamp değişince çalış
     useEffect(() => {
+      let isCancelled = false; // Cleanup için flag
+      
       const renderPdfPages = async () => {
+        if (isCancelled) return;
+        
+        setIsLoading(true);
+        
         try {
           // IndexedDB'den PDF verilerini al
           const pdf1Key = result.pdf1Key || `pdf1_${result.timestamp}`;
@@ -160,6 +261,8 @@ const PdfCompare: React.FC = () => {
           
           const file1Data = await getPdfFile<any>(pdf1Key);
           const file2Data = await getPdfFile<any>(pdf2Key);
+          
+          if (isCancelled) return;
           
           if (!file1Data || !file2Data) {
             console.error('PDF verileri IndexedDB\'den alınamadı');
@@ -176,6 +279,8 @@ const PdfCompare: React.FC = () => {
           // PDF dokümanlarını paralel olarak yükle
           const [pdf1, pdf2] = await Promise.all([loadDocument1, loadDocument2]);
           
+          if (isCancelled) return;
+          
           // Sayfa sayılarını al
           const numPages1 = pdf1.numPages;
           const numPages2 = pdf2.numPages;
@@ -183,6 +288,8 @@ const PdfCompare: React.FC = () => {
           // PDF 1 sayfalarını render et
           const pdf1CanvasElements: HTMLCanvasElement[] = [];
           for (let i = 1; i <= numPages1; i++) {
+            if (isCancelled) return;
+            
             const page = await pdf1.getPage(i);
             const scale = 1.5;
             const viewport = page.getViewport({ scale });
@@ -201,6 +308,8 @@ const PdfCompare: React.FC = () => {
           // PDF 2 sayfalarını render et
           const pdf2CanvasElements: HTMLCanvasElement[] = [];
           for (let i = 1; i <= numPages2; i++) {
+            if (isCancelled) return;
+            
             const page = await pdf2.getPage(i);
             const scale = 1.5;
             const viewport = page.getViewport({ scale });
@@ -216,25 +325,45 @@ const PdfCompare: React.FC = () => {
             pdf2CanvasElements.push(canvas);
           }
           
-          setPdf1Pages(pdf1CanvasElements);
-          setPdf2Pages(pdf2CanvasElements);
+          if (isCancelled) return;
+          
+          // Otomatik olarak görsel karşılaştırmayı başlat
+          const comparisonResults = await performVisualComparison(pdf1Key, pdf2Key, pdf1CanvasElements, pdf2CanvasElements);
+          
+          if (isCancelled) return;
+          
+          // Tüm state'leri tek seferde güncelle (batch update)
+          if (comparisonResults) {
+            setPdf1Pages(pdf1CanvasElements);
+            setPdf2Pages(pdf2CanvasElements);
+            setVisualResults(comparisonResults.visualResults);
+            setOverlayPages(comparisonResults.overlayCanvases);
+            setPdf1WithDiffPages(comparisonResults.pdf1WithDiff);
+            setPdf2WithDiffPages(comparisonResults.pdf2WithDiff);
+          } else {
+            // Hata durumunda sadece temel sayfaları göster
+            setPdf1Pages(pdf1CanvasElements);
+            setPdf2Pages(pdf2CanvasElements);
+          }
         } catch (error) {
-          console.error('PDF render hatası:', error);
+          if (!isCancelled) {
+            console.error('PDF render hatası:', error);
+          }
         } finally {
-          setIsLoading(false);
+          if (!isCancelled) {
+            setIsLoading(false);
+          }
         }
       };
       
       // PDF sayfalarını render et
       renderPdfPages();
       
-      // Component kaldırıldığında temizle
+      // Cleanup function
       return () => {
-        // Canvas elementlerini temizle
-        setPdf1Pages([]);
-        setPdf2Pages([]);
+        isCancelled = true;
       };
-    }, [result]);
+    }, [result.timestamp]); // Sadece timestamp değişince çalış
     
     // PDF'ler yüklendiğinde otomatik kaydırma
     useEffect(() => {
@@ -346,28 +475,6 @@ const PdfCompare: React.FC = () => {
       }
     };
   
-    // Görsel karşılaştırma işlevi
-    const handleVisualCompare = async () => {
-      if (!result.pdf1Key || !result.pdf2Key) {
-        console.error('PDF anahtarları bulunamadı');
-        return;
-      }
-      
-      setIsComparingVisually(true);
-      try {
-        const visualResults = await PdfCompareService.compareVisually(result.pdf1Key, result.pdf2Key);
-        setVisualResults(visualResults);
-        
-        // Overlay canvas'ları ayıkla
-        const overlayCanvases = visualResults.map(vr => vr.overlayCanvas).filter(Boolean) as HTMLCanvasElement[];
-        setOverlayPages(overlayCanvases);
-      } catch (error) {
-        console.error('Görsel karşılaştırma hatası:', error);
-      } finally {
-        setIsComparingVisually(false);
-      }
-    };
-  
     // Karşılaştırma modunu değiştir
     const handleModeChange = (mode: CompareMode) => {
       // Scroll pozisyonlarını sıfırla
@@ -382,9 +489,6 @@ const PdfCompare: React.FC = () => {
       }
       
       setCompareMode(mode);
-      if (mode === CompareMode.VISUAL && visualResults.length === 0) {
-        handleVisualCompare();
-      }
     };
   
     // Excel'e aktarma işlevi
@@ -457,7 +561,7 @@ const PdfCompare: React.FC = () => {
                 className="pdf-preview-pages"
                 ref={pdf1ContainerRef}
               >
-                {pdf1Pages.map((canvas, index) => (
+                {(pdf1WithDiffPages.length > 0 ? pdf1WithDiffPages : pdf1Pages).map((canvas, index) => (
                   <div key={`pdf1-page-${index}`} ref={el => pdf1PageRefs.current[index] = el}>
                     <div className="pdf-page-number">Sayfa {index + 1}</div>
                     <div 
@@ -482,7 +586,7 @@ const PdfCompare: React.FC = () => {
                 className="pdf-preview-pages"
                 ref={pdf2ContainerRef}
               >
-                {pdf2Pages.map((canvas, index) => (
+                {(pdf2WithDiffPages.length > 0 ? pdf2WithDiffPages : pdf2Pages).map((canvas, index) => (
                   <div key={`pdf2-page-${index}`} ref={el => pdf2PageRefs.current[index] = el}>
                     <div className="pdf-page-number">Sayfa {index + 1}</div>
                     <div 
@@ -539,7 +643,6 @@ const PdfCompare: React.FC = () => {
             <button 
               className={`mode-button ${compareMode === CompareMode.VISUAL ? 'active' : ''}`}
               onClick={() => handleModeChange(CompareMode.VISUAL)}
-              disabled={isComparingVisually}
             >
               {t('pdf.modes.visual')}
             </button>
@@ -631,10 +734,15 @@ const PdfCompare: React.FC = () => {
       </>
     );
   
+    // Loading durumunda cosmic spinner göster
+    if (isLoading) {
+      return <FullscreenSpinner message="PDF dosyaları karşılaştırılıyor..." />;
+    }
+    
     return (
       <ComparisonLayout
-        noDifference={noDifference && !isLoading && !isComparingVisually}
-        isLoading={isLoading || isComparingVisually}
+        noDifference={noDifference}
+        isLoading={false}
         previewContent={previewContent}
         summaryContent={summaryContent}
       />
