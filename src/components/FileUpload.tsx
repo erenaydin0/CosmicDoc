@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import '../style/FileUpload.css';
+import '../App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload, faCheck, faExclamationTriangle, faTimes, faExchangeAlt, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';

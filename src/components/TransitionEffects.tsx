@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { useLocation } from 'react-router-dom';
-import '../style/TransitionEffects.css';
+import '../App.css';
 
 // Sayfa geçiş bileşeni için prop tipleri
 interface PageTransitionProps {

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon, faCog, faGlobe, faDisplay, faChevronDown, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import CosmicLogo from './CosmicLogo';
-import '../style/Header.css';
+import '../App.css';
 
 const THEME_STORAGE_KEY = 'cosmicdoc-theme-preference';
 

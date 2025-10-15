@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import FileUpload from '../components/FileUpload';
 import { compareTextFiles, TextCompareResult as TextCompareResultType } from '../services/TextCompareService';
-import '../style/PageStyles.css';
 import { formatFileSize } from '../utils/formatters';
 import { exportTextCompareResults } from '../utils/exportUtils';
 import { calculateTextDiffCount } from '../utils/diffUtils';

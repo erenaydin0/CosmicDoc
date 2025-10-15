@@ -1,4 +1,4 @@
-import '../style/Components.css';
+import '../App.css';
 
 interface CosmicSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';

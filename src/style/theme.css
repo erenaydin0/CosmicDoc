@@ -1,0 +1,194 @@
+/**
+ * CosmicDoc Theme System
+ * Tüm CSS değişkenleri ve tema tanımları
+ */
+
+/* ============================================
+   COSMIC LIGHT THEME
+   ============================================ */
+:root {
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #faf9f8;
+  --bg-tertiary: #f5f3f1;
+  --bg-hover: #f5f3f1;
+  --bg-active: #e8e3df;
+  
+  /* Text Colors */
+  --text-primary: #2a2520;
+  --text-secondary: #6b5d52;
+  --text-tertiary: #9a8a7d;
+  
+  /* Border Colors */
+  --border-primary: #e8e3df;
+  --border-secondary: #d4ccc4;
+  
+  /* Shadow */
+  --shadow: 0 1px 2px rgba(101, 73, 54, 0.06);
+  --shadow-lg: 0 4px 6px rgba(101, 73, 54, 0.08);
+  --shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-2xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Status Colors */
+  --status-primary: #D07E47;
+  --status-primary-hover: #c96d3d;
+  --status-success: #88b87a;
+  --status-success-hover: #76a668;
+  --status-error: #d87575;
+  --status-error-hover: #c96363;
+  --status-warning: #e89558;
+  --status-warning-hover: #d88446;
+  --status-info: #6b9bd1;
+  --status-purple: #a66794;
+  
+  /* Status Background */
+  --status-primary-bg: #fef5ed;
+  --status-success-bg: #f0fdf4;
+  --status-error-bg: #fef2f2;
+  --status-warning-bg: #fef3c7;
+  --status-info-bg: #eff6ff;
+  --status-purple-bg: #f9f0f6;
+  
+  /* Accent Colors */
+  --accent-primary: #D07E47;
+  --accent-secondary: #a66794;
+  
+  /* Semantic Colors */
+  --color-capture: #fef3c7;
+  --color-selected: #D07E47;
+
+  /* Legacy Compatibility */
+  --background-color: var(--bg-secondary);
+  --card-bg-color: var(--bg-primary);
+  --border-color: var(--border-primary);
+  --text-color: var(--text-primary);
+  --primary-color: var(--text-primary);
+  --secondary-color: var(--text-secondary);
+  --accent-color: var(--accent-primary);
+  --hover-bg-color: var(--bg-hover);
+  --subtle-bg-color: var(--bg-tertiary);
+  --divider-color: var(--border-primary);
+  --subtle-shadow: var(--shadow);
+  --card-shadow: var(--shadow-lg);
+  --elevated-shadow: var(--shadow-xl);
+  --hover-shadow: var(--shadow-2xl);
+  --success-color: var(--status-success);
+  --warning-color: var(--status-warning);
+  --error-color: var(--status-error);
+  --success-bg-color: var(--status-success-bg);
+  --warning-bg-color: var(--status-warning-bg);
+  --error-bg-color: var(--status-error-bg);
+  --focus-ring-color: rgba(208, 126, 71, 0.3);
+  --overlay-bg-color: rgba(255, 255, 255, 0.8);
+  
+  /* Typography Scale */
+  --font-family-base: 'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+  
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+}
+
+/* ============================================
+   COSMIC DARK THEME
+   ============================================ */
+.dark,
+[data-theme='dark'] {
+  /* Background Colors */
+  --bg-primary: #0d0a0f;
+  --bg-secondary: #15111a;
+  --bg-tertiary: #1d1823;
+  --bg-hover: #221d28;
+  --bg-active: #2a2430;
+  --bg-primary-transparent: rgba(13, 10, 15, 0.5);
+  
+  /* Text Colors */
+  --text-primary: #ebe8ec;
+  --text-secondary: #b8adb5;
+  --text-tertiary: #8a7d85;
+  
+  /* Border Colors */
+  --border-primary: #2a2430;
+  --border-secondary: #3d3540;
+  
+  /* Shadow */
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  
+  /* Status Colors */
+  --status-primary: #e89558;
+  --status-primary-hover: #f5a76a;
+  --status-success: #9bc98d;
+  --status-success-hover: #aed59f;
+  --status-error: #e58585;
+  --status-error-hover: #f09797;
+  --status-warning: #f5a76a;
+  --status-warning-hover: #f7b87c;
+  --status-info: #7daee0;
+  --status-purple: #b87aa6;
+  
+  /* Status Background */
+  --status-primary-bg: rgba(232, 149, 88, 0.1);
+  --status-success-bg: rgba(136, 184, 122, 0.1);
+  --status-error-bg: rgba(216, 117, 117, 0.1);
+  --status-warning-bg: rgba(232, 149, 88, 0.1);
+  --status-info-bg: rgba(107, 155, 209, 0.1);
+  --status-purple-bg: rgba(166, 103, 148, 0.1);
+  
+  /* Accent Colors */
+  --accent-primary: #e89558;
+  --accent-secondary: #b87aa6;
+  
+  /* Semantic Colors */
+  --color-capture: rgba(232, 149, 88, 0.15);
+  --color-selected: #e89558;
+
+  /* Legacy Compatibility */
+  --background-color: var(--bg-secondary);
+  --card-bg-color: var(--bg-primary);
+  --border-color: var(--border-primary);
+  --text-color: var(--text-primary);
+  --primary-color: var(--text-primary);
+  --secondary-color: var(--text-secondary);
+  --accent-color: var(--accent-primary);
+  --hover-bg-color: var(--bg-hover);
+  --subtle-bg-color: var(--bg-tertiary);
+  --divider-color: var(--border-primary);
+  --subtle-shadow: var(--shadow);
+  --card-shadow: var(--shadow-lg);
+  --elevated-shadow: var(--shadow-xl);
+  --hover-shadow: var(--shadow-2xl);
+  --success-color: var(--status-success);
+  --warning-color: var(--status-warning);
+  --error-color: var(--status-error);
+  --success-bg-color: var(--status-success-bg);
+  --warning-bg-color: var(--status-warning-bg);
+  --error-bg-color: var(--status-error-bg);
+  --focus-ring-color: rgba(232, 149, 88, 0.3);
+  --overlay-bg-color: rgba(13, 10, 15, 0.8);
+}
+

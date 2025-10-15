@@ -1,5 +1,5 @@
 import React from 'react';
-import '../style/Components.css';
+import '../App.css';
 
 // Export düğmesi için prop tipleri
 interface ExportButtonProps {

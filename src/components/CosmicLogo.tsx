@@ -1,4 +1,4 @@
-import '../style/CosmicLogo.css';
+import '../App.css';
 
 interface CosmicLogoProps {
   size?: number;

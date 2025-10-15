@@ -6,10 +6,6 @@ import PdfCompare from './pages/PdfCompare';
 import TextCompare from './pages/TextCompare';
 import { PageTransition } from './components/TransitionEffects';
 import "./App.css";
-import "./style/PageStyles.css";
-import "./style/Components.css";
-import "./style/TransitionEffects.css";
-import "./style/ComparisonStyles.css";
 
 // Sayfaların dış wrapper bileşeni
 const AppRoutes = () => {
