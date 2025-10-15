@@ -19,6 +19,7 @@ const ExcelCompare: React.FC = () => {
   const allowedExcelTypes = ['.xlsx', '.xls', '.xlsm', '.xlsb', '.csv'];
   const [compareResult, setCompareResult] = useState<ExcelCompareResultType | null>(null);
   const [matchColumns, setMatchColumns] = useState<boolean>(false);
+  const [showHeaders, setShowHeaders] = useState<boolean>(true);
   const { startComparison, finishComparison, createLoadingResult } = useComparisonLoading();
 
   
@@ -316,6 +317,14 @@ const ExcelCompare: React.FC = () => {
                 valueToCompare = diff.col;
                 displayValue = convertColumnIndexToLetter(valueToCompare);
                 break;
+              case 'columnName':
+                valueToCompare = diff.columnName;
+                displayValue = String(valueToCompare || '-');
+                break;
+              case 'rowName':
+                valueToCompare = diff.rowName;
+                displayValue = String(valueToCompare || '-');
+                break;
               case 'value1':
                 valueToCompare = diff.value1;
                 displayValue = String(valueToCompare === null ? '(boş)' : valueToCompare);
@@ -363,9 +372,14 @@ const ExcelCompare: React.FC = () => {
       if (!searchTerm) return allValues;
       
       return allValues.filter(value => {
-        const displayValue = columnKey === 'col' 
-          ? convertColumnIndexToLetter(value) 
-          : String(value === null ? '(boş)' : value);
+        let displayValue: string;
+        if (columnKey === 'col') {
+          displayValue = convertColumnIndexToLetter(value);
+        } else if (columnKey === 'columnName' || columnKey === 'rowName') {
+          displayValue = String(value || '-');
+        } else {
+          displayValue = String(value === null ? '(boş)' : value);
+        }
         return displayValue.toLowerCase().includes(searchTerm);
       });
     };
@@ -394,6 +408,14 @@ const ExcelCompare: React.FC = () => {
               case 'col':
                 valueToCompare = diff.col;
                 displayValue = convertColumnIndexToLetter(valueToCompare);
+                break;
+              case 'columnName':
+                valueToCompare = diff.columnName;
+                displayValue = String(valueToCompare || '-');
+                break;
+              case 'rowName':
+                valueToCompare = diff.rowName;
+                displayValue = String(valueToCompare || '-');
                 break;
               case 'value1':
                 valueToCompare = diff.value1;
@@ -542,12 +564,21 @@ const ExcelCompare: React.FC = () => {
       }
       
       // Sütun başlıklarını ve bunlara karşılık gelen CellDiff anahtarlarını tanımla
-      const columnHeaders = [
-        { label: t('excel.results.columns.column'), key: 'col' },
-        { label: t('excel.results.columns.row'), key: 'row' },
-        { label: t('excel.results.columns.file1Value'), key: 'value1' },
-        { label: t('excel.results.columns.file2Value'), key: 'value2' },
-      ];
+      const columnHeaders = showHeaders 
+        ? [
+            { label: t('excel.results.columns.column'), key: 'col' },
+            { label: t('excel.results.columns.columnHeader'), key: 'columnName' },
+            { label: t('excel.results.columns.row'), key: 'row' },
+            { label: t('excel.results.columns.rowHeader'), key: 'rowName' },
+            { label: t('excel.results.columns.file1Value'), key: 'value1' },
+            { label: t('excel.results.columns.file2Value'), key: 'value2' },
+          ]
+        : [
+            { label: t('excel.results.columns.column'), key: 'col' },
+            { label: t('excel.results.columns.row'), key: 'row' },
+            { label: t('excel.results.columns.file1Value'), key: 'value1' },
+            { label: t('excel.results.columns.file2Value'), key: 'value2' },
+          ];
   
       return (
         <div className="differences-table-wrapper">
@@ -597,7 +628,11 @@ const ExcelCompare: React.FC = () => {
                                 const searchTerm = filterSearchTerms[col.key]?.toLowerCase() || '';
                                 const filteredValues = searchTerm 
                                   ? allValues.filter(value => {
-                                      const displayValue = col.key === 'col' ? convertColumnIndexToLetter(value) : String(value === null ? '(boş)' : value);
+                                      const displayValue = col.key === 'col' 
+                                        ? convertColumnIndexToLetter(value) 
+                                        : (col.key === 'columnName' || col.key === 'rowName')
+                                        ? String(value || '-')
+                                        : String(value === null ? '(boş)' : value);
                                       return displayValue.toLowerCase().includes(searchTerm);
                                     })
                                   : allValues;
@@ -632,7 +667,11 @@ const ExcelCompare: React.FC = () => {
                                     checked={filters[col.key]?.has(value) || false}
                                     onChange={(e) => handleFilterChange(col.key, value, e.target.checked)}
                                   />
-                                  {col.key === 'col' ? convertColumnIndexToLetter(value) : String(value === null ? '(boş)' : value)}
+                                  {col.key === 'col' 
+                                    ? convertColumnIndexToLetter(value) 
+                                    : (col.key === 'columnName' || col.key === 'rowName')
+                                    ? String(value || '-')
+                                    : String(value === null ? '(boş)' : value)}
                                 </label>
                               ))}
                               {getFilteredValues(col.key).length === 0 && (
@@ -664,7 +703,9 @@ const ExcelCompare: React.FC = () => {
                         }
                       >
                         {col.key === 'col' && convertColumnIndexToLetter(diff.col)}
+                        {col.key === 'columnName' && (diff.columnName || <span className="empty-value">-</span>)}
                         {col.key === 'row' && diff.row}
+                        {col.key === 'rowName' && (diff.rowName || <span className="empty-value">-</span>)}
                         {col.key === 'value1' && (diff.value1 !== null ? String(diff.value1) : <span className="empty-value">(boş)</span>)}
                         {col.key === 'value2' && (diff.value2 !== null ? String(diff.value2) : <span className="empty-value">(boş)</span>)}
                       </td>
@@ -762,6 +803,17 @@ const ExcelCompare: React.FC = () => {
         allowedFileTypes={allowedExcelTypes}
       />
 <div className="comparison-options">
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={showHeaders}
+            onChange={(e) => setShowHeaders(e.target.checked)}
+          />
+          <span>{t('excel.options.showHeaders')}</span>
+          <small className="option-description">
+            {t('excel.options.showHeadersDesc')}
+          </small>
+        </label>
         <label className="checkbox-label">
           <input
             type="checkbox"

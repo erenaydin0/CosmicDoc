@@ -397,6 +397,9 @@ export class ExcelCompareService {
       return await this.compareSheetsWithColumnMapping(sheet1, sheet2, sheetName);
     }
     
+    // İlk satırı başlık olarak oku (varsa)
+    const headers = sheet1.length > 0 ? sheet1[0] : [];
+    
     // Normal mod - pozisyona göre karşılaştırma
     const maxRows = Math.max(sheet1.length, sheet2.length);
     const CHUNK_SIZE = 1000; // Her chunk'ta 1000 satır işle
@@ -418,11 +421,23 @@ export class ExcelCompareService {
           
           // Hücre değerleri farklı mı?
           if (this.cellValuesAreDifferent(value1, value2)) {
+            // Sütun adını al (ilk satırdan)
+            const columnName = c < headers.length && headers[c] !== null && headers[c] !== undefined && String(headers[c]).trim() !== '' 
+              ? String(headers[c]) 
+              : undefined;
+            
+            // Satır adını al (ilk sütundan)
+            const rowName = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
+              ? String(sheet1[r][0]) 
+              : undefined;
+            
             differences.push({
               value1,
               value2,
               row: r + 1, // 1'den başlayan satır numaraları
               col: c + 1, // 1'den başlayan sütun numaraları
+              columnName,
+              rowName,
               sheet: sheetName
             });
           }
@@ -503,11 +518,14 @@ export class ExcelCompareService {
       if (!columnMapping.has(i)) {
         const header1 = headers1[i];
         if (header1 !== null && header1 !== undefined && String(header1).trim() !== '') {
+          const columnName = String(header1);
           differences.push({
             value1: header1,
             value2: null,
             row: 1, // Başlık satırı
             col: i + 1,
+            columnName,
+            rowName: undefined,
             sheet: sheetName
           });
         }
@@ -520,11 +538,14 @@ export class ExcelCompareService {
       if (!isMatched) {
         const header2 = headers2[j];
         if (header2 !== null && header2 !== undefined && String(header2).trim() !== '') {
+          const columnName = String(header2);
           differences.push({
             value1: null,
             value2: header2,
             row: 1, // Başlık satırı
             col: j + 1,
+            columnName,
+            rowName: undefined,
             sheet: sheetName
           });
         }
@@ -548,11 +569,23 @@ export class ExcelCompareService {
           const value2 = col2Index < row2.length ? row2[col2Index] : null;
           
           if (this.cellValuesAreDifferent(value1, value2)) {
+            // Sütun adını al
+            const columnName = col1Index < headers1.length && headers1[col1Index] !== null && headers1[col1Index] !== undefined && String(headers1[col1Index]).trim() !== '' 
+              ? String(headers1[col1Index]) 
+              : undefined;
+            
+            // Satır adını al (ilk sütundan)
+            const rowName = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
+              ? String(sheet1[r][0]) 
+              : undefined;
+            
             differences.push({
               value1,
               value2,
               row: r + 1, // 1'den başlayan satır numaraları
               col: col1Index + 1, // Dosya 1'deki sütun numarası
+              columnName,
+              rowName,
               sheet: sheetName
             });
           }
@@ -563,11 +596,23 @@ export class ExcelCompareService {
           if (!columnMapping.has(c)) {
             const value1 = row1[c];
             if (value1 !== null && value1 !== undefined && String(value1).trim() !== '') {
+              // Sütun adını al
+              const columnName = c < headers1.length && headers1[c] !== null && headers1[c] !== undefined && String(headers1[c]).trim() !== '' 
+                ? String(headers1[c]) 
+                : undefined;
+              
+              // Satır adını al (ilk sütundan)
+              const rowName = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
+                ? String(sheet1[r][0]) 
+                : undefined;
+              
               differences.push({
                 value1,
                 value2: null,
                 row: r + 1,
                 col: c + 1,
+                columnName,
+                rowName,
                 sheet: sheetName
               });
             }
@@ -581,11 +626,23 @@ export class ExcelCompareService {
           if (!isMatched) {
             const value2 = row2[c];
             if (value2 !== null && value2 !== undefined && String(value2).trim() !== '') {
+              // Sütun adını al
+              const columnName = c < headers2.length && headers2[c] !== null && headers2[c] !== undefined && String(headers2[c]).trim() !== '' 
+                ? String(headers2[c]) 
+                : undefined;
+              
+              // Satır adını al (ilk sütundan)
+              const rowName = r < sheet2.length && sheet2[r][0] !== null && sheet2[r][0] !== undefined && String(sheet2[r][0]).trim() !== '' 
+                ? String(sheet2[r][0]) 
+                : undefined;
+              
               differences.push({
                 value1: null,
                 value2,
                 row: r + 1,
                 col: c + 1, // Sheet2'deki sütun numarası
+                columnName,
+                rowName,
                 sheet: sheetName
               });
             }

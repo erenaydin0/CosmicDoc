@@ -34,7 +34,9 @@
       "matchColumns": "Sütunları Eşle",
       "matchColumnsDesc": "Sütunları pozisyonlarına değil başlık isimlerine göre eşleştirir",
       "ignoreSheetNames": "Sayfa İsimlerini Yoksay", 
-      "ignoreSheetNamesDesc": "Sayfa isimlerine değil sıralarına göre karşılaştırır (1. sayfa ile 1. sayfa)"
+      "ignoreSheetNamesDesc": "Sayfa isimlerine değil sıralarına göre karşılaştırır (1. sayfa ile 1. sayfa)",
+      "showHeaders": "Başlıkları Göster",
+      "showHeadersDesc": "İlk satır ve sütundan başlıkları okuyup sonuç tablosunda gösterir"
     },
     "results": {
       "title": "Excel Karşılaştırma Sonucu",
@@ -43,7 +45,9 @@
       "exportToExcel": "Excel'e Aktar",
       "columns": {
         "column": "Sütun",
-        "row": "Satır", 
+        "columnHeader": "Sütun Başlığı",
+        "row": "Satır",
+        "rowHeader": "Satır Başı",
         "file1Value": "Dosya 1 Değeri",
         "file2Value": "Dosya 2 Değeri"
       },

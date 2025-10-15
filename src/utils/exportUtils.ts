@@ -38,7 +38,9 @@ export const exportExcelCompareResults = (
       allRows.push({
         'Sayfa': sheet.sheetName,
         'Satır': diff.row,
+        'Satır Başı': diff.rowName || '-',
         'Sütun': convertColumnIndexToLetter(diff.col), // Sütun numarasını harfe çevir
+        'Sütun Başlığı': diff.columnName || '-',
         'Dosya 1 Değeri': diff.value1 !== null ? String(diff.value1) : '(boş)',
         'Dosya 2 Değeri': diff.value2 !== null ? String(diff.value2) : '(boş)',
       });
@@ -50,7 +52,9 @@ export const exportExcelCompareResults = (
     allRows.push({
       'Sayfa': sheetName,
       'Satır': '-',
+      'Satır Başı': '-',
       'Sütun': '-',
+      'Sütun Başlığı': '-',
       'Dosya 1 Değeri': '(sayfa yok)',
       'Dosya 2 Değeri': 'Sayfa mevcut',
     });
@@ -60,7 +64,9 @@ export const exportExcelCompareResults = (
     allRows.push({
       'Sayfa': sheetName,
       'Satır': '-',
+      'Satır Başı': '-',
       'Sütun': '-',
+      'Sütun Başlığı': '-',
       'Dosya 1 Değeri': 'Sayfa mevcut',
       'Dosya 2 Değeri': '(sayfa yok)',
     });

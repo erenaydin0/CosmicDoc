@@ -34,7 +34,9 @@
       "matchColumns": "Match Columns",
       "matchColumnsDesc": "Matches columns by header names instead of positions",
       "ignoreSheetNames": "Ignore Sheet Names",
-      "ignoreSheetNamesDesc": "Compares by sheet order instead of names (1st sheet with 1st sheet)"
+      "ignoreSheetNamesDesc": "Compares by sheet order instead of names (1st sheet with 1st sheet)",
+      "showHeaders": "Show Headers",
+      "showHeadersDesc": "Reads headers from first row and column and displays them in result table"
     },
     "results": {
       "title": "Excel Comparison Result",
@@ -43,7 +45,9 @@
       "exportToExcel": "Export to Excel",
       "columns": {
         "column": "Column",
+        "columnHeader": "Column Header",
         "row": "Row",
+        "rowHeader": "Row Header",
         "file1Value": "File 1 Value", 
         "file2Value": "File 2 Value"
       },

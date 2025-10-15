@@ -3,6 +3,8 @@ export interface CellDiff {
   value2: string | number | boolean | null;
   row: number;
   col: number;
+  columnName?: string;
+  rowName?: string;
   sheet: string;
 }
 
