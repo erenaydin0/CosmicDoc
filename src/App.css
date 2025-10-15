@@ -25,24 +25,26 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Cosmic stars effect for dark mode */
-.dark body::before {
+body::before {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background-size: 100% 100%;
+  background-position: 0% 0%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 1;
+  animation: cosmic-twinkle 15s ease-in-out infinite;
   background-image: 
-    /* Large bright stars */
     radial-gradient(4px 4px at 15% 25%, rgba(232, 149, 88, 0.9), transparent),
     radial-gradient(3px 3px at 75% 15%, rgba(184, 122, 166, 0.9), transparent),
     radial-gradient(4px 4px at 85% 75%, rgba(232, 149, 88, 0.8), transparent),
     radial-gradient(3px 3px at 25% 85%, rgba(184, 122, 166, 0.8), transparent),
     radial-gradient(5px 5px at 50% 10%, rgba(232, 149, 88, 0.7), transparent),
     radial-gradient(3px 3px at 90% 50%, rgba(184, 122, 166, 0.7), transparent),
-    
-    /* Medium stars */
     radial-gradient(2px 2px at 5% 40%, rgba(232, 149, 88, 0.6), transparent),
     radial-gradient(2px 2px at 35% 5%, rgba(184, 122, 166, 0.6), transparent),
     radial-gradient(2px 2px at 65% 35%, rgba(232, 149, 88, 0.5), transparent),
@@ -51,8 +53,6 @@ body {
     radial-gradient(2px 2px at 10% 70%, rgba(184, 122, 166, 0.4), transparent),
     radial-gradient(2px 2px at 80% 90%, rgba(232, 149, 88, 0.3), transparent),
     radial-gradient(2px 2px at 55% 60%, rgba(184, 122, 166, 0.3), transparent),
-    
-    /* Small stars */
     radial-gradient(1px 1px at 12% 12%, rgba(232, 149, 88, 0.4), transparent),
     radial-gradient(1px 1px at 28% 28%, rgba(184, 122, 166, 0.4), transparent),
     radial-gradient(1px 1px at 42% 8%, rgba(232, 149, 88, 0.3), transparent),
@@ -65,13 +65,6 @@ body {
     radial-gradient(1px 1px at 62% 68%, rgba(184, 122, 166, 0.2), transparent),
     radial-gradient(1px 1px at 78% 48%, rgba(232, 149, 88, 0.3), transparent),
     radial-gradient(1px 1px at 92% 82%, rgba(184, 122, 166, 0.3), transparent);
-    
-  background-size: 100% 100%;
-  background-position: 0% 0%;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 1;
-  animation: cosmic-twinkle 15s ease-in-out infinite;
 }
 
 @keyframes cosmic-twinkle {
@@ -91,54 +84,6 @@ body {
     opacity: 0.9;
     transform: scale(1.02);
   }
-}
-
-[data-theme='dark'] body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    /* Large bright stars */
-    radial-gradient(4px 4px at 15% 25%, rgba(232, 149, 88, 0.9), transparent),
-    radial-gradient(3px 3px at 75% 15%, rgba(184, 122, 166, 0.9), transparent),
-    radial-gradient(4px 4px at 85% 75%, rgba(232, 149, 88, 0.8), transparent),
-    radial-gradient(3px 3px at 25% 85%, rgba(184, 122, 166, 0.8), transparent),
-    radial-gradient(5px 5px at 50% 10%, rgba(232, 149, 88, 0.7), transparent),
-    radial-gradient(3px 3px at 90% 50%, rgba(184, 122, 166, 0.7), transparent),
-    
-    /* Medium stars */
-    radial-gradient(2px 2px at 5% 40%, rgba(232, 149, 88, 0.6), transparent),
-    radial-gradient(2px 2px at 35% 5%, rgba(184, 122, 166, 0.6), transparent),
-    radial-gradient(2px 2px at 65% 35%, rgba(232, 149, 88, 0.5), transparent),
-    radial-gradient(2px 2px at 95% 25%, rgba(184, 122, 166, 0.5), transparent),
-    radial-gradient(2px 2px at 45% 95%, rgba(232, 149, 88, 0.4), transparent),
-    radial-gradient(2px 2px at 10% 70%, rgba(184, 122, 166, 0.4), transparent),
-    radial-gradient(2px 2px at 80% 90%, rgba(232, 149, 88, 0.3), transparent),
-    radial-gradient(2px 2px at 55% 60%, rgba(184, 122, 166, 0.3), transparent),
-    
-    /* Small stars */
-    radial-gradient(1px 1px at 12% 12%, rgba(232, 149, 88, 0.4), transparent),
-    radial-gradient(1px 1px at 28% 28%, rgba(184, 122, 166, 0.4), transparent),
-    radial-gradient(1px 1px at 42% 8%, rgba(232, 149, 88, 0.3), transparent),
-    radial-gradient(1px 1px at 58% 42%, rgba(184, 122, 166, 0.3), transparent),
-    radial-gradient(1px 1px at 72% 18%, rgba(232, 149, 88, 0.2), transparent),
-    radial-gradient(1px 1px at 88% 38%, rgba(184, 122, 166, 0.2), transparent),
-    radial-gradient(1px 1px at 8% 58%, rgba(232, 149, 88, 0.3), transparent),
-    radial-gradient(1px 1px at 22% 78%, rgba(184, 122, 166, 0.3), transparent),
-    radial-gradient(1px 1px at 38% 88%, rgba(232, 149, 88, 0.2), transparent),
-    radial-gradient(1px 1px at 62% 68%, rgba(184, 122, 166, 0.2), transparent),
-    radial-gradient(1px 1px at 78% 48%, rgba(232, 149, 88, 0.3), transparent),
-    radial-gradient(1px 1px at 92% 82%, rgba(184, 122, 166, 0.3), transparent);
-    
-  background-size: 100% 200%;
-  background-position: 0% 0%;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 1;
-  animation: cosmic-twinkle 15s ease-in-out infinite;
 }
 
 .container {

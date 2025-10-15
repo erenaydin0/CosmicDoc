@@ -743,13 +743,13 @@ textarea::-webkit-scrollbar-thumb:hover {
 }
 
 .card {
-  background-color: var(--bg-primary);
+  background-color: transparent;
   color: var(--text-primary);
   padding: 2rem;
   border-radius: 40px;
   text-decoration: none;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border: 1px solid var(--border-primary);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -759,13 +759,12 @@ textarea::-webkit-scrollbar-thumb:hover {
   min-height: 200px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
 }
 
 .card:active {
   transform: scale(0.98);
-  box-shadow: var(--subtle-shadow);
+  box-shadow: var(--shadow-md);
   transition: transform 0.1s, box-shadow 0.1s;
 }
 
@@ -793,18 +792,6 @@ textarea::-webkit-scrollbar-thumb:hover {
   z-index: 0;
 }
 
-.card[to="/excel-compare"] .ripple {
-  background-color: var(--status-success-bg);
-}
-
-.card[to="/pdf-compare"] .ripple {
-  background-color: var(--status-error-bg);
-}
-
-.card[to="/text-compare"] .ripple {
-  background-color: var(--status-info-bg);
-}
-
 .card .icon-container {
   min-width: 80px;
   min-height: 80px;
@@ -828,20 +815,8 @@ textarea::-webkit-scrollbar-thumb:hover {
 }
 
 .card:hover .custom-icon {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1) rotate(2deg);
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
-}
-
-.card:hover .excel-icon .custom-icon {
-  transform: scale(1.1) rotate(-3deg);
-}
-
-.card:hover .pdf-icon .custom-icon {
-  transform: scale(1.1) rotate(3deg);
-}
-
-.card:hover .text-icon .custom-icon {
-  transform: scale(1.1) rotate(-2deg);
 }
 
 .card svg {
@@ -881,9 +856,10 @@ textarea::-webkit-scrollbar-thumb:hover {
 
 .card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--border-secondary);
-  background: var(--bg-hover);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  backdrop-filter: blur(5px);
 }
 
 .card:hover::before {

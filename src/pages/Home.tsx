@@ -52,7 +52,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="page-content">
-      <h1 className="page-title">{t('home.title')}</h1>
+      <h1 className="page-title logo">{t('home.title')}</h1>
       
       <div className="card-container">
         <Link 
@@ -66,7 +66,7 @@ const Home: React.FC = () => {
           <div className="icon-container excel-icon">
             <FileIcon type="excel" className="custom-icon" />
           </div>
-          <h2>{t('home.features.excel.title')}</h2>
+          <h2 className="logo">{t('home.features.excel.title')}</h2>
           <p>{t('home.features.excel.description')}</p>
         </Link>
         
@@ -81,7 +81,7 @@ const Home: React.FC = () => {
           <div className="icon-container pdf-icon">
             <FileIcon type="pdf" className="custom-icon" />
           </div>
-          <h2>{t('home.features.pdf.title')}</h2>
+          <h2 className="logo">{t('home.features.pdf.title')}</h2>
           <p>{t('home.features.pdf.description')}</p>
         </Link>
         
@@ -96,7 +96,7 @@ const Home: React.FC = () => {
           <div className="icon-container text-icon">
             <FileIcon type="text" className="custom-icon" />
           </div>
-          <h2>{t('home.features.text.title')}</h2>
+          <h2 className="logo">{t('home.features.text.title')}</h2>
           <p>{t('home.features.text.description')}</p>
         </Link>
         
