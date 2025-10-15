@@ -91,17 +91,6 @@ export default function CosmicLogo({ size = 32, animated = true }: CosmicLogoPro
             <stop offset="0%" stopColor="var(--status-purple)" stopOpacity="0.6" />
             <stop offset="100%" stopColor="var(--status-primary)" stopOpacity="0.6" />
           </linearGradient>
-          
-          <radialGradient id="gradientCore">
-            <stop offset="0%" stopColor="var(--status-warning)" />
-            <stop offset="100%" stopColor="var(--status-primary)" />
-          </radialGradient>
-          
-          <linearGradient id="gradientDiamond" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--status-warning)" />
-            <stop offset="50%" stopColor="var(--status-primary)" />
-            <stop offset="100%" stopColor="var(--status-purple)" />
-          </linearGradient>
         </defs>
       </svg>
 

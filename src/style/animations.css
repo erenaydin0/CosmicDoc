@@ -27,6 +27,44 @@
   }
 }
 
+/* Cosmic Logo Orbit Animations */
+@keyframes cosmic-logo-orbit {
+  from { transform: rotate(0deg) translateX(45px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(45px) rotate(-360deg); }
+}
+
+@keyframes cosmic-logo-orbit-slow {
+  from { transform: rotate(0deg) translateX(45px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(45px) rotate(-360deg); }
+}
+
+/* Cosmic Spinner Animations */
+@keyframes spin-cosmic {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-cosmic-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes orbit-cosmic {
+  0% { transform: rotate(0deg) translateY(-60px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateY(-60px) rotate(-360deg); }
+}
+
+@keyframes pulse-cosmic {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
 @keyframes cosmic-orbit {
   from { transform: rotate(0deg) translateX(45px) rotate(0deg); }
   to { transform: rotate(360deg) translateX(45px) rotate(-360deg); }
@@ -62,6 +100,14 @@
 
 .cosmic-logo-pulse {
   animation: cosmic-pulse 3s ease-in-out infinite;
+}
+
+.cosmic-logo-orbit {
+  animation: cosmic-logo-orbit 8s linear infinite;
+}
+
+.cosmic-logo-orbit-slow {
+  animation: cosmic-logo-orbit-slow 12s linear infinite;
 }
 
 /* ============================================

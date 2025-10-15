@@ -547,11 +547,6 @@ const ExcelCompare: React.FC = () => {
                                     : String(value === null ? '(boş)' : value)}
                                 </label>
                               ))}
-                              {getFilteredValues(col.key).length === 0 && (
-                                <div className="no-filter-options">
-                                  <span>Bu filtre için mevcut seçenek yok</span>
-                                </div>
-                              )}
                             </div>
                           </div>
                         )}

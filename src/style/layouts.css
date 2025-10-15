@@ -1348,9 +1348,13 @@ textarea::-webkit-scrollbar-thumb:hover {
 }
 
 .diff-badge {
-  color: var(--error-color);
+  background-color: var(--overlay-bg-color);
+  color: var(--text-color);
   font-weight: 600;
   margin-left: 10px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
 }
 
 .differences-table-wrapper {
