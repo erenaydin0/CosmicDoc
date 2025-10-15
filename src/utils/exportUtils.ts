@@ -1,4 +1,6 @@
 import * as XLSX from 'xlsx';
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeFile as tauriWriteFile } from '@tauri-apps/plugin-fs';
 
 /**
  * Excel'e aktarma işlevi için ortak yardımcı fonksiyonlar
@@ -10,11 +12,36 @@ import * as XLSX from 'xlsx';
  * @param sheetName Excel sayfasının adı
  * @param fileName İndirilecek dosyanın adı (uzantı olmadan)
  */
-export const exportToExcel = (data: any[], sheetName: string, fileName: string): void => {
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, sheetName);
-  XLSX.writeFile(wb, `${fileName}.xlsx`);
+export const exportToExcel = async (data: any[], sheetName: string, fileName: string): Promise<void> => {
+  try {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    
+    // Tauri için dosyayı buffer olarak oluştur
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    
+    // Tauri dialog ile kaydetme yeri seç
+    const filePath = await save({
+      defaultPath: `${fileName}.xlsx`,
+      filters: [{
+        name: 'Excel',
+        extensions: ['xlsx']
+      }]
+    });
+    
+    if (filePath) {
+      console.log('Dosya kaydediliyor:', filePath);
+      // Uint8Array olarak yazma
+      await tauriWriteFile(filePath, new Uint8Array(wbout));
+      console.log('Dosya başarıyla kaydedildi');
+    } else {
+      console.log('Dosya kaydetme iptal edildi');
+    }
+  } catch (error) {
+    console.error('Excel dosyası kaydedilirken hata:', error);
+    throw error;
+  }
 };
 
 /**
@@ -24,12 +51,12 @@ export const exportToExcel = (data: any[], sheetName: string, fileName: string):
  * @param missingSheets2 Dosya 2'de eksik sayfalar
  * @param convertColumnIndexToLetter Sütun indeksini Excel harfine çeviren fonksiyon
  */
-export const exportExcelCompareResults = (
+export const exportExcelCompareResults = async (
   sheetResults: any[],
   missingSheets1: string[],
   missingSheets2: string[],
   convertColumnIndexToLetter: (colIndex: number) => string
-): void => {
+): Promise<void> => {
   const allRows: any[] = [];
   
   // Tüm sayfalardaki tüm farkları birleştir
@@ -72,14 +99,14 @@ export const exportExcelCompareResults = (
     });
   });
 
-  exportToExcel(allRows, 'Excel Farkları', 'excel_fark_raporu');
+  await exportToExcel(allRows, 'Excel Farkları', 'excel_fark_raporu');
 };
 
 /**
  * Metin karşılaştırma sonuçlarını dışa aktarır
  * @param differences Fark dizisi
  */
-export const exportTextCompareResults = (differences: any[]): void => {
+export const exportTextCompareResults = async (differences: any[]): Promise<void> => {
   const allRows: any[] = [];
 
   // Satır numaralarını yeniden hesapla
@@ -132,14 +159,14 @@ export const exportTextCompareResults = (differences: any[]): void => {
     });
   });
 
-  exportToExcel(allRows, 'Metin Farkları', 'metin_fark_raporu');
+  await exportToExcel(allRows, 'Metin Farkları', 'metin_fark_raporu');
 };
 
 /**
  * PDF karşılaştırma sonuçlarını dışa aktarır
  * @param pageResults Sayfa sonuçları
  */
-export const exportPdfCompareResults = (pageResults: any[]): void => {
+export const exportPdfCompareResults = async (pageResults: any[]): Promise<void> => {
   const allRows: any[] = [];
   
   // Tüm sayfalardaki tüm farkları birleştir
@@ -172,14 +199,14 @@ export const exportPdfCompareResults = (pageResults: any[]): void => {
     }
   });
 
-  exportToExcel(allRows, 'PDF Farkları', 'pdf_fark_raporu');
+  await exportToExcel(allRows, 'PDF Farkları', 'pdf_fark_raporu');
 };
 
 /**
  * PDF görsel karşılaştırma sonuçlarını Excel'e aktarır
  * @param visualResults Görsel karşılaştırma sonuçları
  */
-export const exportPdfVisualCompareResults = (visualResults: any[]): void => {
+export const exportPdfVisualCompareResults = async (visualResults: any[]): Promise<void> => {
   const allRows: any[] = [];
   
   // Sadece farklılık bulunan sayfaları filtrele ve Excel'e aktar
@@ -199,5 +226,5 @@ export const exportPdfVisualCompareResults = (visualResults: any[]): void => {
     });
   }
 
-  exportToExcel(allRows, 'PDF Görsel Farkları', 'pdf_gorsel_fark_raporu');
+  await exportToExcel(allRows, 'PDF Görsel Farkları', 'pdf_gorsel_fark_raporu');
 };

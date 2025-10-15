@@ -388,8 +388,8 @@ const PdfCompare: React.FC = () => {
     };
   
     // Excel'e aktarma işlevi
-    const handleExportToExcel = () => {
-      exportPdfCompareResults(result.pageResults);
+    const handleExportToExcel = async () => {
+      await exportPdfCompareResults(result.pageResults);
     };
   
     // Görsel karşılaştırma sonuçlarını PDF'e aktarma işlevi

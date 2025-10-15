@@ -88,8 +88,8 @@ const TextCompare: React.FC = () => {
     }, [result.differences]);
 
     // Excel'e aktarma işlevi
-    const handleExportToExcel = () => {
-      exportTextCompareResults(result.differences);
+    const handleExportToExcel = async () => {
+      await exportTextCompareResults(result.differences);
     };
 
     // Satır numaralarını tutmak için mutable sayaçlar

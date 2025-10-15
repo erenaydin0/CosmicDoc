@@ -167,8 +167,8 @@ const ExcelCompare: React.FC = () => {
     };
     
     // Excel'e aktarma işlevi
-    const handleExportToExcel = () => {
-      exportExcelCompareResults(
+    const handleExportToExcel = async () => {
+      await exportExcelCompareResults(
         result.sheetResults,
         result.missingSheets1,
         result.missingSheets2,
