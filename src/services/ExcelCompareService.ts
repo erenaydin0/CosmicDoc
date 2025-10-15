@@ -497,15 +497,20 @@ export class ExcelCompareService {
     
     // Sütun eşleme tablosu oluştur (sheet1 sütun index -> sheet2 sütun index)
     const columnMapping: Map<number, number> = new Map();
+    const usedSheet2Columns: Set<number> = new Set(); // Sheet2'de zaten eşleştirilmiş sütunlar
     
     for (let i = 0; i < headers1.length; i++) {
       const header1 = String(headers1[i] || '').trim();
       if (header1) {
-        // Aynı başlığı sheet2'de ara
+        // Aynı başlığı sheet2'de ara (henüz kullanılmamış olan)
         for (let j = 0; j < headers2.length; j++) {
+          if (usedSheet2Columns.has(j)) {
+            continue; // Bu sütun zaten eşleştirilmiş, atla
+          }
           const header2 = String(headers2[j] || '').trim();
           if (header1 === header2) {
             columnMapping.set(i, j);
+            usedSheet2Columns.add(j); // Bu sütunu işaretle
             break;
           }
         }
@@ -574,10 +579,23 @@ export class ExcelCompareService {
               ? String(headers1[col1Index]) 
               : undefined;
             
-            // Satır adını al (ilk sütundan)
-            const rowName = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
-              ? String(sheet1[r][0]) 
-              : undefined;
+            // Satır adını belirle - ilk eşleşen sütundan veya ilk sütundan
+            let rowName: string | undefined = undefined;
+            if (columnMapping.has(0)) {
+              // İlk sütun eşleşiyorsa, her iki dosyada da kontrol et
+              const firstColIndex = columnMapping.get(0);
+              const rowValue = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
+                ? String(sheet1[r][0]) 
+                : (firstColIndex !== undefined && r < sheet2.length && sheet2[r][firstColIndex] !== null && sheet2[r][firstColIndex] !== undefined && String(sheet2[r][firstColIndex]).trim() !== ''
+                  ? String(sheet2[r][firstColIndex])
+                  : undefined);
+              rowName = rowValue;
+            } else {
+              // İlk sütun eşleşmiyorsa, dosya 1'in ilk sütununu kullan
+              rowName = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
+                ? String(sheet1[r][0]) 
+                : undefined;
+            }
             
             differences.push({
               value1,
@@ -595,16 +613,30 @@ export class ExcelCompareService {
         for (let c = 0; c < row1.length; c++) {
           if (!columnMapping.has(c)) {
             const value1 = row1[c];
-            if (value1 !== null && value1 !== undefined && String(value1).trim() !== '') {
+            // Boş olmayan değerleri veya eşleşmeyen sütunlardaki tüm değerleri ekle
+            const isEmpty1 = value1 === null || value1 === undefined || String(value1).trim() === '';
+            
+            if (!isEmpty1) {
               // Sütun adını al
               const columnName = c < headers1.length && headers1[c] !== null && headers1[c] !== undefined && String(headers1[c]).trim() !== '' 
                 ? String(headers1[c]) 
                 : undefined;
               
-              // Satır adını al (ilk sütundan)
-              const rowName = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
-                ? String(sheet1[r][0]) 
-                : undefined;
+              // Satır adını belirle
+              let rowName: string | undefined = undefined;
+              if (columnMapping.has(0)) {
+                const firstColIndex = columnMapping.get(0);
+                const rowValue = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
+                  ? String(sheet1[r][0]) 
+                  : (firstColIndex !== undefined && r < sheet2.length && sheet2[r][firstColIndex] !== null && sheet2[r][firstColIndex] !== undefined && String(sheet2[r][firstColIndex]).trim() !== ''
+                    ? String(sheet2[r][firstColIndex])
+                    : undefined);
+                rowName = rowValue;
+              } else {
+                rowName = r < sheet1.length && sheet1[r][0] !== null && sheet1[r][0] !== undefined && String(sheet1[r][0]).trim() !== '' 
+                  ? String(sheet1[r][0]) 
+                  : undefined;
+              }
               
               differences.push({
                 value1,
@@ -625,16 +657,29 @@ export class ExcelCompareService {
           const isMatched = Array.from(columnMapping.values()).includes(c);
           if (!isMatched) {
             const value2 = row2[c];
-            if (value2 !== null && value2 !== undefined && String(value2).trim() !== '') {
+            const isEmpty2 = value2 === null || value2 === undefined || String(value2).trim() === '';
+            
+            if (!isEmpty2) {
               // Sütun adını al
               const columnName = c < headers2.length && headers2[c] !== null && headers2[c] !== undefined && String(headers2[c]).trim() !== '' 
                 ? String(headers2[c]) 
                 : undefined;
               
-              // Satır adını al (ilk sütundan)
-              const rowName = r < sheet2.length && sheet2[r][0] !== null && sheet2[r][0] !== undefined && String(sheet2[r][0]).trim() !== '' 
-                ? String(sheet2[r][0]) 
-                : undefined;
+              // Satır adını belirle
+              let rowName: string | undefined = undefined;
+              const matchedCol1Index = Array.from(columnMapping.entries()).find(([_, col2]) => col2 === 0)?.[0];
+              if (matchedCol1Index !== undefined) {
+                const rowValue = r < sheet2.length && sheet2[r][0] !== null && sheet2[r][0] !== undefined && String(sheet2[r][0]).trim() !== '' 
+                  ? String(sheet2[r][0]) 
+                  : (r < sheet1.length && sheet1[r][matchedCol1Index] !== null && sheet1[r][matchedCol1Index] !== undefined && String(sheet1[r][matchedCol1Index]).trim() !== ''
+                    ? String(sheet1[r][matchedCol1Index])
+                    : undefined);
+                rowName = rowValue;
+              } else {
+                rowName = r < sheet2.length && sheet2[r][0] !== null && sheet2[r][0] !== undefined && String(sheet2[r][0]).trim() !== '' 
+                  ? String(sheet2[r][0]) 
+                  : undefined;
+              }
               
               differences.push({
                 value1: null,
