@@ -53,7 +53,6 @@ const Home: React.FC = () => {
   return (
     <div className="page-content">
       <h1 className="page-title">{t('home.title')}</h1>
-      <p className="page-description">{t('home.subtitle')}</p>
       
       <div className="card-container">
         <Link 

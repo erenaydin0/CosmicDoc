@@ -723,6 +723,7 @@ textarea::-webkit-scrollbar-thumb:hover {
 .page-title {
   font-size: var(--text-4xl);
   color: var(--text-color);
+  margin: 2rem 0;
 }
 
 .page-description {
