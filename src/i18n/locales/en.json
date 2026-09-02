@@ -86,7 +86,16 @@
         "size": "Size"
       }
     },
-    "exportReport": "Download Report"
+    "exportReport": "Download Report",
+    "comparing": "Comparing PDF files...",
+    "renderingPage": "Loading page...",
+    "visualScanning": "Visual scan: {{current}}/{{total}}",
+    "pageOf": "Page {{current}} / {{total}}",
+    "error": {
+      "compareError": "An error occurred while comparing PDF files.",
+      "loadError": "PDF preview could not be loaded.",
+      "tooLarge": "The files are too large to process. Please try again."
+    }
   },
   "text": {
     "title": "Text Comparison",

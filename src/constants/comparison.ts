@@ -12,6 +12,12 @@ export const VISUAL_COMPARISON = {
   DIFFERENCE_THRESHOLD: 0.1 // %0.1
 } as const;
 
+// Büyük PDF'lerde bellek taşmasını önlemek için
+export const PDF_COMPARISON = {
+  TEXT_YIELD_EVERY: 8,
+  VISUAL_YIELD_EVERY: 3
+} as const;
+
 // Sayısal karşılaştırma sabitleri
 export const NUMERIC_COMPARISON = {
   EPSILON: 0.0001 // Küçük sayısal farkları yok say

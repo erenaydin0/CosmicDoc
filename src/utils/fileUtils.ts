@@ -59,6 +59,26 @@ export const saveFilesParallel = async (
 };
 
 /**
+ * PDF gibi büyük dosyaları base64 şişirmeden ArrayBuffer olarak kaydeder
+ */
+export const saveBinaryFilesParallel = async (
+  files: Array<{ file: File; key: string; metadata?: Record<string, any> }>,
+  saveFunction: (key: string, data: string | ArrayBuffer | Blob, metadata: any) => Promise<void>
+): Promise<void> => {
+  await Promise.all(
+    files.map(async ({ file, key, metadata }) => {
+      const data = await file.arrayBuffer();
+      await saveFunction(key, data, {
+        fileName: file.name,
+        fileType: file.type,
+        lastModified: file.lastModified,
+        ...metadata
+      });
+    })
+  );
+};
+
+/**
  * Benzersiz timestamp-based anahtar oluşturur
  * @param prefix Anahtar öneki
  * @param timestamp Zaman damgası (opsiyonel)
