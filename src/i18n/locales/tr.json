@@ -86,7 +86,16 @@
         "size": "Boyut"
       }
     },
-    "exportReport": "Rapor İndir"
+    "exportReport": "Rapor İndir",
+    "comparing": "PDF dosyaları karşılaştırılıyor...",
+    "renderingPage": "Sayfa yükleniyor...",
+    "visualScanning": "Görsel tarama: {{current}}/{{total}}",
+    "pageOf": "Sayfa {{current}} / {{total}}",
+    "error": {
+      "compareError": "PDF dosyaları karşılaştırılırken bir hata oluştu.",
+      "loadError": "PDF önizlemesi yüklenemedi.",
+      "tooLarge": "Dosyalar çok büyük olduğu için işlenemedi. Lütfen tekrar deneyin."
+    }
   },
   "text": {
     "title": "Metin Karşılaştırma", 

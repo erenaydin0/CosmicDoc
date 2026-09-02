@@ -1814,6 +1814,46 @@ textarea::-webkit-scrollbar-thumb:hover {
   margin-bottom: 10px;
 }
 
+.pdf-page-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 15px 0;
+}
+
+.pdf-page-nav button {
+  background-color: var(--subtle-bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.pdf-page-nav button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pdf-page-nav button:not(:disabled):hover {
+  box-shadow: var(--subtle-shadow);
+}
+
+.pdf-preview-page-loading {
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-compare-error {
+  color: var(--error-color);
+  text-align: center;
+  margin: 1rem 0;
+}
+
 .all-pages-details {
   max-height: 550px;
   overflow-y: auto;

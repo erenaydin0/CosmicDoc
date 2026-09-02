@@ -2,11 +2,15 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { DiffResult, PdfPageCompareResult, PdfCompareResult, VisualCompareResult } from '../types/PdfTypes';
 import { diffWords } from 'diff';
 import { getPdfFile } from './IndexedDBService';
-import { VISUAL_COMPARISON } from '../constants/comparison';
+import { PDF_COMPARISON, VISUAL_COMPARISON } from '../constants/comparison';
 import { createOverlayCanvas } from '../utils/canvasUtils';
 
 // Worker yolunu doğru şekilde ayarlayalım
 pdfjsLib.GlobalWorkerOptions.workerSrc = window.location.origin + '/js/pdf.worker.js';
+
+type PdfSource = string | ArrayBuffer | Uint8Array;
+
+const yieldToMain = (): Promise<void> => new Promise(resolve => setTimeout(resolve, 0));
 
 /**
  * PDF dosyalarını karşılaştırmak için servis
@@ -17,62 +21,29 @@ export class PdfCompareService {
    */
   public static async comparePdfFiles(file1: File, file2: File): Promise<PdfCompareResult> {
     try {
-      // Dosyaları yükle ve metin içeriğini çıkar
-      const pdf1Text = await this.extractTextFromPdf(file1);
-      const pdf2Text = await this.extractTextFromPdf(file2);
-      
-      // Sayfa sayılarını karşılaştır
-      const pageCountDiff = pdf1Text.length !== pdf2Text.length;
-      
-      // Her sayfayı karşılaştır
-      const pageResults: PdfPageCompareResult[] = [];
-      const maxPages = Math.max(pdf1Text.length, pdf2Text.length);
-      
-      for (let i = 0; i < maxPages; i++) {
-        const page1Text = i < pdf1Text.length ? pdf1Text[i] : '';
-        const page2Text = i < pdf2Text.length ? pdf2Text[i] : '';
-        
-        // Sayfa içeriğini kelime bazında karşılaştır
-        const differences = this.compareTexts(page1Text, page2Text);
-        
-        // Farklılık yüzdesini hesapla
-        const diffPercentage = this.calculateDiffPercentage(differences);
-        
-        pageResults.push({
-          pageNumber: i + 1,
-          hasDifferences: differences.some(d => d.added || d.removed),
-          diffPercentage,
-          differences
-        });
-      }
-      
-      // Genel farklılık yüzdesini hesapla
-      const overallDiffPercentage = this.calculateOverallDiffPercentage(pageResults);
-      
-      return {
-        file1Name: file1.name,
-        file2Name: file2.name,
-        file1Size: file1.size,
-        file2Size: file2.size,
-        pageCount1: pdf1Text.length,
-        pageCount2: pdf2Text.length,
-        pageCountDiffers: pageCountDiff,
-        pageResults,
-        overallDiffPercentage
-      };
+      const [buffer1, buffer2] = await Promise.all([file1.arrayBuffer(), file2.arrayBuffer()]);
+      return this.buildCompareResult(
+        await this.extractTextFromData(buffer1),
+        await this.extractTextFromData(buffer2),
+        {
+          file1Name: file1.name,
+          file2Name: file2.name,
+          file1Size: file1.size,
+          file2Size: file2.size
+        }
+      );
     } catch (error: unknown) {
       console.error('PDF karşılaştırma hatası:', error);
       const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
       throw new Error(`PDF karşılaştırılırken hata oluştu: ${errorMessage}`);
     }
   }
-  
+
   /**
    * ID ile IndexedDB'den PDF dosyası yükler ve karşılaştırır
    */
   public static async comparePdfFilesFromDB(id1: string, id2: string): Promise<PdfCompareResult | null> {
     try {
-      // IndexedDB'den dosyaları al
       const fileData1 = await getPdfFile<any>(id1);
       const fileData2 = await getPdfFile<any>(id2);
       
@@ -80,65 +51,168 @@ export class PdfCompareService {
         throw new Error('Dosyalar veritabanından yüklenemedi');
       }
       
-      // PDF'leri çözümle
-      const pdf1Data = fileData1.data;
-      const pdf2Data = fileData2.data;
+      const [pdf1Text, pdf2Text] = await Promise.all([
+        this.extractTextFromData(fileData1.data),
+        this.extractTextFromData(fileData2.data)
+      ]);
       
-      // PDF içeriğinden metin çıkar
-      const pdf1Text = await this.extractTextFromDataURL(pdf1Data);
-      const pdf2Text = await this.extractTextFromDataURL(pdf2Data);
-      
-      // Sayfa sayılarını karşılaştır
-      const pageCountDiff = pdf1Text.length !== pdf2Text.length;
-      
-      // Her sayfayı karşılaştır
-      const pageResults: PdfPageCompareResult[] = [];
-      const maxPages = Math.max(pdf1Text.length, pdf2Text.length);
-      
-      for (let i = 0; i < maxPages; i++) {
-        const page1Text = i < pdf1Text.length ? pdf1Text[i] : '';
-        const page2Text = i < pdf2Text.length ? pdf2Text[i] : '';
-        
-        // Sayfa içeriğini kelime bazında karşılaştır
-        const differences = this.compareTexts(page1Text, page2Text);
-        
-        // Farklılık yüzdesini hesapla
-        const diffPercentage = this.calculateDiffPercentage(differences);
-        
-        pageResults.push({
-          pageNumber: i + 1,
-          hasDifferences: differences.some(d => d.added || d.removed),
-          diffPercentage,
-          differences
-        });
-      }
-      
-      // Genel farklılık yüzdesini hesapla
-      const overallDiffPercentage = this.calculateOverallDiffPercentage(pageResults);
-      
-      return {
+      return this.buildCompareResult(pdf1Text, pdf2Text, {
         file1Name: fileData1.metadata?.fileName || 'Dosya 1',
         file2Name: fileData2.metadata?.fileName || 'Dosya 2',
-        file1Size: typeof pdf1Data === 'string' ? pdf1Data.length : 0,
-        file2Size: typeof pdf2Data === 'string' ? pdf2Data.length : 0,
-        pageCount1: pdf1Text.length,
-        pageCount2: pdf2Text.length,
-        pageCountDiffers: pageCountDiff,
-        pageResults,
-        overallDiffPercentage
-      };
+        file1Size: this.getStoredSize(fileData1.data),
+        file2Size: this.getStoredSize(fileData2.data)
+      });
     } catch (error) {
       console.error('PDF veritabanından karşılaştırma hatası:', error);
       return null;
     }
   }
+
+  /**
+   * IndexedDB kaydından pdf.js belgesi yükler
+   */
+  public static async loadPdfDocument(fileKey: string): Promise<pdfjsLib.PDFDocumentProxy> {
+    const fileData = await getPdfFile<any>(fileKey);
+    if (!fileData) {
+      throw new Error('PDF verileri bulunamadı');
+    }
+    return pdfjsLib.getDocument({ data: this.toDocumentData(fileData.data) }).promise;
+  }
+
+  /**
+   * Belirli bir sayfayı canvas'e çizer
+   */
+  public static async renderPage(
+    pdf: pdfjsLib.PDFDocumentProxy,
+    pageNumber: number,
+    scale = VISUAL_COMPARISON.SCALE
+  ): Promise<HTMLCanvasElement | null> {
+    if (pageNumber < 1 || pageNumber > pdf.numPages) {
+      return null;
+    }
+    const page = await pdf.getPage(pageNumber);
+    return this.renderPageToCanvas(page, scale);
+  }
+
+  /**
+   * Önceden çizilmiş canvas'lardan görsel sonuç üretir
+   */
+  public static buildVisualResultFromCanvases(
+    canvas1: HTMLCanvasElement | null,
+    canvas2: HTMLCanvasElement | null,
+    pageNumber: number
+  ): VisualCompareResult {
+    return this.compareCanvases(canvas1, canvas2, pageNumber);
+  }
+
+  /**
+   * Tek sayfayı görsel olarak karşılaştırır
+   */
+  public static async comparePageVisually(
+    pdf1: pdfjsLib.PDFDocumentProxy,
+    pdf2: pdfjsLib.PDFDocumentProxy,
+    pageNumber: number,
+    keepOverlay = true
+  ): Promise<VisualCompareResult> {
+    const canvas1 = pageNumber <= pdf1.numPages ? await this.renderPage(pdf1, pageNumber) : null;
+    const canvas2 = pageNumber <= pdf2.numPages ? await this.renderPage(pdf2, pageNumber) : null;
+    const result = this.compareCanvases(canvas1, canvas2, pageNumber);
+
+    if (!keepOverlay) {
+      return {
+        pageNumber: result.pageNumber,
+        differencePercentage: result.differencePercentage,
+        hasVisualDifferences: result.hasVisualDifferences
+      };
+    }
+
+    return result;
+  }
+
+  /**
+   * Tüm sayfaları tarar; overlay canvas tutmaz
+   */
+  public static async scanVisualDifferences(
+    pdf1: pdfjsLib.PDFDocumentProxy,
+    pdf2: pdfjsLib.PDFDocumentProxy,
+    options?: {
+      onProgress?: (done: number, total: number) => void;
+      shouldCancel?: () => boolean;
+    }
+  ): Promise<VisualCompareResult[]> {
+    const maxPages = Math.max(pdf1.numPages, pdf2.numPages);
+    const visualResults: VisualCompareResult[] = [];
+
+    for (let i = 1; i <= maxPages; i++) {
+      if (options?.shouldCancel?.()) {
+        break;
+      }
+
+      visualResults.push(await this.comparePageVisually(pdf1, pdf2, i, false));
+      options?.onProgress?.(i, maxPages);
+
+      if (i % PDF_COMPARISON.VISUAL_YIELD_EVERY === 0) {
+        await yieldToMain();
+      }
+    }
+
+    return visualResults;
+  }
   
   /**
-   * PDF dosyasından metin çıkarır
+   * İki PDF'i görsel olarak karşılaştırır
    */
-  private static async extractTextFromPdf(file: File): Promise<string[]> {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  public static async compareVisually(file1Key: string, file2Key: string): Promise<VisualCompareResult[]> {
+    try {
+      const [pdf1, pdf2] = await Promise.all([
+        this.loadPdfDocument(file1Key),
+        this.loadPdfDocument(file2Key)
+      ]);
+      return this.scanVisualDifferences(pdf1, pdf2);
+    } catch (error) {
+      console.error('Görsel karşılaştırma hatası:', error);
+      throw new Error('Görsel karşılaştırma yapılırken hata oluştu');
+    }
+  }
+
+  private static buildCompareResult(
+    pdf1Text: string[],
+    pdf2Text: string[],
+    meta: Pick<PdfCompareResult, 'file1Name' | 'file2Name' | 'file1Size' | 'file2Size'>
+  ): PdfCompareResult {
+    const pageCountDiff = pdf1Text.length !== pdf2Text.length;
+    const pageResults: PdfPageCompareResult[] = [];
+    const maxPages = Math.max(pdf1Text.length, pdf2Text.length);
+    
+    for (let i = 0; i < maxPages; i++) {
+      const page1Text = i < pdf1Text.length ? pdf1Text[i] : '';
+      const page2Text = i < pdf2Text.length ? pdf2Text[i] : '';
+      const differences = this.compareTexts(page1Text, page2Text);
+      const diffPercentage = this.calculateDiffPercentage(differences);
+      
+      pageResults.push({
+        pageNumber: i + 1,
+        hasDifferences: differences.some(d => d.added || d.removed),
+        diffPercentage,
+        differences
+      });
+    }
+    
+    return {
+      ...meta,
+      pageCount1: pdf1Text.length,
+      pageCount2: pdf2Text.length,
+      pageCountDiffers: pageCountDiff,
+      pageResults,
+      overallDiffPercentage: this.calculateOverallDiffPercentage(pageResults)
+    };
+  }
+  
+  /**
+   * PDF verisinden metin çıkarır
+   */
+  private static async extractTextFromData(data: PdfSource): Promise<string[]> {
+    const pdf = await pdfjsLib.getDocument({ data: this.toDocumentData(data) }).promise;
     const numPages = pdf.numPages;
     const pagesText: string[] = [];
     
@@ -151,18 +225,18 @@ export class PdfCompareService {
         .trim();
       
       pagesText.push(pageText);
+
+      if (i % PDF_COMPARISON.TEXT_YIELD_EVERY === 0) {
+        await yieldToMain();
+      }
     }
     
     return pagesText;
   }
-  
-  /**
-   * Data URL'den PDF metni çıkarır
-   */
-  private static async extractTextFromDataURL(dataUrl: string): Promise<string[]> {
-    try {
-      // Data URL'deki base64 içeriğini çıkar
-      const base64Content = dataUrl.split(',')[1];
+
+  private static toDocumentData(data: PdfSource): PdfSource {
+    if (typeof data === 'string' && data.includes(',')) {
+      const base64Content = data.split(',')[1];
       const binaryString = window.atob(base64Content);
       const bytes = new Uint8Array(binaryString.length);
       
@@ -170,28 +244,17 @@ export class PdfCompareService {
         bytes[i] = binaryString.charCodeAt(i);
       }
       
-      // PDF'yi yükle
-      const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
-      const numPages = pdf.numPages;
-      const pagesText: string[] = [];
-      
-      // Her sayfadan metni çıkar
-      for (let i = 1; i <= numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items
-          .map(item => 'str' in item ? item.str : '')
-          .join(' ')
-          .trim();
-        
-        pagesText.push(pageText);
-      }
-      
-      return pagesText;
-    } catch (error) {
-      console.error('Data URL çözümlenirken hata:', error);
-      return [];
+      return bytes;
     }
+    
+    return data;
+  }
+
+  private static getStoredSize(data: PdfSource): number {
+    if (typeof data === 'string') {
+      return data.length;
+    }
+    return data.byteLength;
   }
   
   /**
@@ -226,68 +289,17 @@ export class PdfCompareService {
     const sum = pageResults.reduce((acc, result) => acc + result.diffPercentage, 0);
     return sum / pageResults.length;
   }
-
-  /**
-   * İki PDF'i görsel olarak karşılaştırır
-   */
-  public static async compareVisually(file1Key: string, file2Key: string): Promise<VisualCompareResult[]> {
-    try {
-      // IndexedDB'den PDF verilerini al
-      const file1Data = await getPdfFile<any>(file1Key);
-      const file2Data = await getPdfFile<any>(file2Key);
-      
-      if (!file1Data || !file2Data) {
-        throw new Error('PDF verileri bulunamadı');
-      }
-      
-      // PDF dokümanlarını yükle
-      const pdf1 = await pdfjsLib.getDocument(file1Data.data).promise;
-      const pdf2 = await pdfjsLib.getDocument(file2Data.data).promise;
-      
-      const numPages1 = pdf1.numPages;
-      const numPages2 = pdf2.numPages;
-      const maxPages = Math.max(numPages1, numPages2);
-      
-      const visualResults: VisualCompareResult[] = [];
-      
-      for (let i = 1; i <= maxPages; i++) {
-        let canvas1: HTMLCanvasElement | null = null;
-        let canvas2: HTMLCanvasElement | null = null;
-        
-        // İlk PDF'den sayfa render et
-        if (i <= numPages1) {
-          const page1 = await pdf1.getPage(i);
-          canvas1 = await this.renderPageToCanvas(page1);
-        }
-        
-        // İkinci PDF'den sayfa render et
-        if (i <= numPages2) {
-          const page2 = await pdf2.getPage(i);
-          canvas2 = await this.renderPageToCanvas(page2);
-        }
-        
-        // Sayfaları karşılaştır
-        const compareResult = this.compareCanvases(canvas1, canvas2, i);
-        visualResults.push(compareResult);
-      }
-      
-      return visualResults;
-    } catch (error) {
-      console.error('Görsel karşılaştırma hatası:', error);
-      throw new Error('Görsel karşılaştırma yapılırken hata oluştu');
-    }
-  }
   
   /**
    * PDF sayfasını canvas'e render eder
    */
-  private static async renderPageToCanvas(page: any): Promise<HTMLCanvasElement> {
-    const scale = VISUAL_COMPARISON.SCALE;
+  private static async renderPageToCanvas(page: any, scale = VISUAL_COMPARISON.SCALE): Promise<HTMLCanvasElement> {
     const viewport = page.getViewport({ scale });
     
     const canvas = document.createElement('canvas');
     canvas.width = viewport.width;
     canvas.height = viewport.height;
+    canvas.className = 'pdf-preview-page';
     
     const context = canvas.getContext('2d')!;
     await page.render({ canvasContext: context, viewport }).promise;
@@ -320,7 +332,6 @@ export class PdfCompareService {
       };
     }
     
-    // Overlay canvas oluştur ve farkları hesapla
     const { overlayCanvas, differencePercentage } = createOverlayCanvas(canvas1, canvas2);
     
     return {
@@ -330,4 +341,4 @@ export class PdfCompareService {
       overlayCanvas: overlayCanvas
     };
   }
-} 
+}
